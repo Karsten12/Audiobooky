@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="@color/LightGrey">
+
+    <!--android:fontFamily="sans-serif"           // roboto regular-->
+    <!--android:fontFamily="sans-serif-light"     // roboto light-->
+    <!--android:fontFamily="sans-serif-condensed" // roboto condensed-->
+    <!--android:fontFamily="sans-serif-black"     // roboto black-->
+    <!--android:fontFamily="sans-serif-thin"      // roboto thin (android 4.2)-->
+    <!--android:fontFamily="sans-serif-medium"    // roboto medium (android 5.0)-->
+
+    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/profile_image"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:paddingStart="16dp"
+        android:src="@mipmap/ic_launcher"
+        app:civ_border_color="@color/DarkBlue"
+        app:civ_border_width="2dp" />
+
+
+    <TextView
+        android:id="@+id/book_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:paddingEnd="16dp"
+        android:paddingStart="72dp"
+        android:paddingTop="20dp"
+        android:text="Book name"
+        android:textSize="16sp"
+        android:textColor="@color/Black"/>
+
+    <TextView
+        android:id="@+id/book_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/book_name"
+        android:fontFamily="sans-serif"
+        android:paddingEnd="16dp"
+        android:paddingStart="72dp"
+        android:text="Book description"
+        android:textSize="14sp"
+        android:textColor="@color/Gray"/>
+
+
+</RelativeLayout>
