@@ -3,9 +3,14 @@
     package="com.fonsecakarsten.audiobooky">
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature android:name="android.hardware.camera2.full" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 
     <application
@@ -15,6 +20,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main">
@@ -27,6 +41,14 @@
             android:name=".Capture_Activity"
             android:label="CaptureActivity"
             android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".miscActivity"
+            android:label="idk"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ImageDisplay"
+            android:label="idk2"
+            android:parentActivityName=".miscActivity" />
 
     </application>
 
