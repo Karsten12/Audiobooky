@@ -17,7 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -44,7 +43,6 @@ public class newCapureActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        Button capture_btn = (Button) findViewById(R.id.capture_button);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         imageArray = new ArrayList<>();
@@ -56,18 +54,6 @@ public class newCapureActivity extends Activity {
         recyclerView.setLayoutParams(params);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
-
-
-        //Camera Click image
-        capture_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectImage();
-
-            }
-        });
-
-
     }
 
     public void takepicture() {
@@ -243,7 +229,7 @@ public class newCapureActivity extends Activity {
         // Toast.makeText(this, "" + path, Toast.LENGTH_LONG).show();
     }
 
-    private void selectImage() {
+    public void selectImage() {
 
         final CharSequence[] items = {"Take Photo", "Choose from Library",
                 "Cancel"};

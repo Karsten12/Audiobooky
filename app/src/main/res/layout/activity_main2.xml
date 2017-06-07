@@ -18,7 +18,8 @@
         android:layout_above="@+id/recycler_view"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:text="Capture" />
+        android:text="Capture"
+        android:onClick="selectImage" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

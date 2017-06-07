@@ -28,7 +28,6 @@ import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -78,14 +77,6 @@ public class CaptureActivity extends Activity {
         textureView = (TextureView) findViewById(R.id.texture);
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
-        takePictureButton = (Button) findViewById(R.id.button_capture);
-        assert takePictureButton != null;
-        takePictureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                takePicture();
-            }
-        });
     }
 
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
@@ -155,7 +146,7 @@ public class CaptureActivity extends Activity {
         }
     }
 
-    protected void takePicture() {
+    public void takePicture() {
         if (null == cameraDevice) {
             Log.e(TAG, "cameraDevice is null");
             return;
