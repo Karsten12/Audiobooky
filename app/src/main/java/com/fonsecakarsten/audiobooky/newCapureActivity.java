@@ -1,5 +1,6 @@
 package com.fonsecakarsten.audiobooky;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +12,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -31,32 +31,26 @@ import java.util.Date;
  * Created by Karsten on 6/5/2017.
  */
 
-public class miscActivity extends AppCompatActivity {
+public class newCapureActivity extends Activity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
     private int SELECT_FILE = 2;
-    private static Button btnclick;
     private String mCurrentPhotoPath;
-    private static RecyclerView recyclerView;
-    ArrayList<Data_Model> arrayList;
-    String chkpath = null;
-    MyAdapter m;
-    int i = 0;
-    private String userChoosenTask;
-    private Uri fileUri; // file url to store image/video
+    ArrayList<Data_Model> imageArray;
+    MyAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        btnclick = (Button) findViewById(R.id.click);
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        Button capture_btn = (Button) findViewById(R.id.capture_button);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        arrayList = new ArrayList<>();
-        m = new MyAdapter();
+        imageArray = new ArrayList<>();
+        mAdapter = new MyAdapter();
         Log.d("oncreate", "set adapter");
-        recyclerView.setAdapter(m);
+        recyclerView.setAdapter(mAdapter);
         ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
         params.height = 200;
         recyclerView.setLayoutParams(params);
@@ -65,7 +59,7 @@ public class miscActivity extends AppCompatActivity {
 
 
         //Camera Click image
-        btnclick.setOnClickListener(new View.OnClickListener() {
+        capture_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 selectImage();
@@ -78,9 +72,7 @@ public class miscActivity extends AppCompatActivity {
 
     public void takepicture() {
         Log.d("Cameraclick", "takepicture");
-
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
 
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
@@ -136,8 +128,8 @@ public class miscActivity extends AppCompatActivity {
                 String clickpath = mCurrentPhotoPath;
                 Data_Model data_model = new Data_Model();
                 data_model.setImage(clickpath);
-                arrayList.add(data_model);
-                m.notifyDataSetChanged();
+                imageArray.add(data_model);
+                mAdapter.notifyDataSetChanged();
 
 
             } else if (requestCode == SELECT_FILE) {
@@ -153,7 +145,7 @@ public class miscActivity extends AppCompatActivity {
 
         @Override
         public Myviewholder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = getLayoutInflater().inflate(R.layout.item_rowchk, parent, false);
+            View v = getLayoutInflater().inflate(R.layout.imgedisplay, parent, false);
             Myviewholder myviewholder = new Myviewholder(v);
             Log.d("myactivty ", "oncreateViewHolder");
 
@@ -162,7 +154,7 @@ public class miscActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(Myviewholder holder, final int position) {
-            final Data_Model m = arrayList.get(position);
+            final Data_Model m = imageArray.get(position);
             Log.d(" myactivty", "onBindviewholder" + position);
             //holder.imageView.setVisibility(View.VISIBLE);
             // bimatp factory
@@ -191,25 +183,25 @@ public class miscActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which) {
                                 case DialogInterface.BUTTON_POSITIVE:
-                                    arrayList.remove(position);
+                                    imageArray.remove(position);
                                     notifyItemRemoved(position);
-                                    notifyItemRangeChanged(position, arrayList.size());
+                                    notifyItemRangeChanged(position, imageArray.size());
                                     // Yes button clicked
-                                    Toast.makeText(miscActivity.this, "Yes Clicked",
+                                    Toast.makeText(newCapureActivity.this, "Yes Clicked",
                                             Toast.LENGTH_LONG).show();
                                     break;
 
                                 case DialogInterface.BUTTON_NEGATIVE:
                                     // No button clicked
                                     // do nothing
-                                    Toast.makeText(miscActivity.this, "No Clicked",
+                                    Toast.makeText(newCapureActivity.this, "No Clicked",
                                             Toast.LENGTH_LONG).show();
                                     break;
                             }
                         }
                     };
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(miscActivity.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(newCapureActivity.this);
                     builder.setMessage("Are you sure want to Delete ?")
                             .setPositiveButton("Yes", dialogClickListener)
                             .setNegativeButton("No", dialogClickListener).show();
@@ -223,7 +215,7 @@ public class miscActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return arrayList.size();
+            return imageArray.size();
         }
 
         public class Myviewholder extends RecyclerView.ViewHolder {
@@ -246,8 +238,8 @@ public class miscActivity extends AppCompatActivity {
         String path = cursor.getString(column_index);
         Data_Model data_model = new Data_Model();
         data_model.setImage(path);
-        arrayList.add(data_model);
-        m.notifyDataSetChanged();
+        imageArray.add(data_model);
+        mAdapter.notifyDataSetChanged();
         // Toast.makeText(this, "" + path, Toast.LENGTH_LONG).show();
     }
 
@@ -256,7 +248,7 @@ public class miscActivity extends AppCompatActivity {
         final CharSequence[] items = {"Take Photo", "Choose from Library",
                 "Cancel"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(miscActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(newCapureActivity.this);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
@@ -264,12 +256,10 @@ public class miscActivity extends AppCompatActivity {
                 boolean result = true;
 
                 if (items[item].equals("Take Photo")) {
-                    userChoosenTask = "Take Photo";
                     if (result)
                         takepicture();
 
                 } else if (items[item].equals("Choose from Library")) {
-                    userChoosenTask = "Choose from Library";
                     if (result)
                         galleryIntent();
 

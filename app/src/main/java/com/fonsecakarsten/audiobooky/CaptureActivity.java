@@ -33,13 +33,11 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,7 +45,7 @@ import java.util.List;
  * Created by Karsten on 6/4/2017.
  */
 
-public class Capture_Activity extends Activity {
+public class CaptureActivity extends Activity {
     private static final String TAG = "AndroidCameraApi";
     private Button takePictureButton;
     private TextureView textureView;
@@ -135,7 +133,7 @@ public class Capture_Activity extends Activity {
         @Override
         public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
             super.onCaptureCompleted(session, request, result);
-            Toast.makeText(Capture_Activity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
+            Toast.makeText(CaptureActivity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
             createCameraPreview();
         }
     };
@@ -220,7 +218,7 @@ public class Capture_Activity extends Activity {
                 @Override
                 public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(Capture_Activity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CaptureActivity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
                     createCameraPreview();
                 }
             };
@@ -265,7 +263,7 @@ public class Capture_Activity extends Activity {
 
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    Toast.makeText(Capture_Activity.this, "Configuration change", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CaptureActivity.this, "Configuration change", Toast.LENGTH_SHORT).show();
                 }
             }, null);
         } catch (CameraAccessException e) {
@@ -284,7 +282,7 @@ public class Capture_Activity extends Activity {
             imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
             // Add permission for camera and let user grant the permission
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(Capture_Activity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
+                ActivityCompat.requestPermissions(CaptureActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
                 return;
             }
             manager.openCamera(cameraId, stateCallback, null);
@@ -322,7 +320,7 @@ public class Capture_Activity extends Activity {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 // close the app
-                Toast.makeText(Capture_Activity.this, "Sorry!!!, you can't use this app without granting permission", Toast.LENGTH_LONG).show();
+                Toast.makeText(CaptureActivity.this, "Sorry!!!, you can't use this app without granting permission", Toast.LENGTH_LONG).show();
                 finish();
             }
         }

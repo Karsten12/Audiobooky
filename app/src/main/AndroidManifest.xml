@@ -38,17 +38,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Capture_Activity"
+            android:name=".CaptureActivity"
             android:label="CaptureActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".miscActivity"
+            android:name=".newCapureActivity"
             android:label="idk"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ImageDisplay"
             android:label="idk2"
-            android:parentActivityName=".miscActivity" />
+            android:parentActivityName=".newCapureActivity" />
 
     </application>
 

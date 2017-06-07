@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/activity_main"
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:weightSum="1">
+    android:orientation="horizontal">
+
+    <TextureView
+        android:id="@+id/texture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true" />
 
     <Button
-        android:id="@+id/click"
-        android:layout_width="fill_parent"
+        android:id="@+id/capture_button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="10dp"
-        android:text="CLICK"
-        android:background="#fabdca"
-        android:textSize="27sp" />
+        android:layout_above="@+id/recycler_view"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:text="Capture" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="20dp" />
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="BUTTON CHECK" />
-
-
-</LinearLayout>
+</RelativeLayout>

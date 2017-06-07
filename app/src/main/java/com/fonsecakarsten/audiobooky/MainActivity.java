@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
     }
 
     public void onFABClick(View v) {
-        Intent intent = new Intent(this, miscActivity.class);
+        Intent intent = new Intent(this, newCapureActivity.class);
         startActivity(intent);
     }
 
