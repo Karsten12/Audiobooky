@@ -19,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,9 +49,6 @@ public class newCapureActivity extends Activity {
         mAdapter = new MyAdapter();
         Log.d("oncreate", "set adapter");
         recyclerView.setAdapter(mAdapter);
-        ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
-        params.height = 200;
-        recyclerView.setLayoutParams(params);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
     }
@@ -144,10 +140,9 @@ public class newCapureActivity extends Activity {
             final Data_Model m = imageArray.get(position);
             Log.d(" myactivty", "onBindviewholder" + position);
             //holder.imageView.setVisibility(View.VISIBLE);
-            // bimatp factory
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            // downsizing image as it throws OutOfMemory Exception for larger
-            // images
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+
+            // Downsize image, as it throws OutOfMemory Exception for larger images
             options.inSampleSize = 20;
             final Bitmap bitmap = BitmapFactory.decodeFile(m.getImage(), options);
             holder.imageView.setImageBitmap(bitmap);
@@ -159,76 +154,51 @@ public class newCapureActivity extends Activity {
                     View layout = inflater.inflate(R.layout.image_popup, (ViewGroup) findViewById(R.id.image_popup_root));
                     ImageView image = (ImageView) layout.findViewById(R.id.image_view);
 
-                    imageDialog.setPositiveButton("RETAKE", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Todo
-                        }
-                    });
-                    imageDialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Todo
-                        }
-                    });
-                    imageDialog.setNegativeButton("REMOVE", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Todo
-                        }
-                    });
-
                     // Get Image
-                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    bmOptions.inJustDecodeBounds = false;
-                    bmOptions.inSampleSize = 4;
-                    Bitmap bitmap = BitmapFactory.decodeFile(m.getImage(), bmOptions);
+//                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+//                    bmOptions.inJustDecodeBounds = false;
+//                    bmOptions.inSampleSize = 4;
+                    options.inJustDecodeBounds = false;
+                    options.inSampleSize = 4;
+                    Bitmap bitmap = BitmapFactory.decodeFile(m.getImage(), options);
 
                     // Display the image
                     image.setImageBitmap(bitmap);
                     imageDialog.setView(layout);
 
+                    // Retake image
+                    imageDialog.setPositiveButton("RETAKE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Todo
+                            // Retake image
+                            // Remove old image
+                            // Add new image
+                            // notifyItemRemoved(position);
+                            // notifyItemRangeChanged(position, imageArray.size());
+                        }
+                    });
+                    // Do nothing, close dialog
+                    imageDialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    // Remove image from list
+                    imageDialog.setNegativeButton("REMOVE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            imageArray.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, imageArray.size());
+                        }
+                    });
+
                     imageDialog.create();
                     imageDialog.show();
                 }
             });
-            holder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-
-                    //final int pst = position;
-                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case DialogInterface.BUTTON_POSITIVE:
-                                    imageArray.remove(position);
-                                    notifyItemRemoved(position);
-                                    notifyItemRangeChanged(position, imageArray.size());
-                                    // Yes button clicked
-                                    Toast.makeText(newCapureActivity.this, "Yes Clicked",
-                                            Toast.LENGTH_LONG).show();
-                                    break;
-
-                                case DialogInterface.BUTTON_NEGATIVE:
-                                    // No button clicked
-                                    // do nothing
-                                    Toast.makeText(newCapureActivity.this, "No Clicked",
-                                            Toast.LENGTH_LONG).show();
-                                    break;
-                            }
-                        }
-                    };
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(newCapureActivity.this);
-                    builder.setMessage("Are you sure want to Delete ?")
-                            .setPositiveButton("Yes", dialogClickListener)
-                            .setNegativeButton("No", dialogClickListener).show();
-
-                    return true;
-                }
-            });
-
-
         }
 
         @Override
