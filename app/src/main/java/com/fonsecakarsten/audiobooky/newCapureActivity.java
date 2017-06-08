@@ -149,9 +149,9 @@ public class newCapureActivity extends Activity {
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    AlertDialog.Builder imageDialog = new AlertDialog.Builder(getApplicationContext());
+                    AlertDialog.Builder imageDialog = new AlertDialog.Builder(newCapureActivity.this);
                     LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-                    View layout = inflater.inflate(R.layout.image_popup, (ViewGroup) findViewById(R.id.image_popup_root));
+                    View layout = inflater.inflate(R.layout.image_popup, (ViewGroup) findViewById(R.id.image_popup_root), false);
                     ImageView image = (ImageView) layout.findViewById(R.id.image_view);
 
                     // Get Image
@@ -211,13 +211,13 @@ public class newCapureActivity extends Activity {
 
             Myviewholder(View itemView) {
                 super(itemView);
-                imageView = (ImageView) itemView.findViewById(R.id.image);
+                imageView = (ImageView) itemView.findViewById(R.id.image_view);
             }
         }
     }
 
 
-    public void selectImage() {
+    public void selectImage(View v) {
 
         final CharSequence[] items = {"Take Photo", "Choose from Library",
                 "Cancel"};
