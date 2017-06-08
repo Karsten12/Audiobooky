@@ -4,17 +4,16 @@ package com.fonsecakarsten.audiobooky;
  * Created by Karsten on 6/5/2017.
  */
 
-public class Data_Model {
+class Data_Model {
     private String image;
-
 
     // Getter and Setter model for recycler view items
 
-    public String getImage() {
+    String getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    void setImage(String image) {
         this.image = image;
     }
 

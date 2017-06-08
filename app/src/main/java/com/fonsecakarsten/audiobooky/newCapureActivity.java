@@ -15,6 +15,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -131,7 +132,7 @@ public class newCapureActivity extends Activity {
 
         @Override
         public Myviewholder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = getLayoutInflater().inflate(R.layout.imgedisplay, parent, false);
+            View v = getLayoutInflater().inflate(R.layout.image_popup, parent, false);
             Myviewholder myviewholder = new Myviewholder(v);
             Log.d("myactivty ", "oncreateViewHolder");
 
@@ -153,18 +154,49 @@ public class newCapureActivity extends Activity {
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(getApplicationContext(), ImageDisplay.class);
-                    String chkpath = m.getImage();
-                    intent.putExtra("path", chkpath);
-                    Log.d("intent", "new activity");
-                    startActivity(intent);
+                    AlertDialog.Builder imageDialog = new AlertDialog.Builder(getApplicationContext());
+                    LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+                    View layout = inflater.inflate(R.layout.image_popup, (ViewGroup) findViewById(R.id.image_popup_root));
+                    ImageView image = (ImageView) layout.findViewById(R.id.image_view);
+
+                    imageDialog.setPositiveButton("RETAKE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Todo
+                        }
+                    });
+                    imageDialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Todo
+                        }
+                    });
+                    imageDialog.setNegativeButton("REMOVE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Todo
+                        }
+                    });
+
+                    // Get Image
+                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                    bmOptions.inJustDecodeBounds = false;
+                    bmOptions.inSampleSize = 4;
+                    Bitmap bitmap = BitmapFactory.decodeFile(m.getImage(), bmOptions);
+
+                    // Display the image
+                    image.setImageBitmap(bitmap);
+                    imageDialog.setView(layout);
+
+                    imageDialog.create();
+                    imageDialog.show();
                 }
             });
             holder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
 
-                    final int pst = position;
+                    //final int pst = position;
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which) {
@@ -204,30 +236,16 @@ public class newCapureActivity extends Activity {
             return imageArray.size();
         }
 
-        public class Myviewholder extends RecyclerView.ViewHolder {
-            public ImageView imageView;
+        class Myviewholder extends RecyclerView.ViewHolder {
+            ImageView imageView;
 
-            public Myviewholder(View itemView) {
+            Myviewholder(View itemView) {
                 super(itemView);
                 imageView = (ImageView) itemView.findViewById(R.id.image);
             }
         }
     }
 
-    private void onSelectFromGalleryResult(Intent data) {
-
-        Uri selectedImageUri = data.getData();
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = managedQuery(selectedImageUri, projection, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String path = cursor.getString(column_index);
-        Data_Model data_model = new Data_Model();
-        data_model.setImage(path);
-        imageArray.add(data_model);
-        mAdapter.notifyDataSetChanged();
-        // Toast.makeText(this, "" + path, Toast.LENGTH_LONG).show();
-    }
 
     public void selectImage() {
 
@@ -266,5 +284,21 @@ public class newCapureActivity extends Activity {
         Log.d("gallery", "checkpointA");
         startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
         Log.d("gallery", "checkpointB");
+    }
+
+    private void onSelectFromGalleryResult(Intent data) {
+        Uri selectedImageUri = data.getData();
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(selectedImageUri, projection, null, null, null);
+        assert cursor != null;
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        Data_Model data_model = new Data_Model();
+        data_model.setImage(path);
+        imageArray.add(data_model);
+        mAdapter.notifyDataSetChanged();
+        cursor.close();
+        // Toast.makeText(this, "" + path, Toast.LENGTH_LONG).show();
     }
 }

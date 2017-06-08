@@ -29,6 +29,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main">
@@ -45,10 +46,6 @@
             android:name=".newCapureActivity"
             android:label="idk"
             android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".ImageDisplay"
-            android:label="idk2"
-            android:parentActivityName=".newCapureActivity" />
 
     </application>
 
