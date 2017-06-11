@@ -14,7 +14,6 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,14 +46,12 @@ public class newCapureActivity extends Activity {
 
         imageArray = new ArrayList<>();
         mAdapter = new MyAdapter();
-        Log.d("oncreate", "set adapter");
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
     }
 
     public void takepicture() {
-        Log.d("Cameraclick", "takepicture");
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -103,20 +100,19 @@ public class newCapureActivity extends Activity {
             if (requestCode == REQUEST_TAKE_PHOTO) {
 
                 // Save Image To Gallery
-                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                File f = new File(mCurrentPhotoPath);
-                Uri contentUri = Uri.fromFile(f);
-                mediaScanIntent.setData(contentUri);
-                this.sendBroadcast(mediaScanIntent);
-                String clickpath = mCurrentPhotoPath;
+//                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//                File f = new File(mCurrentPhotoPath);
+//                Uri contentUri = Uri.fromFile(f);
+//                mediaScanIntent.setData(contentUri);
+//                this.sendBroadcast(mediaScanIntent);
+//                String clickpath = mCurrentPhotoPath;
                 Data_Model data_model = new Data_Model();
-                data_model.setImage(clickpath);
+                data_model.setImage(mCurrentPhotoPath);
                 imageArray.add(data_model);
                 mAdapter.notifyDataSetChanged();
 
 
             } else if (requestCode == SELECT_FILE) {
-                Log.d("gallery", "checkpointd");
                 onSelectFromGalleryResult(data);
             }
         }
@@ -130,7 +126,6 @@ public class newCapureActivity extends Activity {
         public Myviewholder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = getLayoutInflater().inflate(R.layout.image_popup, parent, false);
             Myviewholder myviewholder = new Myviewholder(v);
-            Log.d("myactivty ", "oncreateViewHolder");
 
             return myviewholder;
         }
@@ -138,7 +133,6 @@ public class newCapureActivity extends Activity {
         @Override
         public void onBindViewHolder(Myviewholder holder, final int position) {
             final Data_Model m = imageArray.get(position);
-            Log.d(" myactivty", "onBindviewholder" + position);
             //holder.imageView.setVisibility(View.VISIBLE);
             final BitmapFactory.Options options = new BitmapFactory.Options();
 
@@ -152,7 +146,7 @@ public class newCapureActivity extends Activity {
                     AlertDialog.Builder imageDialog = new AlertDialog.Builder(newCapureActivity.this);
                     LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                     View layout = inflater.inflate(R.layout.image_popup, (ViewGroup) findViewById(R.id.image_popup_root), false);
-                    ImageView image = (ImageView) layout.findViewById(R.id.image_view);
+                    final ImageView image = (ImageView) layout.findViewById(R.id.image_view);
 
                     // Get Image
 //                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
@@ -189,6 +183,7 @@ public class newCapureActivity extends Activity {
                     imageDialog.setNegativeButton("REMOVE", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+
                             imageArray.remove(position);
                             notifyItemRemoved(position);
                             notifyItemRangeChanged(position, imageArray.size());
@@ -251,9 +246,7 @@ public class newCapureActivity extends Activity {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        Log.d("gallery", "checkpointA");
         startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
-        Log.d("gallery", "checkpointB");
     }
 
     private void onSelectFromGalleryResult(Intent data) {
