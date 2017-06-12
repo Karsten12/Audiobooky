@@ -253,6 +253,7 @@ public class newCapureActivity extends Activity {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
     }
 
@@ -269,6 +270,19 @@ public class newCapureActivity extends Activity {
         mImageArray.add(data_model);
         mAdapter.notifyDataSetChanged();
         cursor.close();
+
+//        if (Intent.ACTION_SEND_MULTIPLE.equals(data.getAction()))
+//        && Intent.hasExtra(Intent.EXTRA_STREAM)) {
+//            // retrieve a collection of selected images
+//            ArrayList<Parcelable> list = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+//            // iterate over these images
+//            if( list != null ) {
+//                for (Parcelable parcel : list) {
+//                    Uri uri = (Uri) parcel;
+//                    // TODO handle the images one by one here
+//                }
+//            }
+//        }
     }
 
 
