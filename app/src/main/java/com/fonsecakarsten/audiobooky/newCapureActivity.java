@@ -1,16 +1,21 @@
 package com.fonsecakarsten.audiobooky;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,9 +38,11 @@ public class newCapureActivity extends Activity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
     private int SELECT_FILE = 2;
-    private String mCurrentPhotoPath;
-    ArrayList<Data_Model> imageArray;
+    private String mCurrPhotoPath;
+    ArrayList<Data_Model> mImageArray;
     MyAdapter mAdapter;
+    public static final int RequestPermissionCode = 1;
+    boolean permissionGranted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +51,12 @@ public class newCapureActivity extends Activity {
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        imageArray = new ArrayList<>();
+        mImageArray = new ArrayList<>();
         mAdapter = new MyAdapter();
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
+        checkPermissions();
     }
 
     public void takepicture() {
@@ -87,7 +95,7 @@ public class newCapureActivity extends Activity {
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
+        mCurrPhotoPath = image.getAbsolutePath();
         return image;
 
 
@@ -101,14 +109,14 @@ public class newCapureActivity extends Activity {
 
                 // Save Image To Gallery
 //                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//                File f = new File(mCurrentPhotoPath);
+//                File f = new File(mCurrPhotoPath);
 //                Uri contentUri = Uri.fromFile(f);
 //                mediaScanIntent.setData(contentUri);
 //                this.sendBroadcast(mediaScanIntent);
-//                String clickpath = mCurrentPhotoPath;
+//                String clickpath = mCurrPhotoPath;
                 Data_Model data_model = new Data_Model();
-                data_model.setImage(mCurrentPhotoPath);
-                imageArray.add(data_model);
+                data_model.setImage(mCurrPhotoPath);
+                mImageArray.add(data_model);
                 mAdapter.notifyDataSetChanged();
 
 
@@ -125,15 +133,13 @@ public class newCapureActivity extends Activity {
         @Override
         public Myviewholder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = getLayoutInflater().inflate(R.layout.image_popup, parent, false);
-            Myviewholder myviewholder = new Myviewholder(v);
 
-            return myviewholder;
+            return new Myviewholder(v);
         }
 
         @Override
-        public void onBindViewHolder(Myviewholder holder, final int position) {
-            final Data_Model m = imageArray.get(position);
-            //holder.imageView.setVisibility(View.VISIBLE);
+        public void onBindViewHolder(final Myviewholder holder, int position) {
+            final Data_Model m = mImageArray.get(position);
             final BitmapFactory.Options options = new BitmapFactory.Options();
 
             // Downsize image, as it throws OutOfMemory Exception for larger images
@@ -169,7 +175,7 @@ public class newCapureActivity extends Activity {
                             // Remove old image
                             // Add new image
                             // notifyItemRemoved(position);
-                            // notifyItemRangeChanged(position, imageArray.size());
+                            // notifyItemRangeChanged(position, mImageArray.size());
                         }
                     });
                     // Do nothing, close dialog
@@ -184,9 +190,12 @@ public class newCapureActivity extends Activity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            imageArray.remove(position);
-                            notifyItemRemoved(position);
-                            notifyItemRangeChanged(position, imageArray.size());
+//                            mImageArray.remove(position);
+//                            notifyItemRemoved(position);
+//                            notifyItemRangeChanged(position, mImageArray.size());
+                            mImageArray.remove(holder.getAdapterPosition());
+                            notifyItemRemoved(holder.getAdapterPosition());
+                            notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray.size());
                         }
                     });
 
@@ -198,7 +207,7 @@ public class newCapureActivity extends Activity {
 
         @Override
         public int getItemCount() {
-            return imageArray.size();
+            return mImageArray.size();
         }
 
         class Myviewholder extends RecyclerView.ViewHolder {
@@ -222,14 +231,12 @@ public class newCapureActivity extends Activity {
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                boolean result = true;
-
                 if (items[item].equals("Take Photo")) {
-                    if (result)
+                    if (permissionGranted)
                         takepicture();
 
                 } else if (items[item].equals("Choose from Library")) {
-                    if (result)
+                    if (permissionGranted)
                         galleryIntent();
 
 
@@ -259,9 +266,40 @@ public class newCapureActivity extends Activity {
         String path = cursor.getString(column_index);
         Data_Model data_model = new Data_Model();
         data_model.setImage(path);
-        imageArray.add(data_model);
+        mImageArray.add(data_model);
         mAdapter.notifyDataSetChanged();
         cursor.close();
-        // Toast.makeText(this, "" + path, Toast.LENGTH_LONG).show();
     }
+
+
+    // Check if camera and external storage permission is granted
+    private void checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int camPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+            int writeExternalPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+            if (camPermission == PackageManager.PERMISSION_DENIED || writeExternalPermission == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, RequestPermissionCode);
+
+            }
+        }
+    }
+
+    // If permissions not granted, request it
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case RequestPermissionCode:
+                if (grantResults.length > 0) {
+                    boolean camPermission = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    boolean writeExternalPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    if (camPermission && writeExternalPermission) {
+                        permissionGranted = true;
+                    }
+                }
+        }
+    }
+
+
+
 }
