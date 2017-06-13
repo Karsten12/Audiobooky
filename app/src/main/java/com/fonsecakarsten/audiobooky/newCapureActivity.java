@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,7 +41,8 @@ public class newCapureActivity extends Activity {
     static final int REQUEST_TAKE_PHOTO = 1;
     private int SELECT_FILE = 2;
     private String mCurrPhotoPath;
-    ArrayList<Data_Model> mImageArray;
+    //ArrayList<Data_Model> mImageArray;
+    ArrayList<String> mImageArray2;
     MyAdapter mAdapter;
     public static final int RequestPermissionCode = 1;
     boolean permissionGranted = false;
@@ -51,7 +54,8 @@ public class newCapureActivity extends Activity {
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        mImageArray = new ArrayList<>();
+        //mImageArray = new ArrayList<>();
+        mImageArray2 = new ArrayList<>();
         mAdapter = new MyAdapter();
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -72,8 +76,7 @@ public class newCapureActivity extends Activity {
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 try {
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                            FileProvider.getUriForFile(this, this.getApplicationContext().getPackageName() + ".provider", createImageFile()));
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(this, this.getApplicationContext().getPackageName() + ".provider", createImageFile()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -97,8 +100,6 @@ public class newCapureActivity extends Activity {
         // Save a file: path for use with ACTION_VIEW intents
         mCurrPhotoPath = image.getAbsolutePath();
         return image;
-
-
     }
 
     @Override
@@ -114,9 +115,11 @@ public class newCapureActivity extends Activity {
 //                mediaScanIntent.setData(contentUri);
 //                this.sendBroadcast(mediaScanIntent);
 //                String clickpath = mCurrPhotoPath;
-                Data_Model data_model = new Data_Model();
-                data_model.setImage(mCurrPhotoPath);
-                mImageArray.add(data_model);
+
+                //Data_Model data_model = new Data_Model();
+                //data_model.setImage(mCurrPhotoPath);
+                //mImageArray.add(data_model);
+                mImageArray2.add(mCurrPhotoPath);
                 mAdapter.notifyDataSetChanged();
 
 
@@ -139,12 +142,14 @@ public class newCapureActivity extends Activity {
 
         @Override
         public void onBindViewHolder(final Myviewholder holder, int position) {
-            final Data_Model m = mImageArray.get(position);
+            //final Data_Model m = mImageArray.get(position);
+            final String imagePath = mImageArray2.get(position);
             final BitmapFactory.Options options = new BitmapFactory.Options();
 
             // Downsize image, as it throws OutOfMemory Exception for larger images
             options.inSampleSize = 20;
-            final Bitmap bitmap = BitmapFactory.decodeFile(m.getImage(), options);
+            //final Bitmap bitmap = BitmapFactory.decodeFile(m.getImage(), options);
+            final Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
             holder.imageView.setImageBitmap(bitmap);
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -160,7 +165,7 @@ public class newCapureActivity extends Activity {
 //                    bmOptions.inSampleSize = 4;
                     options.inJustDecodeBounds = false;
                     options.inSampleSize = 4;
-                    Bitmap bitmap = BitmapFactory.decodeFile(m.getImage(), options);
+                    Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
 
                     // Display the image
                     image.setImageBitmap(bitmap);
@@ -193,9 +198,11 @@ public class newCapureActivity extends Activity {
 //                            mImageArray.remove(position);
 //                            notifyItemRemoved(position);
 //                            notifyItemRangeChanged(position, mImageArray.size());
-                            mImageArray.remove(holder.getAdapterPosition());
+                            //mImageArray.remove(holder.getAdapterPosition());
+                            mImageArray2.remove(holder.getAdapterPosition());
                             notifyItemRemoved(holder.getAdapterPosition());
-                            notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray.size());
+                            //notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray.size());
+                            notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray2.size());
                         }
                     });
 
@@ -207,7 +214,7 @@ public class newCapureActivity extends Activity {
 
         @Override
         public int getItemCount() {
-            return mImageArray.size();
+            return mImageArray2.size();
         }
 
         class Myviewholder extends RecyclerView.ViewHolder {
@@ -265,9 +272,10 @@ public class newCapureActivity extends Activity {
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         String path = cursor.getString(column_index);
-        Data_Model data_model = new Data_Model();
-        data_model.setImage(path);
-        mImageArray.add(data_model);
+        //Data_Model data_model = new Data_Model();
+        //data_model.setImage(path);
+        //mImageArray.add(data_model);
+        mImageArray2.add(path);
         mAdapter.notifyDataSetChanged();
         cursor.close();
 
@@ -286,6 +294,24 @@ public class newCapureActivity extends Activity {
     }
 
 
+    // if photo is not stored locally, use this to get bitmap from external
+    private Bitmap getBitmapFromUri(Uri uri) throws IOException {
+        ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+        parcelFileDescriptor.close();
+        return image;
+    }
+
+    // Pass the images back to be processed
+    public void done(View v) {
+        Intent intent = new Intent();
+        intent.putExtra("imageArray", mImageArray2);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+
     // Check if camera and external storage permission is granted
     private void checkPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -294,8 +320,10 @@ public class newCapureActivity extends Activity {
 
             if (camPermission == PackageManager.PERMISSION_DENIED || writeExternalPermission == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, RequestPermissionCode);
-
             }
+        } else {
+            // Device has android build < M, permissions auto granted
+            permissionGranted = true;
         }
     }
 
@@ -313,7 +341,6 @@ public class newCapureActivity extends Activity {
                 }
         }
     }
-
 
 
 }
