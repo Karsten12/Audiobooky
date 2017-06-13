@@ -233,11 +233,15 @@ public class newCapureActivity extends Activity {
         final CharSequence[] items = {"Take Photo", "Choose from Library",
                 "Cancel"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(newCapureActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
+                if (!permissionGranted) {
+                    ActivityCompat.requestPermissions(newCapureActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, RequestPermissionCode);
+                }
+
                 if (items[item].equals("Take Photo")) {
                     if (permissionGranted)
                         takepicture();
