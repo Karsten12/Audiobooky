@@ -1,7 +1,9 @@
 package com.fonsecakarsten.audiobooky;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toolbar;
+
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.common.AccountPicker;
 
 import java.util.ArrayList;
 
@@ -20,6 +25,14 @@ public class MainActivity extends Activity {
 
     ArrayList<String> mImageArray;
     recycleAdapter mAdapter;
+
+
+    private static String accessToken;
+    static final int REQUEST_GALLERY_IMAGE = 10;
+    static final int REQUEST_CODE_PICK_ACCOUNT = 11;
+    static final int REQUEST_ACCOUNT_AUTHORIZATION = 12;
+    static final int REQUEST_PERMISSIONS = 13;
+    Account mAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +51,7 @@ public class MainActivity extends Activity {
     }
 
     public void onFABClick(View v) {
-        Intent intent = new Intent(this, newCapureActivity.class);
+        Intent intent = new Intent(this, NewCapureActivity.class);
         startActivityForResult(intent, 1);
     }
 
@@ -51,11 +64,52 @@ public class MainActivity extends Activity {
             if (resultCode == RESULT_OK) {
                 mImageArray = data.getExtras().getStringArrayList("imageArray");
                 for (int i = 0; i < mImageArray.size(); i++) {
-                    OCR_async task = new OCR_async(mImageArray.get(i), getApplicationContext());
+                    MobileVisionAsync task = new MobileVisionAsync(mImageArray.get(i), getApplicationContext());
                     task.execute();
                 }
             }
         }
+    }
+
+
+    public Bitmap resizeBitmap(Bitmap bitmap) {
+        int maxDimension = 1024;
+        int originalWidth = bitmap.getWidth();
+        int originalHeight = bitmap.getHeight();
+        int resizedWidth = maxDimension;
+        int resizedHeight = maxDimension;
+
+        if (originalHeight > originalWidth) {
+            resizedHeight = maxDimension;
+            resizedWidth = (int) (resizedHeight * (float) originalWidth / (float) originalHeight);
+        } else if (originalWidth > originalHeight) {
+            resizedWidth = maxDimension;
+            resizedHeight = (int) (resizedWidth * (float) originalHeight / (float) originalWidth);
+        } else if (originalHeight == originalWidth) {
+            resizedHeight = maxDimension;
+            resizedWidth = maxDimension;
+        }
+        return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
+    }
+
+    private void pickUserAccount() {
+        String[] accountTypes = new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
+        Intent intent = AccountPicker.newChooseAccountIntent(null, null, accountTypes, false, null, null, null, null);
+        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
+    }
+
+    private void getAuthToken() {
+        String SCOPE = "oauth2:https://www.googleapis.com/auth/cloud-platform";
+        if (mAccount == null) {
+            pickUserAccount();
+        } else {
+            new GetTokenTask(MainActivity.this, mAccount, SCOPE, REQUEST_ACCOUNT_AUTHORIZATION)
+                    .execute();
+        }
+    }
+
+    public void onTokenReceived(String token) {
+        accessToken = token;
     }
 
 

@@ -17,12 +17,12 @@ import com.google.android.gms.vision.text.TextRecognizer;
  * Created by Karsten on 6/13/2017.
  */
 
-class OCR_async extends AsyncTask<String, Void, String> {
+class MobileVisionAsync extends AsyncTask<String, Void, String> {
 
     private String URI;
     private Context context;
 
-    OCR_async(String imageURI, Context con) {
+    MobileVisionAsync(String imageURI, Context con) {
         this.URI = imageURI;
         this.context = con;
     }

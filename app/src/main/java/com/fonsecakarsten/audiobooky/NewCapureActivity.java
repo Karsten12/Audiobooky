@@ -36,13 +36,12 @@ import java.util.Date;
  * Created by Karsten on 6/5/2017.
  */
 
-public class newCapureActivity extends Activity {
+public class NewCapureActivity extends Activity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
     private int SELECT_FILE = 2;
     private String mCurrPhotoPath;
-    //ArrayList<Data_Model> mImageArray;
-    ArrayList<String> mImageArray2;
+    ArrayList<String> mImageArray;
     MyAdapter mAdapter;
     public static final int RequestPermissionCode = 1;
     boolean permissionGranted = false;
@@ -54,8 +53,7 @@ public class newCapureActivity extends Activity {
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        //mImageArray = new ArrayList<>();
-        mImageArray2 = new ArrayList<>();
+        mImageArray = new ArrayList<>();
         mAdapter = new MyAdapter();
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -116,10 +114,8 @@ public class newCapureActivity extends Activity {
 //                this.sendBroadcast(mediaScanIntent);
 //                String clickpath = mCurrPhotoPath;
 
-                //Data_Model data_model = new Data_Model();
-                //data_model.setImage(mCurrPhotoPath);
-                //mImageArray.add(data_model);
-                mImageArray2.add(mCurrPhotoPath);
+
+                mImageArray.add(mCurrPhotoPath);
                 mAdapter.notifyDataSetChanged();
 
 
@@ -142,8 +138,7 @@ public class newCapureActivity extends Activity {
 
         @Override
         public void onBindViewHolder(final Myviewholder holder, int position) {
-            //final Data_Model m = mImageArray.get(position);
-            final String imagePath = mImageArray2.get(position);
+            final String imagePath = mImageArray.get(position);
             final BitmapFactory.Options options = new BitmapFactory.Options();
 
             // Downsize image, as it throws OutOfMemory Exception for larger images
@@ -154,7 +149,7 @@ public class newCapureActivity extends Activity {
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    AlertDialog.Builder imageDialog = new AlertDialog.Builder(newCapureActivity.this);
+                    AlertDialog.Builder imageDialog = new AlertDialog.Builder(NewCapureActivity.this);
                     LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                     View layout = inflater.inflate(R.layout.image_popup, (ViewGroup) findViewById(R.id.image_popup_root), false);
                     final ImageView image = (ImageView) layout.findViewById(R.id.image_view);
@@ -195,14 +190,9 @@ public class newCapureActivity extends Activity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-//                            mImageArray.remove(position);
-//                            notifyItemRemoved(position);
-//                            notifyItemRangeChanged(position, mImageArray.size());
-                            //mImageArray.remove(holder.getAdapterPosition());
-                            mImageArray2.remove(holder.getAdapterPosition());
+                            mImageArray.remove(holder.getAdapterPosition());
                             notifyItemRemoved(holder.getAdapterPosition());
-                            //notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray.size());
-                            notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray2.size());
+                            notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray.size());
                         }
                     });
 
@@ -214,7 +204,7 @@ public class newCapureActivity extends Activity {
 
         @Override
         public int getItemCount() {
-            return mImageArray2.size();
+            return mImageArray.size();
         }
 
         class Myviewholder extends RecyclerView.ViewHolder {
@@ -239,7 +229,7 @@ public class newCapureActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (!permissionGranted) {
-                    ActivityCompat.requestPermissions(newCapureActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, RequestPermissionCode);
+                    ActivityCompat.requestPermissions(NewCapureActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, RequestPermissionCode);
                 }
 
                 if (items[item].equals("Take Photo")) {
@@ -276,10 +266,7 @@ public class newCapureActivity extends Activity {
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         String path = cursor.getString(column_index);
-        //Data_Model data_model = new Data_Model();
-        //data_model.setImage(path);
-        //mImageArray.add(data_model);
-        mImageArray2.add(path);
+        mImageArray.add(path);
         mAdapter.notifyDataSetChanged();
         cursor.close();
 
@@ -310,7 +297,7 @@ public class newCapureActivity extends Activity {
     // Pass the images back to be processed
     public void done(View v) {
         Intent intent = new Intent();
-        intent.putExtra("imageArray", mImageArray2);
+        intent.putExtra("imageArray", mImageArray);
         setResult(RESULT_OK, intent);
         finish();
     }
