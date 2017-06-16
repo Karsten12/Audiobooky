@@ -1,11 +1,11 @@
 package com.fonsecakarsten.audiobooky;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
@@ -30,15 +30,19 @@ import java.util.Locale;
 public class CloudVisionAsync extends AsyncTask<String, Void, String> {
 
     private String accessToken;
-    private Bitmap bitmap;
+    private String URI;
 
-    CloudVisionAsync(String idk, Bitmap bmap) {
-        this.accessToken = idk;
-        this.bitmap = bmap;
+    CloudVisionAsync(String token, String imageURI) {
+        this.accessToken = token;
+        this.URI = imageURI;
     }
 
     @Override
     protected String doInBackground(String... params) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 1;
+        Bitmap bitmap = resizeBitmap(BitmapFactory.decodeFile(URI, options));
+
         try {
             GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
             HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
@@ -48,20 +52,11 @@ public class CloudVisionAsync extends AsyncTask<String, Void, String> {
             Vision vision = builder.build();
 
             List<Feature> featureList = new ArrayList<>();
-            Feature labelDetection = new Feature();
-            labelDetection.setType("LABEL_DETECTION");
-            labelDetection.setMaxResults(10);
-            featureList.add(labelDetection);
 
             Feature textDetection = new Feature();
             textDetection.setType("TEXT_DETECTION");
             textDetection.setMaxResults(10);
             featureList.add(textDetection);
-
-            Feature landmarkDetection = new Feature();
-            landmarkDetection.setType("LANDMARK_DETECTION");
-            landmarkDetection.setMaxResults(10);
-            featureList.add(landmarkDetection);
 
             List<AnnotateImageRequest> imageList = new ArrayList<>();
             AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
@@ -81,8 +76,6 @@ public class CloudVisionAsync extends AsyncTask<String, Void, String> {
             BatchAnnotateImagesResponse response = annotateRequest.execute();
             return convertResponseToString(response);
 
-        } catch (GoogleJsonResponseException e) {
-            //Log.e(LOG_TAG, "Request failed: " + e.getContent());
         } catch (IOException e) {
             //Log.d(LOG_TAG, "Request failed: " + e.getMessage());
         }
@@ -128,16 +121,36 @@ public class CloudVisionAsync extends AsyncTask<String, Void, String> {
         } else {
             message.append("nothing\n");
         }
-
+        System.out.println(message.toString());
         return message.toString();
     }
 
-    public Image getBase64EncodedJpeg(Bitmap bitmap) {
+    private Image getBase64EncodedJpeg(Bitmap bitmap) {
         Image image = new Image();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
         byte[] imageBytes = byteArrayOutputStream.toByteArray();
         image.encodeContent(imageBytes);
         return image;
+    }
+
+    private Bitmap resizeBitmap(Bitmap bitmap) {
+        int maxDimension = 1024;
+        int originalWidth = bitmap.getWidth();
+        int originalHeight = bitmap.getHeight();
+        int resizedWidth = maxDimension;
+        int resizedHeight = maxDimension;
+
+        if (originalHeight > originalWidth) {
+            resizedHeight = maxDimension;
+            resizedWidth = (int) (resizedHeight * (float) originalWidth / (float) originalHeight);
+        } else if (originalWidth > originalHeight) {
+            resizedWidth = maxDimension;
+            resizedHeight = (int) (resizedWidth * (float) originalHeight / (float) originalWidth);
+        } else if (originalHeight == originalWidth) {
+            resizedHeight = maxDimension;
+            resizedWidth = maxDimension;
+        }
+        return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
 }

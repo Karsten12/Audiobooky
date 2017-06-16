@@ -1,15 +1,16 @@
 package com.fonsecakarsten.audiobooky;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -47,7 +48,7 @@ public class MainActivity extends Activity {
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
-
+        getAuthToken();
     }
 
     public void onFABClick(View v) {
@@ -63,33 +64,38 @@ public class MainActivity extends Activity {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 mImageArray = data.getExtras().getStringArrayList("imageArray");
-                for (int i = 0; i < mImageArray.size(); i++) {
-                    MobileVisionAsync task = new MobileVisionAsync(mImageArray.get(i), getApplicationContext());
+//                for (int i = 0; i < mImageArray.size(); i++) {
+//                    MobileVisionAsync task = new MobileVisionAsync(mImageArray.get(i), getApplicationContext());
+//                    task.execute();
+//                }
+                if (mImageArray.size() > 0) {
+                    CloudVisionAsync task = new CloudVisionAsync(accessToken, mImageArray.get(0));
                     task.execute();
                 }
             }
+        } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
+            if (resultCode == RESULT_OK) {
+                String email = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                AccountManager am = AccountManager.get(this);
+                Account[] accounts = am.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
+                for (Account account : accounts) {
+                    if (account.name.equals(email)) {
+                        mAccount = account;
+                        break;
+                    }
+                }
+                getAuthToken();
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "No Account Selected", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == REQUEST_ACCOUNT_AUTHORIZATION) {
+            if (resultCode == RESULT_OK) {
+                Bundle extra = data.getExtras();
+                onTokenReceived(extra.getString("authtoken"));
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Authorization Failed", Toast.LENGTH_SHORT).show();
+            }
         }
-    }
-
-
-    public Bitmap resizeBitmap(Bitmap bitmap) {
-        int maxDimension = 1024;
-        int originalWidth = bitmap.getWidth();
-        int originalHeight = bitmap.getHeight();
-        int resizedWidth = maxDimension;
-        int resizedHeight = maxDimension;
-
-        if (originalHeight > originalWidth) {
-            resizedHeight = maxDimension;
-            resizedWidth = (int) (resizedHeight * (float) originalWidth / (float) originalHeight);
-        } else if (originalWidth > originalHeight) {
-            resizedWidth = maxDimension;
-            resizedHeight = (int) (resizedWidth * (float) originalHeight / (float) originalWidth);
-        } else if (originalHeight == originalWidth) {
-            resizedHeight = maxDimension;
-            resizedWidth = maxDimension;
-        }
-        return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
 
     private void pickUserAccount() {
@@ -103,8 +109,7 @@ public class MainActivity extends Activity {
         if (mAccount == null) {
             pickUserAccount();
         } else {
-            new GetTokenTask(MainActivity.this, mAccount, SCOPE, REQUEST_ACCOUNT_AUTHORIZATION)
-                    .execute();
+            new GetTokenTask(MainActivity.this, mAccount, SCOPE, REQUEST_ACCOUNT_AUTHORIZATION).execute();
         }
     }
 
