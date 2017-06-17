@@ -4,7 +4,10 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.fonsecakarsten.audiobooky.NewCapureActivity.RequestPermissionCode;
 import static com.fonsecakarsten.audiobooky.R.mipmap.ic_launcher_round;
 
 public class MainActivity extends Activity {
@@ -27,12 +31,9 @@ public class MainActivity extends Activity {
     ArrayList<String> mImageArray;
     recycleAdapter mAdapter;
 
-
     private static String accessToken;
-    static final int REQUEST_GALLERY_IMAGE = 10;
     static final int REQUEST_CODE_PICK_ACCOUNT = 11;
     static final int REQUEST_ACCOUNT_AUTHORIZATION = 12;
-    static final int REQUEST_PERMISSIONS = 13;
     Account mAccount;
 
     @Override
@@ -46,8 +47,12 @@ public class MainActivity extends Activity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         mAdapter = new recycleAdapter();
         recyclerView.setAdapter(mAdapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(linearLayoutManager);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(mLayoutManager);
+
+        if (!hasPermission()) {
+            ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
+        }
         getAuthToken();
     }
 
@@ -117,6 +122,37 @@ public class MainActivity extends Activity {
         accessToken = token;
     }
 
+    // Check if permissions granted
+    private boolean hasPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            String[] permArray = getResources().getStringArray(R.array.permissions);
+            for (String permission : permArray) {
+                if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // If permissions not granted, request it
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        int granted = PackageManager.PERMISSION_GRANTED;
+        switch (requestCode) {
+            case RequestPermissionCode:
+                if (grantResults.length > 0 &&
+                        grantResults[0] == granted &&
+                        grantResults[1] == granted &&
+                        grantResults[2] == granted) {
+                    // Permissions all granted
+                    break;
+                } else {
+                    // One or more permissions denied, re-request permissions
+                    ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
+                }
+        }
+    }
 
     private class recycleAdapter extends RecyclerView.Adapter<recycleAdapter.viewholder> {
 

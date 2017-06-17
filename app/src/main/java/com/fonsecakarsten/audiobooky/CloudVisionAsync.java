@@ -27,7 +27,7 @@ import java.util.Locale;
  * Created by Karsten on 6/15/2017.
  */
 
-public class CloudVisionAsync extends AsyncTask<String, Void, String> {
+class CloudVisionAsync extends AsyncTask<String, Void, String> {
 
     private String accessToken;
     private String URI;

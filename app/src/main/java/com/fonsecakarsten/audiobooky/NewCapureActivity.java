@@ -1,6 +1,5 @@
 package com.fonsecakarsten.audiobooky;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -16,7 +15,6 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -44,7 +42,6 @@ public class NewCapureActivity extends Activity {
     ArrayList<String> mImageArray;
     MyAdapter mAdapter;
     public static final int RequestPermissionCode = 1;
-    boolean permissionGranted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +55,9 @@ public class NewCapureActivity extends Activity {
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
-        checkPermissions();
     }
 
-    public void takepicture() {
+    public void takePicture() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -85,7 +81,6 @@ public class NewCapureActivity extends Activity {
     }
 
     private File createImageFile() throws IOException {
-        // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "PNG_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
@@ -102,28 +97,16 @@ public class NewCapureActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
 
-                // Save Image To Gallery
-//                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//                File f = new File(mCurrPhotoPath);
-//                Uri contentUri = Uri.fromFile(f);
-//                mediaScanIntent.setData(contentUri);
-//                this.sendBroadcast(mediaScanIntent);
-//                String clickpath = mCurrPhotoPath;
-
-
                 mImageArray.add(mCurrPhotoPath);
                 mAdapter.notifyDataSetChanged();
-
 
             } else if (requestCode == SELECT_FILE) {
                 onSelectFromGalleryResult(data);
             }
         }
-
     }
 
 
@@ -143,7 +126,6 @@ public class NewCapureActivity extends Activity {
 
             // Downsize image, as it throws OutOfMemory Exception for larger images
             options.inSampleSize = 20;
-            //final Bitmap bitmap = BitmapFactory.decodeFile(m.getImage(), options);
             final Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
             holder.imageView.setImageBitmap(bitmap);
             holder.imageView.setOnClickListener(new View.OnClickListener() {
@@ -155,9 +137,6 @@ public class NewCapureActivity extends Activity {
                     final ImageView image = (ImageView) layout.findViewById(R.id.image_view);
 
                     // Get Image
-//                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//                    bmOptions.inJustDecodeBounds = false;
-//                    bmOptions.inSampleSize = 4;
                     options.inJustDecodeBounds = false;
                     options.inSampleSize = 4;
                     Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
@@ -219,34 +198,29 @@ public class NewCapureActivity extends Activity {
 
 
     public void selectImage(View v) {
-
-        final CharSequence[] items = {"Take Photo", "Choose from Library",
-                "Cancel"};
+        final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (!permissionGranted) {
-                    ActivityCompat.requestPermissions(NewCapureActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, RequestPermissionCode);
-                }
+        builder.setTitle("Add Photo!")
+                .setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (items[item].equals("Take Photo")) {
+                            takePicture();
 
-                if (items[item].equals("Take Photo")) {
-                    if (permissionGranted)
-                        takepicture();
+                        } else if (items[item].equals("Choose from Library")) {
+                            galleryIntent();
 
-                } else if (items[item].equals("Choose from Library")) {
-                    if (permissionGranted)
-                        galleryIntent();
-
-
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
+                        } else if (items[item].equals("Cancel")) {
+                            dialog.dismiss();
+                        }
+                    }
+                });
+        if (hasPermission()) {
+            builder.show();
+        } else {
+            ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
+        }
     }
 
 
@@ -284,7 +258,6 @@ public class NewCapureActivity extends Activity {
 //        }
     }
 
-
     // if photo is not stored locally, use this to get bitmap from external
     private Bitmap getBitmapFromUri(Uri uri) throws IOException {
         ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
@@ -302,33 +275,34 @@ public class NewCapureActivity extends Activity {
         finish();
     }
 
-
-    // Check if camera and external storage permission is granted
-    private void checkPermissions() {
+    // Check if permissions granted
+    private boolean hasPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int camPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-            int writeExternalPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-            if (camPermission == PackageManager.PERMISSION_DENIED || writeExternalPermission == PackageManager.PERMISSION_DENIED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, RequestPermissionCode);
+            String[] permArray = getResources().getStringArray(R.array.permissions);
+            for (String permission : permArray) {
+                if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
             }
-        } else {
-            // Device has android build < M, permissions auto granted
-            permissionGranted = true;
         }
+        return true;
     }
 
     // If permissions not granted, request it
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        int granted = PackageManager.PERMISSION_GRANTED;
         switch (requestCode) {
             case RequestPermissionCode:
-                if (grantResults.length > 0) {
-                    boolean camPermission = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    boolean writeExternalPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    if (camPermission && writeExternalPermission) {
-                        permissionGranted = true;
-                    }
+                if (grantResults.length > 0 &&
+                        grantResults[0] == granted &&
+                        grantResults[1] == granted &&
+                        grantResults[2] == granted) {
+                    // Permissions all granted
+                    break;
+                } else {
+                    // One or more permissions denied, re-request permissions
+                    ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
                 }
         }
     }
