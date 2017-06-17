@@ -17,15 +17,13 @@ import java.io.IOException;
 
 class GetTokenTask extends AsyncTask<Void, Void, Void> {
     private Activity mActivity;
-    private String mScope;
     private Account mAccount;
     private int mRequestCode;
 
-    GetTokenTask(Activity activity, Account account, String scope, int requestCode) {
+    GetTokenTask(Activity activity, Account account) {
         this.mActivity = activity;
-        this.mScope = scope;
         this.mAccount = account;
-        this.mRequestCode = requestCode;
+        this.mRequestCode = MainActivity.REQUEST_ACCOUNT_AUTHORIZATION;
     }
 
     @Override
@@ -41,15 +39,13 @@ class GetTokenTask extends AsyncTask<Void, Void, Void> {
         return null;
     }
 
-    /**
-     * Gets an authentication token from Google and handles any
-     * GoogleAuthException that may occur.
-     */
+    // Get an authentication token from Google
     private String fetchToken() throws IOException {
         String accessToken;
         try {
+            String mScope = "oauth2:https://www.googleapis.com/auth/cloud-platform";
             accessToken = GoogleAuthUtil.getToken(mActivity, mAccount, mScope);
-            GoogleAuthUtil.clearToken(mActivity, accessToken); // used to remove stale tokens.
+            GoogleAuthUtil.clearToken(mActivity, accessToken); // used to remove stale tokens
             accessToken = GoogleAuthUtil.getToken(mActivity, mAccount, mScope);
             return accessToken;
         } catch (UserRecoverableAuthException userRecoverableException) {

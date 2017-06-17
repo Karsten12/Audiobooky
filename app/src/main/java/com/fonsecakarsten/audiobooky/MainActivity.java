@@ -28,8 +28,8 @@ import static com.fonsecakarsten.audiobooky.R.mipmap.ic_launcher_round;
 
 public class MainActivity extends Activity {
 
-    ArrayList<String> mImageArray;
-    recycleAdapter mAdapter;
+    private ArrayList<String> mImageArray;
+    private recycleAdapter mAdapter;
 
     private static String accessToken;
     static final int REQUEST_CODE_PICK_ACCOUNT = 11;
@@ -110,11 +110,10 @@ public class MainActivity extends Activity {
     }
 
     private void getAuthToken() {
-        String SCOPE = "oauth2:https://www.googleapis.com/auth/cloud-platform";
         if (mAccount == null) {
             pickUserAccount();
         } else {
-            new GetTokenTask(MainActivity.this, mAccount, SCOPE, REQUEST_ACCOUNT_AUTHORIZATION).execute();
+            new GetTokenTask(MainActivity.this, mAccount).execute();
         }
     }
 
