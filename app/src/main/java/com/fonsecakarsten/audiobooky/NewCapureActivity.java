@@ -109,7 +109,6 @@ public class NewCapureActivity extends Activity {
         }
     }
 
-
     class MyAdapter extends RecyclerView.Adapter<MyAdapter.Myviewholder> {
 
         @Override
@@ -196,7 +195,6 @@ public class NewCapureActivity extends Activity {
         }
     }
 
-
     public void selectImage(View v) {
         final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
 
@@ -222,7 +220,6 @@ public class NewCapureActivity extends Activity {
             ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
         }
     }
-
 
     public void galleryIntent() {
         Intent intent = new Intent();
@@ -306,6 +303,5 @@ public class NewCapureActivity extends Activity {
                 }
         }
     }
-
 
 }

@@ -30,7 +30,7 @@
             android:src="@mipmap/ic_launcher_round"
             app:fabSize="normal"
             app:layout_anchorGravity="bottom|right|end"
-            android:onClick="onFABClick"/>
+            android:onClick="createNewBook" />
     </android.support.design.widget.CoordinatorLayout>
 
 </LinearLayout>

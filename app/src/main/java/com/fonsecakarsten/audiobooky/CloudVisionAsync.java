@@ -84,43 +84,17 @@ class CloudVisionAsync extends AsyncTask<String, Void, String> {
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
         StringBuilder message = new StringBuilder("Results:\n\n");
-        message.append("Labels:\n");
-        List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
-        if (labels != null) {
-            for (EntityAnnotation label : labels) {
-                message.append(String.format(Locale.getDefault(), "%.3f: %s",
-                        label.getScore(), label.getDescription()));
-                message.append("\n");
-            }
-        } else {
-            message.append("nothing\n");
-        }
-
         message.append("Texts:\n");
-        List<EntityAnnotation> texts = response.getResponses().get(0)
-                .getTextAnnotations();
+        List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations(); // Get the response to the 0th image
         if (texts != null) {
             for (EntityAnnotation text : texts) {
-                message.append(String.format(Locale.getDefault(), "%s: %s",
-                        text.getLocale(), text.getDescription()));
+                message.append(String.format(Locale.getDefault(), "%s: %s", text.getLocale(), text.getDescription()));
                 message.append("\n");
             }
         } else {
             message.append("nothing\n");
         }
 
-        message.append("Landmarks:\n");
-        List<EntityAnnotation> landmarks = response.getResponses().get(0)
-                .getLandmarkAnnotations();
-        if (landmarks != null) {
-            for (EntityAnnotation landmark : landmarks) {
-                message.append(String.format(Locale.getDefault(), "%.3f: %s",
-                        landmark.getScore(), landmark.getDescription()));
-                message.append("\n");
-            }
-        } else {
-            message.append("nothing\n");
-        }
         System.out.println(message.toString());
         return message.toString();
     }
