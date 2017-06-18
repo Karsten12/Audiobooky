@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,7 +47,7 @@ public class NewCapureActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.new_book);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -55,6 +56,14 @@ public class NewCapureActivity extends Activity {
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.FAB2);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                done();
+            }
+        });
     }
 
     public void takePicture() {
@@ -265,7 +274,7 @@ public class NewCapureActivity extends Activity {
     }
 
     // Pass the images back to be processed
-    public void done(View v) {
+    public void done() {
         Intent intent = new Intent();
         intent.putExtra("imageArray", mImageArray);
         setResult(RESULT_OK, intent);

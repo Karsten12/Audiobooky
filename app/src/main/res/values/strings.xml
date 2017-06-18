@@ -2,8 +2,8 @@
     <string name="app_name">AudioBooky</string>
     <string name="title_activity_main">MainActivity</string>
     <string-array name="permissions">
-        <item>Manifest.permission.CAMERA</item>
-        <item>Manifest.permission.WRITE_EXTERNAL_STORAGE</item>
-        <item>Manifest.permission.GET_ACCOUNTS</item>
+        <item>android.Manifest.permission.CAMERA</item>
+        <item>android.Manifest.permission.WRITE_EXTERNAL_STORAGE</item>
+        <item>android.Manifest.permission.GET_ACCOUNTS</item>
     </string-array>
 </resources>

@@ -29,6 +29,7 @@
         android:layout_alignParentBottom="true" />
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/FAB2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -37,7 +38,7 @@
         android:src="@mipmap/ic_launcher_round"
         app:fabSize="normal"
         app:layout_anchorGravity="bottom|right|end"
-        android:onClick="done" />
+        app:useCompatPadding="true" />
 
 
 </RelativeLayout>

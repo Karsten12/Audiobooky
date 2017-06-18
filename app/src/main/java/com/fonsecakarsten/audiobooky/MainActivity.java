@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,16 +50,26 @@ public class MainActivity extends Activity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setActionBar(toolbar);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.mainRecView);
         mAdapter = new recycleAdapter();
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
 
+        FloatingActionButton captureBtn = (FloatingActionButton) findViewById(R.id.FAB1);
+        captureBtn.bringToFront();
+        captureBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createNewBook();
+            }
+        });
+
+
         if (!hasPermission()) {
             ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
         }
-        getAuthToken();
+        //getAuthToken();
     }
 
     // Convert each image's text using OCR
@@ -116,7 +127,7 @@ public class MainActivity extends Activity {
         accessToken = token;
     }
 
-    public void createNewBook(View v) {
+    public void createNewBook() {
         AlertDialog.Builder newBookDialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.newbook_dialog, (ViewGroup) findViewById(R.id.dialog_root), false);
@@ -151,10 +162,8 @@ public class MainActivity extends Activity {
     private boolean hasPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             String[] permArray = getResources().getStringArray(R.array.permissions);
-            for (String permission : permArray) {
-                if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
+            for (String perm1 : permArray) {
+                int idk = ActivityCompat.checkSelfPermission(this, perm1);
             }
         }
         return true;
