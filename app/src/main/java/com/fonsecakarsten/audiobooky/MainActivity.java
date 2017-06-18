@@ -1,22 +1,21 @@
 package com.fonsecakarsten.audiobooky;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,14 +28,14 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.fonsecakarsten.audiobooky.NewCapureActivity.RequestPermissionCode;
 import static com.fonsecakarsten.audiobooky.R.mipmap.ic_launcher_round;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     private ArrayList<AudioBook> mBooks = new ArrayList<>();
     private ArrayList<String> mImageArray;
     private recycleAdapter mAdapter;
     private AudioBook newBook;
+    String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.GET_ACCOUNTS};
 
     private static String accessToken;
     static final int REQUEST_CODE_PICK_ACCOUNT = 11;
@@ -68,11 +67,7 @@ public class MainActivity extends Activity {
             }
         });
 
-
-        if (!hasPermission()) {
-            ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
-        }
-        //getAuthToken();
+        getAuthToken();
     }
 
     // Convert each image's text using OCR
@@ -100,7 +95,8 @@ public class MainActivity extends Activity {
                 }
                 getAuthToken();
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "No Account Selected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You need to select an account", Toast.LENGTH_SHORT).show();
+                pickUserAccount();
             }
         } else if (requestCode == REQUEST_ACCOUNT_AUTHORIZATION) {
             if (resultCode == RESULT_OK) {
@@ -131,65 +127,70 @@ public class MainActivity extends Activity {
     }
 
     public void createNewBook() {
-        AlertDialog.Builder newBookDialog = new AlertDialog.Builder(this);
-        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = LayoutInflater.from(this);
         View layout = inflater.inflate(R.layout.newbook_dialog, (ViewGroup) findViewById(R.id.dialog_root), false);
-        newBookDialog.setView(layout);
-
         final EditText title = (EditText) layout.findViewById(R.id.dialog_title);
         final EditText author = (EditText) layout.findViewById(R.id.dialog_author);
 
-        newBookDialog.setTitle("Create a new audiobook!");
-        newBookDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        newBookDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                newBook = new AudioBook();
-                newBook.setTitle(title.getText().toString());
-                newBook.setAuthor(author.getText().toString());
+        AlertDialog newBookDialog = new AlertDialog.Builder(this)
+                .setView(layout)
+                .setTitle("Create a new audiobook!")
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        newBook = new AudioBook();
+                        newBook.setTitle(title.getText().toString());
+                        newBook.setAuthor(author.getText().toString());
 
-                Intent intent = new Intent(getApplicationContext(), NewCapureActivity.class);
-                startActivityForResult(intent, 1);
-            }
-        });
-        newBookDialog.create();
+                        Intent intent = new Intent(getApplicationContext(), NewCapureActivity.class);
+                        startActivityForResult(intent, 1);
+                    }
+                })
+                .create();
+        title.requestFocus();
+        newBookDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         newBookDialog.show();
     }
 
-    // Check if permissions granted
-    private boolean hasPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String[] permArray = getResources().getStringArray(R.array.permissions);
-            for (String perm1 : permArray) {
-                int idk = ActivityCompat.checkSelfPermission(this, perm1);
-            }
-        }
-        return true;
-    }
+//    // Check if permissions granted
+//    public static boolean hasPermissions(Context context, String... permissions)  {
+//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+//            for (String permission : permissions) {
+//                int idk = ActivityCompat.checkSelfPermission(context, permission);
+//                System.out.println(idk);
+//                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    }
 
     // If permissions not granted, request it
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        int granted = PackageManager.PERMISSION_GRANTED;
-        switch (requestCode) {
-            case RequestPermissionCode:
-                if (grantResults.length > 0 &&
-                        grantResults[0] == granted &&
-                        grantResults[1] == granted &&
-                        grantResults[2] == granted) {
-                    // Permissions all granted
-                    break;
-                } else {
-                    // One or more permissions denied, re-request permissions
-                    ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
-                }
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+//        int granted = PackageManager.PERMISSION_GRANTED;
+//        switch (requestCode) {
+//            case RequestPermissionCode:
+//                //System.out.println("HELLO");
+//                if (grantResults.length > 0 &&
+//                        grantResults[0] == granted &&
+//                        grantResults[1] == granted &&
+//                        grantResults[2] == granted) {
+//                    // Permissions all granted
+//                    break;
+//                } else {
+//                    // One or more permissions denied, re-request permissions
+//                    ActivityCompat.requestPermissions(this, PERMISSIONS, RequestPermissionCode);
+//                }
+//        }
+//    }
 
     private class recycleAdapter extends RecyclerView.Adapter<recycleAdapter.viewholder> {
 

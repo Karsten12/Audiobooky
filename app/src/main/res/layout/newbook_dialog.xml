@@ -6,18 +6,28 @@
     android:layout_height="wrap_content"
     android:padding="10dp">
 
-
-    <EditText
-        android:id="@+id/dialog_title"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Title" />
+        android:layout_height="wrap_content">
 
+        <EditText
+            android:id="@+id/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title"
+            android:inputType="textCapSentences" />
+    </android.support.design.widget.TextInputLayout>
 
-    <EditText
-        android:id="@+id/dialog_author"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Author" />
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/dialog_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Author"
+            android:inputType="textCapSentences" />
+    </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

@@ -4,18 +4,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,8 +37,8 @@ public class NewCapureActivity extends Activity {
     static final int REQUEST_TAKE_PHOTO = 1;
     private int SELECT_FILE = 2;
     private String mCurrPhotoPath;
-    ArrayList<String> mImageArray;
-    MyAdapter mAdapter;
+    private ArrayList<String> mImageArray;
+    private MyAdapter mAdapter;
     public static final int RequestPermissionCode = 1;
 
     @Override
@@ -223,14 +220,15 @@ public class NewCapureActivity extends Activity {
                         }
                     }
                 });
-        if (hasPermission()) {
+        if (//hasPermission()
+                true) {
             builder.show();
         } else {
-            ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
+            //ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
         }
     }
 
-    public void galleryIntent() {
+    private void galleryIntent() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -274,7 +272,7 @@ public class NewCapureActivity extends Activity {
     }
 
     // Pass the images back to be processed
-    public void done() {
+    private void done() {
         Intent intent = new Intent();
         intent.putExtra("imageArray", mImageArray);
         setResult(RESULT_OK, intent);
@@ -282,35 +280,35 @@ public class NewCapureActivity extends Activity {
     }
 
     // Check if permissions granted
-    private boolean hasPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String[] permArray = getResources().getStringArray(R.array.permissions);
-            for (String permission : permArray) {
-                if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+//    private boolean hasPermission() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            String[] permArray = getResources().getStringArray(R.array.permissions);
+//            for (String permission : permArray) {
+//                if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    }
 
     // If permissions not granted, request it
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        int granted = PackageManager.PERMISSION_GRANTED;
-        switch (requestCode) {
-            case RequestPermissionCode:
-                if (grantResults.length > 0 &&
-                        grantResults[0] == granted &&
-                        grantResults[1] == granted &&
-                        grantResults[2] == granted) {
-                    // Permissions all granted
-                    break;
-                } else {
-                    // One or more permissions denied, re-request permissions
-                    ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
-                }
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+//        int granted = PackageManager.PERMISSION_GRANTED;
+//        switch (requestCode) {
+//            case RequestPermissionCode:
+//                if (grantResults.length > 0 &&
+//                        grantResults[0] == granted &&
+//                        grantResults[1] == granted &&
+//                        grantResults[2] == granted) {
+//                    // Permissions all granted
+//                    break;
+//                } else {
+//                    // One or more permissions denied, re-request permissions
+//                    ActivityCompat.requestPermissions(this, getResources().getStringArray(R.array.permissions), RequestPermissionCode);
+//                }
+//        }
+//    }
 
 }

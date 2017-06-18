@@ -27,19 +27,20 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:support-v13:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'de.hdodenhof:circleimageview:2.1.0'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.google.android.gms:play-services-vision:11.0.1'
-    compile 'com.google.android.gms:play-services-base:11.0.1'
-    compile 'com.google.android.gms:play-services-auth:11.0.1'
-    compile 'com.google.apis:google-api-services-vision:v1-rev16-1.22.0'
     compile('com.google.api-client:google-api-client-android:1.22.0') {
         exclude module: 'httpclient'
     }
     compile('com.google.http-client:google-http-client-gson:1.20.0') {
         exclude module: 'httpclient'
     }
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:support-v13:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'com.android.support:support-compat:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.google.android.gms:play-services-vision:11.0.1'
+    compile 'com.google.android.gms:play-services-base:11.0.1'
+    compile 'com.google.android.gms:play-services-auth:11.0.1'
+    compile 'com.google.apis:google-api-services-vision:v1-rev16-1.22.0'
 }

@@ -84,13 +84,9 @@ class CloudVisionAsync extends AsyncTask<String, Void, String> {
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
         StringBuilder message = new StringBuilder("Results:\n\n");
-        message.append("Texts:\n");
         List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations(); // Get the response to the 0th image
         if (texts != null) {
-            for (EntityAnnotation text : texts) {
-                message.append(String.format(Locale.getDefault(), "%s: %s", text.getLocale(), text.getDescription()));
-                message.append("\n");
-            }
+            message.append(String.format(Locale.getDefault(), "%s", texts.get(0).getDescription()));
         } else {
             message.append("nothing\n");
         }
