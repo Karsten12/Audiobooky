@@ -248,10 +248,9 @@ public class NewCapureActivity extends Activity {
         mAdapter.notifyDataSetChanged();
         cursor.close();
 
-//        if (Intent.ACTION_SEND_MULTIPLE.equals(data.getAction()))
-//        && Intent.hasExtra(Intent.EXTRA_STREAM)) {
+//        if (Intent.ACTION_SEND_MULTIPLE.equals(data.getAction()) && data.hasExtra(Intent.EXTRA_STREAM)) {
 //            // retrieve a collection of selected images
-//            ArrayList<Parcelable> list = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+//            ArrayList<Parcelable> list = data.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
 //            // iterate over these images
 //            if( list != null ) {
 //                for (Parcelable parcel : list) {
