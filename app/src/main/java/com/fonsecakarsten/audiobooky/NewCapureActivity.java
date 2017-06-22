@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,6 +25,7 @@ import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +43,9 @@ public class NewCapureActivity extends Activity {
     private ArrayList<String> mImageArray;
     private MyAdapter mAdapter;
     public static final int RequestPermissionCode = 1;
+    private Bitmap rcbitmap;
+    private BitmapFactory.Options mOptions = new BitmapFactory.Options();
+    boolean first = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,12 +133,8 @@ public class NewCapureActivity extends Activity {
         @Override
         public void onBindViewHolder(final Myviewholder holder, int position) {
             final String imagePath = mImageArray.get(position);
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-
-            // Downsize image, as it throws OutOfMemory Exception for larger images
-            options.inSampleSize = 16;
-            final Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
-            holder.imageView.setImageBitmap(bitmap);
+            // Get and display image
+            holder.imageView.setImageBitmap(getAndRotateImage(imagePath, 16, false));
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -140,12 +142,15 @@ public class NewCapureActivity extends Activity {
                     View layout = inflater.inflate(R.layout.image_popup, (ViewGroup) findViewById(R.id.image_popup_root), false);
                     ImageView image = (ImageView) layout.findViewById(R.id.image_popup_image);
 
-                    // Get Image
-                    //options.inJustDecodeBounds = false;
-                    options.inSampleSize = 4;
-                    Bitmap bmap = BitmapFactory.decodeFile(imagePath, options);
-                    // Display the image
-                    image.setImageBitmap(bmap);
+                    // Get and display image
+                    if (first) {
+                        rcbitmap = getAndRotateImage(imagePath, 4, true);
+                        mOptions.inBitmap = rcbitmap;
+                        first = false;
+                    } else {
+                        rcbitmap = getAndRotateImage(imagePath, 4, true);
+                    }
+                    image.setImageBitmap(rcbitmap);
 
                     AlertDialog imageDialog = new AlertDialog.Builder(NewCapureActivity.this)
                             .setView(layout)
@@ -255,7 +260,7 @@ public class NewCapureActivity extends Activity {
 //        }
     }
 
-    // if photo is not stored locally, use this to get bitmap from external
+    // if photo is not stored locally, use this to get rcbitmap from external
     private Bitmap getBitmapFromUri(Uri uri) throws IOException {
         ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
         FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
@@ -303,5 +308,57 @@ public class NewCapureActivity extends Activity {
 //                }
 //        }
 //    }
+
+
+    public Bitmap getAndRotateImage(String path, int insamp, boolean reuse) {
+        BitmapFactory.Options options;
+        try {
+            File f = new File(path);
+            ExifInterface exif = new ExifInterface(f.getPath());
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+            int angle = 0;
+
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    angle = 90;
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    angle = 180;
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    angle = 270;
+                    break;
+
+                default:
+                    break;
+            }
+
+            Matrix mat = new Matrix();
+            mat.postRotate(angle);
+            Bitmap bmp;
+
+            if (reuse) {
+                options = mOptions;
+                options.inSampleSize = insamp;
+                bmp = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+                rcbitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
+
+            } else {
+                options = new BitmapFactory.Options();
+                options.inSampleSize = insamp;
+                bmp = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+                return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
+            }
+
+        } catch (IOException e) {
+            System.out.println("TAG-- Error in setting image");
+        } catch (OutOfMemoryError oom) {
+            System.out.println("TAG-- OOM Error in setting image");
+        }
+        return null;
+    }
 
 }

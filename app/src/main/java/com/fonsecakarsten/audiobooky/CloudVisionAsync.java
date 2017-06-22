@@ -37,9 +37,7 @@ class CloudVisionAsync extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 1;
-        Bitmap bitmap = resizeBitmap(BitmapFactory.decodeFile(URI, options));
+        Bitmap bitmap = resizeBitmap(URI);
 
         try {
             GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
@@ -111,7 +109,10 @@ class CloudVisionAsync extends AsyncTask<String, Void, String> {
         return image;
     }
 
-    private Bitmap resizeBitmap(Bitmap bitmap) {
+    private Bitmap resizeBitmap(String uri) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        Bitmap bitmap = BitmapFactory.decodeFile(uri, options);
+
         int maxDimension = 1024;
         int originalWidth = bitmap.getWidth();
         int originalHeight = bitmap.getHeight();
