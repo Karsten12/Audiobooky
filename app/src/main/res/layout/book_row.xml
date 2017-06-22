@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/book_row_root"
     android:layout_width="match_parent"
-    android:layout_height="72dp">
+    android:layout_height="72dp"
+    android:longClickable="true">
 
     <!--android:fontFamily="sans-serif"           // roboto regular-->
     <!--android:fontFamily="sans-serif-light"     // roboto light-->

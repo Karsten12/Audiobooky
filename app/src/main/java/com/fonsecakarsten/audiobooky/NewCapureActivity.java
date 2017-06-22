@@ -119,7 +119,7 @@ public class NewCapureActivity extends Activity {
 
         @Override
         public Myviewholder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = getLayoutInflater().inflate(R.layout.image_popup, parent, false);
+            View v = getLayoutInflater().inflate(R.layout.image_row, parent, false);
 
             return new Myviewholder(v);
         }
@@ -130,57 +130,51 @@ public class NewCapureActivity extends Activity {
             final BitmapFactory.Options options = new BitmapFactory.Options();
 
             // Downsize image, as it throws OutOfMemory Exception for larger images
-            options.inSampleSize = 20;
+            options.inSampleSize = 16;
             final Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
             holder.imageView.setImageBitmap(bitmap);
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    AlertDialog.Builder imageDialog = new AlertDialog.Builder(NewCapureActivity.this);
                     LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                     View layout = inflater.inflate(R.layout.image_popup, (ViewGroup) findViewById(R.id.image_popup_root), false);
-                    final ImageView image = (ImageView) layout.findViewById(R.id.image_view);
+                    ImageView image = (ImageView) layout.findViewById(R.id.image_popup_image);
 
                     // Get Image
-                    options.inJustDecodeBounds = false;
+                    //options.inJustDecodeBounds = false;
                     options.inSampleSize = 4;
-                    Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
-
+                    Bitmap bmap = BitmapFactory.decodeFile(imagePath, options);
                     // Display the image
-                    image.setImageBitmap(bitmap);
-                    imageDialog.setView(layout);
+                    image.setImageBitmap(bmap);
 
-                    // Retake image
-                    imageDialog.setPositiveButton("RETAKE", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Todo
-                            // Retake image
-                            // Remove old image
-                            // Add new image
-                            // notifyItemRemoved(position);
-                            // notifyItemRangeChanged(position, mImageArray.size());
-                        }
-                    });
-                    // Do nothing, close dialog
-                    imageDialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    // Remove image from list
-                    imageDialog.setNegativeButton("REMOVE", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                    AlertDialog imageDialog = new AlertDialog.Builder(NewCapureActivity.this)
+                            .setView(layout)
+                            .setPositiveButton("RETAKE", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Todo
+                                    // Retake image
+                                    // Remove old image
+                                    // Add new image
+                                    // notifyItemRemoved(position);
+                                    // notifyItemRangeChanged(position, mImageArray.size());
+                                }
+                            })
+                            .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setNegativeButton("REMOVE", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
-                            mImageArray.remove(holder.getAdapterPosition());
-                            notifyItemRemoved(holder.getAdapterPosition());
-                            notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray.size());
-                        }
-                    });
-
-                    imageDialog.create();
+                                    mImageArray.remove(holder.getAdapterPosition());
+                                    notifyItemRemoved(holder.getAdapterPosition());
+                                    notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray.size());
+                                }
+                            }).create();
                     imageDialog.show();
                 }
             });

@@ -13,7 +13,6 @@ import com.google.api.services.vision.v1.Vision;
 import com.google.api.services.vision.v1.model.AnnotateImageRequest;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesRequest;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
-import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 
@@ -21,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by Karsten on 6/15/2017.
@@ -83,16 +81,25 @@ class CloudVisionAsync extends AsyncTask<String, Void, String> {
     }
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
-        StringBuilder message = new StringBuilder("Results:\n\n");
-        List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations(); // Get the response to the 0th image
-        if (texts != null) {
-            message.append(String.format(Locale.getDefault(), "%s", texts.get(0).getDescription()));
-        } else {
-            message.append("nothing\n");
+        //StringBuilder message = new StringBuilder("Results:\n\n");
+
+        int pages = response.getResponses().size();
+        ArrayList<String> pageTexts = new ArrayList<>();
+        for (int i = 0; i < pages; i++) {
+            String pageText = response.getResponses().get(i).getTextAnnotations().get(0).getDescription();
+            pageTexts.add(pageText);
         }
 
-        System.out.println(message.toString());
-        return message.toString();
+
+//        List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations(); // Get the response to the 0th image
+//        if (texts != null) {
+//            message.append(String.format(Locale.getDefault(), "%s", texts.get(0).getDescription()));
+//        } else {
+//            message.append("nothing\n");
+//        }
+
+        //System.out.println(message.toString());
+        return null;
     }
 
     private Image getBase64EncodedJpeg(Bitmap bitmap) {

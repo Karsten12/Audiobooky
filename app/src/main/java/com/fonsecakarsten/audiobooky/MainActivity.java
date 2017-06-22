@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -210,6 +211,23 @@ public class MainActivity extends AppCompatActivity {
             holder.bookName.setText("The Hardy Boys: The Disappearing Floor");
             holder.bookAuthor.setText("Franklin W. Dixon");
 
+            holder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Go to listenAudio activity
+                    // TODO
+                }
+            });
+            holder.root.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    // Open popup with information about the book
+                    // TODO
+                    return false;
+                }
+            });
+
+
 
         }
 
@@ -223,9 +241,11 @@ public class MainActivity extends AppCompatActivity {
             CircleImageView imageView;
             TextView bookName;
             TextView bookAuthor;
+            RelativeLayout root;
 
             viewholder(View itemView) {
                 super(itemView);
+                root = (RelativeLayout) itemView.findViewById(R.id.book_row_root);
                 imageView = (CircleImageView) itemView.findViewById(R.id.profile_image);
                 bookName = (TextView) itemView.findViewById(R.id.book_name);
                 bookAuthor = (TextView) itemView.findViewById(R.id.book_author);
