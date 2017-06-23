@@ -41,14 +41,14 @@
             android:name=".CaptureActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".NewCapureActivity"
+            android:name=".NewCaptureActivity"
             android:parentActivityName=".MainActivity" />
 
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <activity android:name=".ListenAudio"></activity>
+        <activity android:name=".BookActivity"></activity>
     </application>
 
 </manifest>

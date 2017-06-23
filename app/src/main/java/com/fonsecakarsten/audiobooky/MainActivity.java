@@ -32,12 +32,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static com.fonsecakarsten.audiobooky.R.mipmap.ic_launcher_round;
 
 public class MainActivity extends AppCompatActivity {
-    private ArrayList<AudioBook> mBooks = new ArrayList<>();
-    private ArrayList<String> mImageArray;
-    private recycleAdapter mAdapter;
-    private AudioBook newBook;
-    String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.GET_ACCOUNTS};
 
+    String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.GET_ACCOUNTS};
+    private ArrayList<AudioBook> mBooks = new ArrayList<>();
+    private recycleAdapter mAdapter;
     private static String accessToken;
     static final int REQUEST_CODE_PICK_ACCOUNT = 11;
     static final int REQUEST_ACCOUNT_AUTHORIZATION = 12;
@@ -71,19 +69,10 @@ public class MainActivity extends AppCompatActivity {
         getAuthToken();
     }
 
-    // Convert each image's text using OCR
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                mImageArray = data.getExtras().getStringArrayList("imageArray");
-                if (mImageArray.size() > 0) {
-                    CloudVisionAsync task = new CloudVisionAsync(accessToken, mImageArray.get(0));
-                    task.execute();
-                }
-            }
-        } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
+        if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
             if (resultCode == RESULT_OK) {
                 String email = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                 AccountManager am = AccountManager.get(this);
@@ -145,12 +134,14 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        newBook = new AudioBook();
+                        AudioBook newBook = new AudioBook();
                         newBook.setTitle(title.getText().toString());
                         newBook.setAuthor(author.getText().toString());
 
-                        Intent intent = new Intent(getApplicationContext(), NewCapureActivity.class);
-                        startActivityForResult(intent, 1);
+                        Intent intent = new Intent(getApplicationContext(), NewCaptureActivity.class);
+                        intent.putExtra("newBook", newBook);
+                        intent.putExtra("token", accessToken);
+                        startActivity(intent);
                     }
                 })
                 .create();
@@ -252,5 +243,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }

@@ -35,7 +35,7 @@ import java.util.Date;
  * Created by Karsten on 6/5/2017.
  */
 
-public class NewCapureActivity extends Activity {
+public class NewCaptureActivity extends Activity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
     private int SELECT_FILE = 2;
@@ -46,6 +46,7 @@ public class NewCapureActivity extends Activity {
     private Bitmap rcbitmap;
     private BitmapFactory.Options mOptions = new BitmapFactory.Options();
     boolean first = true;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,11 @@ public class NewCapureActivity extends Activity {
                 done();
             }
         });
+
+        Intent fromMA = getIntent();
+        intent = new Intent(getApplicationContext(), BookActivity.class);
+        intent.putExtra("newBook", fromMA.getSerializableExtra("newBook"));
+        intent.putExtra("token", fromMA.getExtras().getString("token"));
     }
 
     public void takePicture() {
@@ -152,7 +158,7 @@ public class NewCapureActivity extends Activity {
                     }
                     image.setImageBitmap(rcbitmap);
 
-                    AlertDialog imageDialog = new AlertDialog.Builder(NewCapureActivity.this)
+                    AlertDialog imageDialog = new AlertDialog.Builder(NewCaptureActivity.this)
                             .setView(layout)
                             .setPositiveButton("RETAKE", new DialogInterface.OnClickListener() {
                                 @Override
@@ -271,9 +277,8 @@ public class NewCapureActivity extends Activity {
 
     // Pass the images back to be processed
     private void done() {
-        Intent intent = new Intent();
         intent.putExtra("imageArray", mImageArray);
-        setResult(RESULT_OK, intent);
+        startActivity(intent);
         finish();
     }
 
@@ -308,7 +313,6 @@ public class NewCapureActivity extends Activity {
 //                }
 //        }
 //    }
-
 
     public Bitmap getAndRotateImage(String path, int insamp, boolean reuse) {
         BitmapFactory.Options options;
@@ -345,6 +349,7 @@ public class NewCapureActivity extends Activity {
                 options.inSampleSize = insamp;
                 bmp = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
                 rcbitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
+                return rcbitmap;
 
             } else {
                 options = new BitmapFactory.Options();

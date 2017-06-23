@@ -2,13 +2,14 @@ package com.fonsecakarsten.audiobooky;
 
 import android.graphics.Bitmap;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by Karsten on 6/16/2017.
  */
 
-class AudioBook {
+class AudioBook implements Serializable {
     private Bitmap coverImage;
     private String title;
     private String author;

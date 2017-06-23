@@ -2,6 +2,8 @@ package com.fonsecakarsten.audiobooky;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.os.AsyncTask;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -17,6 +19,8 @@ import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +29,7 @@ import java.util.List;
  * Created by Karsten on 6/15/2017.
  */
 
-class CloudVisionAsync extends AsyncTask<String, Void, String> {
+class CloudVisionAsync extends AsyncTask<String, Void, ArrayList<String>> {
 
     private String accessToken;
     private String URI;
@@ -36,9 +40,8 @@ class CloudVisionAsync extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... params) {
+    protected ArrayList<String> doInBackground(String... params) {
         Bitmap bitmap = resizeBitmap(URI);
-
         try {
             GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
             HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
@@ -75,29 +78,19 @@ class CloudVisionAsync extends AsyncTask<String, Void, String> {
         } catch (IOException e) {
             //Log.d(LOG_TAG, "Request failed: " + e.getMessage());
         }
-        return "Cloud Vision API request failed.";
+        return null;
     }
 
-    private String convertResponseToString(BatchAnnotateImagesResponse response) {
+    private ArrayList<String> convertResponseToString(BatchAnnotateImagesResponse response) {
         //StringBuilder message = new StringBuilder("Results:\n\n");
 
         int pages = response.getResponses().size();
         ArrayList<String> pageTexts = new ArrayList<>();
         for (int i = 0; i < pages; i++) {
-            String pageText = response.getResponses().get(i).getTextAnnotations().get(0).getDescription();
+            String pageText = response.getResponses().get(i).getTextAnnotations().get(0).getDescription(); // Get the text on the ith page
             pageTexts.add(pageText);
         }
-
-
-//        List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations(); // Get the response to the 0th image
-//        if (texts != null) {
-//            message.append(String.format(Locale.getDefault(), "%s", texts.get(0).getDescription()));
-//        } else {
-//            message.append("nothing\n");
-//        }
-
-        //System.out.println(message.toString());
-        return null;
+        return pageTexts;
     }
 
     private Image getBase64EncodedJpeg(Bitmap bitmap) {
@@ -110,8 +103,7 @@ class CloudVisionAsync extends AsyncTask<String, Void, String> {
     }
 
     private Bitmap resizeBitmap(String uri) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(uri, options);
+        Bitmap bitmap = getAndRotateImage(uri);
 
         int maxDimension = 1024;
         int originalWidth = bitmap.getWidth();
@@ -131,4 +123,42 @@ class CloudVisionAsync extends AsyncTask<String, Void, String> {
         }
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
+
+    private Bitmap getAndRotateImage(String path) {
+        try {
+            File f = new File(path);
+            long length = f.length();
+            length = length / 1024;
+            ExifInterface exif = new ExifInterface(f.getPath());
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            int angle = 0;
+
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    angle = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    angle = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    angle = 270;
+                    break;
+                default:
+                    break;
+            }
+
+            Matrix mat = new Matrix();
+            mat.postRotate(angle);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Bitmap bmp = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+            return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
+
+        } catch (IOException e) {
+            System.out.println("TAG-- Error in setting image");
+        } catch (OutOfMemoryError oom) {
+            System.out.println("TAG-- OOM Error in setting image");
+        }
+        return null;
+    }
+
 }
