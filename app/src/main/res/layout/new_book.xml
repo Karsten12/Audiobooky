@@ -35,7 +35,7 @@
         android:layout_gravity="bottom|end"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:src="@mipmap/ic_launcher_round"
+        android:src="@mipmap/ic_done"
         app:fabSize="normal"
         app:layout_anchorGravity="bottom|right|end"
         app:useCompatPadding="true" />

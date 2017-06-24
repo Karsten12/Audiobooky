@@ -19,7 +19,7 @@ public class BookActivity extends AppCompatActivity {
     private ArrayList<String> mImageArray;
     private static String accessToken;
     private AudioBook book;
-    Intent fromCA;
+    private Intent fromCA;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +32,7 @@ public class BookActivity extends AppCompatActivity {
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
-        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), mLayoutManager.getOrientation());
-        recyclerView.addItemDecoration(mDividerItemDecoration);
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), mLayoutManager.getOrientation()));
 
         // Get title
         fromCA = getIntent();

@@ -29,7 +29,8 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.fonsecakarsten.audiobooky.R.mipmap.ic_launcher_round;
+import static com.fonsecakarsten.audiobooky.R.mipmap.ic_launcher;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,23 +47,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setActionBar(toolbar);
 
+        // Set up recyclerView
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.mainRecView);
         mAdapter = new recycleAdapter();
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
-        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), mLayoutManager.getOrientation());
-        recyclerView.addItemDecoration(mDividerItemDecoration);
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), mLayoutManager.getOrientation()));
 
+        // Set up Floating action button
         FloatingActionButton captureBtn = (FloatingActionButton) findViewById(R.id.FAB1);
         captureBtn.bringToFront();
         captureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createNewBook();
+                addNewBook();
             }
         });
 
@@ -116,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         accessToken = token;
     }
 
-    public void createNewBook() {
+    public void addNewBook() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View layout = inflater.inflate(R.layout.newbook_dialog, (ViewGroup) findViewById(R.id.dialog_root), false);
         final EditText title = (EditText) layout.findViewById(R.id.dialog_title);
@@ -124,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
         AlertDialog newBookDialog = new AlertDialog.Builder(this)
                 .setView(layout)
-                .setTitle("Create a new audiobook!")
+                .setTitle("Add a new audiobook!")
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -138,6 +141,8 @@ public class MainActivity extends AppCompatActivity {
                         newBook.setTitle(title.getText().toString());
                         newBook.setAuthor(author.getText().toString());
 
+                        // TODO
+                        // Check if either textboxes are empty
                         Intent intent = new Intent(getApplicationContext(), NewCaptureActivity.class);
                         intent.putExtra("newBook", newBook);
                         intent.putExtra("token", accessToken);
@@ -198,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
 //            holder.imageView.setImageBitmap(mBooks.get(position).getCoverImage());
 //            holder.bookName.setText(mBooks.get(position).getTitle());
 //            holder.bookAuthor.setText(mBooks.get(position).getAuthor());
-            holder.imageView.setImageResource(ic_launcher_round);
+            holder.imageView.setImageResource(ic_launcher);
             holder.bookName.setText("The Hardy Boys: The Disappearing Floor");
             holder.bookAuthor.setText("Franklin W. Dixon");
 

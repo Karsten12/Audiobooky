@@ -71,6 +71,7 @@ public class NewCaptureActivity extends Activity {
 
         Intent fromMA = getIntent();
         intent = new Intent(getApplicationContext(), BookActivity.class);
+        //AudioBook book = (AudioBook) fromMA.getSerializableExtra("newBook");
         intent.putExtra("newBook", fromMA.getSerializableExtra("newBook"));
         intent.putExtra("token", fromMA.getExtras().getString("token"));
     }

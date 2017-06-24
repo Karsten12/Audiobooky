@@ -160,5 +160,4 @@ class CloudVisionAsync extends AsyncTask<String, Void, ArrayList<String>> {
         }
         return null;
     }
-
 }

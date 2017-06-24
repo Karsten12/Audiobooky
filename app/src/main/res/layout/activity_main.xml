@@ -29,13 +29,13 @@
         android:id="@+id/FAB1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:src="@mipmap/ic_launcher_round"
+        android:layout_gravity="bottom|center_horizontal"
         android:clickable="true"
+        android:src="@mipmap/ic_playlist_add"
         app:fabSize="normal"
-        app:layout_anchor="@id/mainRecView"
-        app:useCompatPadding="true"
-        app:layout_anchorGravity="bottom|right|end" />
+        app:layout_anchor="@+id/mainRecView"
+        app:layout_anchorGravity="bottom|right"
+        app:useCompatPadding="true" />
 
 </android.support.design.widget.CoordinatorLayout>
 
