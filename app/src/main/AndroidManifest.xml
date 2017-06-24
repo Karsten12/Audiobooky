@@ -38,17 +38,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CaptureActivity"
+            android:name=".BookActivity"
             android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".NewCaptureActivity"
-            android:parentActivityName=".MainActivity" />
-
-        <meta-data
-            android:name="com.google.android.gms.vision.DEPENDENCIES"
-            android:value="ocr" />
-
-        <activity android:name=".BookActivity"></activity>
+        <activity android:name=".CaptureActivity" />
+        <activity android:name=".NewCaptureActivity" />
     </application>
 
 </manifest>

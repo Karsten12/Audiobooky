@@ -209,16 +209,6 @@ public class MainActivity extends AppCompatActivity {
                     // TODO
                 }
             });
-            holder.root.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    // Open popup with information about the book
-                    // TODO
-                    return false;
-                }
-            });
-
-
         }
 
         @Override

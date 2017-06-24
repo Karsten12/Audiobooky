@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chapter_row_root"
+    android:layout_width="match_parent"
+    android:layout_height="48dp">
+
+    <!--android:fontFamily="sans-serif"           // roboto regular-->
+    <!--android:fontFamily="sans-serif-light"     // roboto light-->
+    <!--android:fontFamily="sans-serif-condensed" // roboto condensed-->
+    <!--android:fontFamily="sans-serif-black"     // roboto black-->
+    <!--android:fontFamily="sans-serif-thin"      // roboto thin (android 4.2)-->
+    <!--android:fontFamily="sans-serif-medium"    // roboto medium (android 5.0)-->
+
+    <TextView
+        android:id="@+id/chapter_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Book name"
+        android:textSize="16sp"
+        android:textColor="@color/Black"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:layout_centerInParent="true" />
+
+</RelativeLayout>

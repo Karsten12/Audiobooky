@@ -50,6 +50,10 @@ class AudioBook implements Serializable {
         return pageText.get(page);
     }
 
+//    public int getChapters() {
+//        return null
+//    }
+
     public String getPublishDate() {
         return publishDate;
     }
