@@ -243,6 +243,8 @@ public class NewCaptureActivity extends Activity {
     }
 
     private void onSelectFromGalleryResult(Intent data) {
+        // TODO
+        // Fix path = null error
         Uri selectedImageUri = data.getData();
         String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = getContentResolver().query(selectedImageUri, projection, null, null, null);

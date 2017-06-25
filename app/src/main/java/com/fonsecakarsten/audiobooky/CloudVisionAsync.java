@@ -33,6 +33,7 @@ class CloudVisionAsync extends AsyncTask<String, Void, ArrayList<String>> {
 
     private String accessToken;
     private String URI;
+    private File f;
 
     CloudVisionAsync(String token, String imageURI) {
         this.accessToken = token;
@@ -68,9 +69,7 @@ class CloudVisionAsync extends AsyncTask<String, Void, ArrayList<String>> {
             batchAnnotateImagesRequest.setRequests(imageList);
 
             Vision.Images.Annotate annotateRequest = vision.images().annotate(batchAnnotateImagesRequest);
-            // Due to a bug: requests to Vision API containing large images fail when GZipped.
             annotateRequest.setDisableGZipContent(true);
-            //Log.d(LOG_TAG, "sending request");
 
             BatchAnnotateImagesResponse response = annotateRequest.execute();
             return convertResponseToString(response);
@@ -79,6 +78,13 @@ class CloudVisionAsync extends AsyncTask<String, Void, ArrayList<String>> {
             //Log.d(LOG_TAG, "Request failed: " + e.getMessage());
         }
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(ArrayList<String> strings) {
+        super.onPostExecute(strings);
+        f.delete();
+
     }
 
     private ArrayList<String> convertResponseToString(BatchAnnotateImagesResponse response) {
@@ -126,7 +132,7 @@ class CloudVisionAsync extends AsyncTask<String, Void, ArrayList<String>> {
 
     private Bitmap getAndRotateImage(String path) {
         try {
-            File f = new File(path);
+            f = new File(path);
             long length = f.length();
             length = length / 1024;
             ExifInterface exif = new ExifInterface(f.getPath());
