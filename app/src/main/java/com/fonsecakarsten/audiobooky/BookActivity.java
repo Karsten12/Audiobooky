@@ -1,5 +1,6 @@
 package com.fonsecakarsten.audiobooky;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -11,9 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -23,16 +30,15 @@ public class BookActivity extends AppCompatActivity {
     private static String accessToken;
     private AudioBook book;
     private Intent fromCA;
-    private File f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book_activity);
 
-//        // Set up toolbar
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
-//        setActionBar(toolbar);
+        // Set up toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setActionBar(toolbar);
 
         // Set up recyclerView
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.book_recview);
@@ -55,19 +61,22 @@ public class BookActivity extends AppCompatActivity {
 //        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
 
 
-        // Create file in private app directory to store all of this book's content
-        // Book's title will be the the fileName
-        String directory = "data/data/com.fonsecakarsten.audiobooky/";
-        f = new File(directory + title + ".txt");
-        if (!f.exists()) {
-            try {
-                f.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (checkFileExists(title)) {
+            openBook(title);
+        } else {
+            saveBook(title);
         }
-
-        getResults();
+//        // Create file in private app directory to store all of this book's content
+//        // Book's title will be the the fileName
+//        String directory = "data/data/com.fonsecakarsten.audiobooky/";
+//        f = new File(directory + title + ".txt");
+//        if (!f.exists()) {
+//            try {
+//                f.createNewFile();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     // Get results from newCaptureActiavity and process images, converting them with CloudVisionAsync
@@ -78,11 +87,77 @@ public class BookActivity extends AppCompatActivity {
             CloudVisionAsync task = new CloudVisionAsync(accessToken, mImageArray.get(i));
             try {
                 book.setPageText(task.get().get(0));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    // Check if audio book file already exists
+    public boolean checkFileExists(String fname) {
+        File file = getBaseContext().getFileStreamPath(fname);
+        return file.exists();
+    }
+
+    // Open saved audio book
+    public void openBook(String title) {
+        FileInputStream fis = null;
+        try {
+            fis = getApplicationContext().openFileInput(title);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        ObjectInputStream is = null;
+        try {
+            is = new ObjectInputStream(fis);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            book = (AudioBook) is.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Create new audio book, (SHOULD DO ON EXIT)
+    public void saveBook(String title) {
+        FileOutputStream fos = null;
+        try {
+            fos = getApplicationContext().openFileOutput(title, Context.MODE_PRIVATE);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        ObjectOutputStream os = null;
+        try {
+            os = new ObjectOutputStream(fos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            os.writeObject(book);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

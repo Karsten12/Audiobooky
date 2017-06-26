@@ -25,6 +25,7 @@ import android.widget.Toolbar;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -70,6 +71,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         getAuthToken();
+
+        // Get number of audio books created
+        File directory = getFilesDir();
+        File[] files = directory.listFiles();
+        int size = files.length;
+        System.out.println(size);
     }
 
     @Override
