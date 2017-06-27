@@ -53,6 +53,12 @@ public class BookActivity extends AppCompatActivity {
         book = (AudioBook) fromCA.getSerializableExtra("newBook");
         String title = book.getTitle();
 
+        if (checkFileExists(title)) {
+            openBook(title);
+        } else {
+            saveBook(title);
+        }
+
         // Set up collapsing toolbar complex view
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(book.getTitle());
@@ -60,26 +66,9 @@ public class BookActivity extends AppCompatActivity {
 //        collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
 //        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
 
-
-        if (checkFileExists(title)) {
-            openBook(title);
-        } else {
-            saveBook(title);
-        }
-//        // Create file in private app directory to store all of this book's content
-//        // Book's title will be the the fileName
-//        String directory = "data/data/com.fonsecakarsten.audiobooky/";
-//        f = new File(directory + title + ".txt");
-//        if (!f.exists()) {
-//            try {
-//                f.createNewFile();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 
-    // Get results from newCaptureActiavity and process images, converting them with CloudVisionAsync
+    // Get results from newCaptureActivity and process images, converting them with CloudVisionAsync
     private void getResults() {
         accessToken = fromCA.getExtras().getString("token");
         mImageArray = fromCA.getExtras().getStringArrayList("imageArray");
@@ -95,19 +84,24 @@ public class BookActivity extends AppCompatActivity {
 
     // Check if audio book file already exists
     public boolean checkFileExists(String fname) {
-        File file = getBaseContext().getFileStreamPath(fname);
-        return file.exists();
+        File appDir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
+        File subDirectory = new File(appDir, fname);
+        return subDirectory.exists();
     }
 
     // Open saved audio book
     public void openBook(String title) {
+        File mydir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
+        File bookFile = new File(mydir, title);
         FileInputStream fis = null;
+        ObjectInputStream is = null;
+
         try {
-            fis = getApplicationContext().openFileInput(title);
+            //fis = getApplicationContext().openFileInput(title);
+            fis = new FileInputStream(bookFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        ObjectInputStream is = null;
         try {
             is = new ObjectInputStream(fis);
         } catch (IOException e) {
@@ -130,15 +124,19 @@ public class BookActivity extends AppCompatActivity {
         }
     }
 
-    // Create new audio book, (SHOULD DO ON EXIT)
+    // Create new audio book
     public void saveBook(String title) {
+        File mydir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
+        File bookFile = new File(mydir, title);
         FileOutputStream fos = null;
+        ObjectOutputStream os = null;
+
         try {
-            fos = getApplicationContext().openFileOutput(title, Context.MODE_PRIVATE);
+            //fos = getApplicationContext().openFileOutput(title, Context.MODE_PRIVATE);
+            fos = new FileOutputStream(bookFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        ObjectOutputStream os = null;
         try {
             os = new ObjectOutputStream(fos);
         } catch (IOException e) {
@@ -166,7 +164,6 @@ public class BookActivity extends AppCompatActivity {
         @Override
         public BookActivity.recycleAdapter.viewholder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = getLayoutInflater().inflate(R.layout.chapter_row, parent, false);
-
             return new BookActivity.recycleAdapter.viewholder(v);
         }
 

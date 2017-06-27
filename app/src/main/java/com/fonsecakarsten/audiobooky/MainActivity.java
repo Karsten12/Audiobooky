@@ -4,6 +4,7 @@ import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,6 +27,10 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -70,13 +75,55 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        openAddAllBooks();
         getAuthToken();
+    }
 
-        // Get number of audio books created
-        File directory = getFilesDir();
-        File[] files = directory.listFiles();
-        int size = files.length;
-        System.out.println(size);
+    // Get list of audioBooks from internal app subdirectory "books"
+    public void getBookList() {
+        File[] files = getFilesDir().listFiles();
+        System.out.println(files.length);
+    }
+
+    //  Get a list of all audiobooks from internal app subdirectory "books" and add them to mbooks
+    public void openAddAllBooks() {
+        File appDir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
+        File subDirectory = appDir.getAbsoluteFile();
+        FileInputStream fis;
+        ObjectInputStream is;
+        AudioBook audioBook;
+
+        for (String list : subDirectory.list()) {
+            fis = null;
+            is = null;
+            audioBook = null;
+            try {
+                fis = new FileInputStream(new File(appDir, list));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            try {
+                is = new ObjectInputStream(fis);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                audioBook = (AudioBook) is.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                fis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mBooks.add(audioBook);
+        }
     }
 
     @Override
@@ -206,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(viewholder holder, int position) {
+        public void onBindViewHolder(viewholder holder, final int position) {
 //            holder.imageView.setImageBitmap(mBooks.get(position).getCoverImage());
 //            holder.bookName.setText(mBooks.get(position).getTitle());
 //            holder.bookAuthor.setText(mBooks.get(position).getAuthor());
@@ -214,13 +261,16 @@ public class MainActivity extends AppCompatActivity {
             holder.bookName.setText("The Hardy Boys: The Disappearing Floor");
             holder.bookAuthor.setText("Franklin W. Dixon");
 
-            holder.root.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Go to listenAudio activity
-                    // TODO
-                }
-            });
+//            holder.root.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    // Go to listenAudio activity
+//                    AudioBook book = mBooks.get(position);
+//                    Intent intent = new Intent(getApplicationContext(), BookActivity.class);
+//                    intent.putExtra("newBook", book);
+//                    startActivity(intent);
+//                }
+//            });
         }
 
         @Override

@@ -18,7 +18,7 @@
         android:fontFamily="sans-serif"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:text="Book name"
+        android:text="Chapter name"
         android:textSize="16sp"
         android:textColor="@color/Black"
         android:ellipsize="end"
