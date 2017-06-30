@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title"
-            android:inputType="textCapSentences" />
+            android:inputType="textCapWords" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Author"
-            android:inputType="textCapSentences" />
+            android:inputType="textCapWords" />
     </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

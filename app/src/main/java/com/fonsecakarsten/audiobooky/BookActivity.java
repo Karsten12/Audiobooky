@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,12 +40,10 @@ import java.util.concurrent.ExecutionException;
 public class BookActivity extends AppCompatActivity {
     static final int REQUEST_CODE_PICK_ACCOUNT = 11;
     static final int REQUEST_ACCOUNT_AUTHORIZATION = 12;
-    private recycleAdapter mAdapter;
-    private ArrayList<String> mImageArray;
     private static String accessToken;
-    private AudioBook book;
-    private Intent fromCA;
     Account mAccount;
+    private recycleAdapter mAdapter;
+    private AudioBook book;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,16 +62,14 @@ public class BookActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), mLayoutManager.getOrientation()));
 
-        // Get title
-        fromCA = getIntent();
-        book = (AudioBook) fromCA.getSerializableExtra("newBook");
-        String title = book.getTitle();
+        // Get book from calling Activity
+        book = (AudioBook) getIntent().getSerializableExtra("newBook");
 
-        if (checkFileExists(title)) {
-            openBook(title);
-        } else {
-            saveBook(title);
-        }
+//        if (checkFileExists(title)) {
+//            openBook(title);
+//        } else {
+//            saveBook(title);
+//        }
 
         // Set up collapsing toolbar complex view
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -81,20 +78,21 @@ public class BookActivity extends AppCompatActivity {
 //        collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
 //        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
 
-    }
-
-    // Get results from newCaptureActivity and process images, converting them with CloudVisionAsync
-    private void getResults() {
-        accessToken = fromCA.getExtras().getString("token");
-        mImageArray = fromCA.getExtras().getStringArrayList("imageArray");
-        for (int i = 0; i < mImageArray.size(); i++) {
-            CloudVisionAsync task = new CloudVisionAsync(accessToken, mImageArray.get(i));
-            try {
-                book.setPageText(task.get().get(0));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+        FloatingActionButton playFab = (FloatingActionButton) findViewById(R.id.play_fab);
+        FloatingActionButton addFab = (FloatingActionButton) findViewById(R.id.add_chapter_fab);
+        playFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO
             }
-        }
+        });
+        addFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addChapter();
+            }
+        });
+
     }
 
     // Check if audio book file already exists
@@ -140,9 +138,9 @@ public class BookActivity extends AppCompatActivity {
     }
 
     // Create new audio book
-    public void saveBook(String title) {
+    public void saveBook() {
         File mydir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
-        File bookFile = new File(mydir, title);
+        File bookFile = new File(mydir, book.getTitle());
         FileOutputStream fos = null;
         ObjectOutputStream os = null;
 
@@ -195,10 +193,9 @@ public class BookActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
 
                         // TODO
-                        // Check if either textboxes are empty
-                        // Should be startActivity for result
+                        // Check if title textbox is empty
                         Intent intent = new Intent(getApplicationContext(), NewCaptureActivity.class);
-                        startActivity(intent);
+                        startActivityForResult(intent, 1);
                     }
                 })
                 .create();
@@ -208,10 +205,28 @@ public class BookActivity extends AppCompatActivity {
 
     }
 
+    // Get images from newCaptureActivity and process them, converting them with CloudVisionAsync
+    private void processImages(ArrayList<String> imageArray) {
+        for (int i = 0; i < imageArray.size(); i++) {
+            CloudVisionAsync task = new CloudVisionAsync(accessToken, imageArray.get(i));
+            try {
+                book.setPageText(task.get().get(0));
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
+
+        if (requestCode == 1) {
+            // Process images for a new chapter
+            if (resultCode == RESULT_OK) {
+                processImages(data.getExtras().getStringArrayList("imageArray"));
+            }
+        } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
             if (resultCode == RESULT_OK) {
                 String email = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                 AccountManager am = AccountManager.get(this);
@@ -235,6 +250,24 @@ public class BookActivity extends AppCompatActivity {
                 Toast.makeText(this, "Authorization Failed", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveBook();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        saveBook();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        saveBook();
     }
 
     private void pickUserAccount() {

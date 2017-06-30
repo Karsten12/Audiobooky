@@ -68,12 +68,6 @@ public class MainActivity extends AppCompatActivity {
         openAddAllBooks();
     }
 
-    // Get list of audioBooks from internal app subdirectory "books"
-    public void getBookList() {
-        File[] files = getFilesDir().listFiles();
-        System.out.println(files.length);
-    }
-
     //  Get a list of all audiobooks from internal app subdirectory "books" and add them to mbooks
     public void openAddAllBooks() {
         File appDir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
@@ -140,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                         // TODO
                         // Check if either textboxes are empty
                         // ISBN mobile vision activity
-                        Intent intent = new Intent(getApplicationContext(), NewCaptureActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), BookActivity.class);
                         intent.putExtra("newBook", newBook);
                         startActivity(intent);
                     }
@@ -195,30 +189,27 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(viewholder holder, final int position) {
-//            holder.imageView.setImageBitmap(mBooks.get(position).getCoverImage());
-//            holder.bookName.setText(mBooks.get(position).getTitle());
-//            holder.bookAuthor.setText(mBooks.get(position).getAuthor());
+        public void onBindViewHolder(final viewholder holder, int position) {
+            //holder.imageView.setImageBitmap(mBooks.get(position).getCoverImage());
             holder.imageView.setImageResource(ic_launcher);
-            holder.bookName.setText("The Hardy Boys: The Disappearing Floor");
-            holder.bookAuthor.setText("Franklin W. Dixon");
+            holder.bookName.setText(mBooks.get(position).getTitle());
+            holder.bookAuthor.setText(mBooks.get(position).getAuthor());
 
-//            holder.root.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    // Go to listenAudio activity
-//                    AudioBook book = mBooks.get(position);
-//                    Intent intent = new Intent(getApplicationContext(), BookActivity.class);
-//                    intent.putExtra("newBook", book);
-//                    startActivity(intent);
-//                }
-//            });
+            holder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Go to listenAudio activity
+                    AudioBook book = mBooks.get(holder.getAdapterPosition());
+                    Intent intent = new Intent(getApplicationContext(), BookActivity.class);
+                    intent.putExtra("newBook", book);
+                    startActivity(intent);
+                }
+            });
         }
 
         @Override
         public int getItemCount() {
-            //return mBooks.size();
-            return 10;
+            return mBooks.size();
         }
 
         class viewholder extends RecyclerView.ViewHolder {

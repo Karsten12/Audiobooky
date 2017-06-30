@@ -46,9 +46,8 @@ import java.util.List;
 
 public class CaptureActivity extends Activity {
     private static final String TAG = "AndroidCameraApi";
-    private Button takePictureButton;
-    private TextureView textureView;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+    private static final int REQUEST_CAMERA_PERMISSION = 200;
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -61,23 +60,9 @@ public class CaptureActivity extends Activity {
     protected CameraCaptureSession cameraCaptureSessions;
     protected CaptureRequest captureRequest;
     protected CaptureRequest.Builder captureRequestBuilder;
+    private Button takePictureButton;
+    private TextureView textureView;
     private Size imageDimension;
-    private ImageReader imageReader;
-    private File file;
-    private static final int REQUEST_CAMERA_PERMISSION = 200;
-    private boolean mFlashSupported;
-    private Handler mBackgroundHandler;
-    private HandlerThread mBackgroundThread;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.camera_preview);
-        textureView = (TextureView) findViewById(R.id.texture);
-        assert textureView != null;
-        textureView.setSurfaceTextureListener(textureListener);
-    }
-
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
@@ -99,6 +84,10 @@ public class CaptureActivity extends Activity {
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
         }
     };
+    private ImageReader imageReader;
+    private File file;
+    private boolean mFlashSupported;
+    private Handler mBackgroundHandler;
     private final CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(CameraDevice camera) {
@@ -127,6 +116,16 @@ public class CaptureActivity extends Activity {
             createCameraPreview();
         }
     };
+    private HandlerThread mBackgroundThread;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.camera_preview);
+        textureView = (TextureView) findViewById(R.id.texture);
+        assert textureView != null;
+        textureView.setSurfaceTextureListener(textureListener);
+    }
 
     protected void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("Camera Background");
