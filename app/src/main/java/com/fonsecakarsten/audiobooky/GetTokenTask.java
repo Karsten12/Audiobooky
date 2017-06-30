@@ -23,7 +23,7 @@ class GetTokenTask extends AsyncTask<Void, Void, Void> {
     GetTokenTask(Activity activity, Account account) {
         this.mActivity = activity;
         this.mAccount = account;
-        this.mRequestCode = MainActivity.REQUEST_ACCOUNT_AUTHORIZATION;
+        this.mRequestCode = BookActivity.REQUEST_ACCOUNT_AUTHORIZATION;
     }
 
     @Override
@@ -31,7 +31,7 @@ class GetTokenTask extends AsyncTask<Void, Void, Void> {
         try {
             String token = fetchToken();
             if (token != null) {
-                ((MainActivity) mActivity).onTokenReceived(token);
+                ((BookActivity) mActivity).onTokenReceived(token);
             }
         } catch (IOException e) {
             e.printStackTrace();

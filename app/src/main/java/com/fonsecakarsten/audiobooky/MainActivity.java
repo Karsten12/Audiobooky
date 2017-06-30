@@ -1,8 +1,6 @@
 package com.fonsecakarsten.audiobooky;
 
 import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,11 +18,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.Toolbar;
-
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.common.AccountPicker;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,10 +37,6 @@ public class MainActivity extends AppCompatActivity {
     String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.GET_ACCOUNTS};
     private ArrayList<AudioBook> mBooks = new ArrayList<>();
     private recycleAdapter mAdapter;
-    private static String accessToken;
-    static final int REQUEST_CODE_PICK_ACCOUNT = 11;
-    static final int REQUEST_ACCOUNT_AUTHORIZATION = 12;
-    Account mAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         openAddAllBooks();
-        getAuthToken();
     }
 
     // Get list of audioBooks from internal app subdirectory "books"
@@ -126,56 +115,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
-            if (resultCode == RESULT_OK) {
-                String email = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                AccountManager am = AccountManager.get(this);
-                Account[] accounts = am.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
-                for (Account account : accounts) {
-                    if (account.name.equals(email)) {
-                        mAccount = account;
-                        break;
-                    }
-                }
-                getAuthToken();
-            } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "You need to select an account", Toast.LENGTH_SHORT).show();
-                pickUserAccount();
-            }
-        } else if (requestCode == REQUEST_ACCOUNT_AUTHORIZATION) {
-            if (resultCode == RESULT_OK) {
-                Bundle extra = data.getExtras();
-                onTokenReceived(extra.getString("authtoken"));
-            } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Authorization Failed", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void pickUserAccount() {
-        String[] accountTypes = new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
-        Intent intent = AccountPicker.newChooseAccountIntent(null, null, accountTypes, false, null, null, null, null);
-        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
-    }
-
-    private void getAuthToken() {
-        if (mAccount == null) {
-            pickUserAccount();
-        } else {
-            new GetTokenTask(MainActivity.this, mAccount).execute();
-        }
-    }
-
-    public void onTokenReceived(String token) {
-        accessToken = token;
-    }
-
     public void addNewBook() {
         LayoutInflater inflater = LayoutInflater.from(this);
-        View layout = inflater.inflate(R.layout.newbook_dialog, (ViewGroup) findViewById(R.id.dialog_root), false);
+        View layout = inflater.inflate(R.layout.newbook_dialog, (ViewGroup) findViewById(R.id.newbook_dialog_root), false);
         final EditText title = (EditText) layout.findViewById(R.id.dialog_title);
         final EditText author = (EditText) layout.findViewById(R.id.dialog_author);
 
@@ -197,9 +139,9 @@ public class MainActivity extends AppCompatActivity {
 
                         // TODO
                         // Check if either textboxes are empty
+                        // ISBN mobile vision activity
                         Intent intent = new Intent(getApplicationContext(), NewCaptureActivity.class);
                         intent.putExtra("newBook", newBook);
-                        intent.putExtra("token", accessToken);
                         startActivity(intent);
                     }
                 })

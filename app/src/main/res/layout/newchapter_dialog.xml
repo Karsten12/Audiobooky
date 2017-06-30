@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/newbook_dialog_root"
+    android:id="@+id/newchapter_dialog_root"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -11,22 +11,10 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/dialog_title"
+            android:id="@+id/chapter_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Title"
-            android:inputType="textCapSentences" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/dialog_author"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Author"
+            android:hint="Chapter Title"
             android:inputType="textCapSentences" />
     </android.support.design.widget.TextInputLayout>
 

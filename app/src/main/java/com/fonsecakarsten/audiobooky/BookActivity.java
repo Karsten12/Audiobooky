@@ -1,6 +1,10 @@
 package com.fonsecakarsten.audiobooky;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -8,11 +12,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
+
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.common.AccountPicker;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,12 +35,16 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+
 public class BookActivity extends AppCompatActivity {
+    static final int REQUEST_CODE_PICK_ACCOUNT = 11;
+    static final int REQUEST_ACCOUNT_AUTHORIZATION = 12;
     private recycleAdapter mAdapter;
     private ArrayList<String> mImageArray;
     private static String accessToken;
     private AudioBook book;
     private Intent fromCA;
+    Account mAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,6 +172,87 @@ public class BookActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // Add a chapter to the current audiobook
+    public void addChapter() {
+        getAuthToken();
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View layout = inflater.inflate(R.layout.newchapter_dialog, (ViewGroup) findViewById(R.id.newchapter_dialog_root), false);
+        final EditText title = (EditText) layout.findViewById(R.id.chapter_title);
+
+        AlertDialog newChapterDialog = new AlertDialog.Builder(this)
+                .setView(layout)
+                .setTitle("Add a new chapter!")
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        // TODO
+                        // Check if either textboxes are empty
+                        // Should be startActivity for result
+                        Intent intent = new Intent(getApplicationContext(), NewCaptureActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .create();
+        title.requestFocus();
+        newChapterDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        newChapterDialog.show();
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
+            if (resultCode == RESULT_OK) {
+                String email = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                AccountManager am = AccountManager.get(this);
+                Account[] accounts = am.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
+                for (Account account : accounts) {
+                    if (account.name.equals(email)) {
+                        mAccount = account;
+                        break;
+                    }
+                }
+                getAuthToken();
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "You need to select an account", Toast.LENGTH_SHORT).show();
+                pickUserAccount();
+            }
+        } else if (requestCode == REQUEST_ACCOUNT_AUTHORIZATION) {
+            if (resultCode == RESULT_OK) {
+                Bundle extra = data.getExtras();
+                onTokenReceived(extra.getString("authtoken"));
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Authorization Failed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void pickUserAccount() {
+        String[] accountTypes = new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
+        Intent intent = AccountPicker.newChooseAccountIntent(null, null, accountTypes, false, null, null, null, null);
+        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
+    }
+
+    private void getAuthToken() {
+        if (mAccount == null) {
+            pickUserAccount();
+        } else {
+            new GetTokenTask(BookActivity.this, mAccount).execute();
+        }
+    }
+
+    public void onTokenReceived(String token) {
+        accessToken = token;
     }
 
     private class recycleAdapter extends RecyclerView.Adapter<BookActivity.recycleAdapter.viewholder> {

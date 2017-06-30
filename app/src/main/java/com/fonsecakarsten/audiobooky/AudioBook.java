@@ -16,19 +16,8 @@ class AudioBook implements Serializable {
     private String description;
     private String publisher;
     private String publishDate;
+    private String ISBN;
     private ArrayList<String> pageText = new ArrayList<>();
-
-    public void setCoverImage(Bitmap coverImage) {
-        this.coverImage = coverImage;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
 
     public void setPageText(String newPage) {
         pageText.add(newPage);
@@ -38,12 +27,24 @@ class AudioBook implements Serializable {
         return coverImage;
     }
 
+    public void setCoverImage(Bitmap coverImage) {
+        this.coverImage = coverImage;
+    }
+
     public String getTitle() {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getAuthor() {
         return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getPageText(int page) {
@@ -53,6 +54,14 @@ class AudioBook implements Serializable {
 //    public int getChapters() {
 //        return null
 //    }
+
+    public void setISBN(String ISBN) {
+        this.ISBN = ISBN;
+    }
+
+    public String getISBN() {
+        return ISBN;
+    }
 
     public String getPublishDate() {
         return publishDate;
