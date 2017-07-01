@@ -10,9 +10,11 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +23,6 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
@@ -52,7 +53,7 @@ public class BookActivity extends AppCompatActivity {
 
         // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
-        setActionBar(toolbar);
+        setSupportActionBar(toolbar);
 
         // Set up recyclerView
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.book_recview);
@@ -65,18 +66,13 @@ public class BookActivity extends AppCompatActivity {
         // Get book from calling Activity
         book = (AudioBook) getIntent().getSerializableExtra("newBook");
 
-//        if (checkFileExists(title)) {
-//            openBook(title);
-//        } else {
-//            saveBook(title);
-//        }
-
         // Set up collapsing toolbar complex view
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(book.getTitle());
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
-//        collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
-//        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
+//        Palette palette = createPaletteSync();
+//        collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
+//        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark)));
 
         FloatingActionButton playFab = (FloatingActionButton) findViewById(R.id.play_fab);
         FloatingActionButton addFab = (FloatingActionButton) findViewById(R.id.add_chapter_fab);
@@ -93,13 +89,6 @@ public class BookActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    // Check if audio book file already exists
-    public boolean checkFileExists(String fname) {
-        File appDir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
-        File subDirectory = new File(appDir, fname);
-        return subDirectory.exists();
     }
 
     // Open saved audio book
@@ -286,6 +275,12 @@ public class BookActivity extends AppCompatActivity {
 
     public void onTokenReceived(String token) {
         accessToken = token;
+    }
+
+    // Generate palette synchronously and return it
+    public Palette createPaletteSync() {
+        Palette p = Palette.from(book.getCoverImage()).generate();
+        return p;
     }
 
     private class recycleAdapter extends RecyclerView.Adapter<BookActivity.recycleAdapter.viewholder> {
