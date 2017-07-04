@@ -20,6 +20,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.fonsecakarsten.audiobooky.Barcode.BarcodeCaptureActivity;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -127,16 +129,21 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        AudioBook newBook = new AudioBook();
-                        newBook.setTitle(title.getText().toString());
-                        newBook.setAuthor(author.getText().toString());
+//                        AudioBook newBook = new AudioBook();
+//                        newBook.setTitle(title.getText().toString());
+//                        newBook.setAuthor(author.getText().toString());
+//
+//                        // TODO
+//                        // Check if either textboxes are empty
+//                        // ISBN mobile vision activity
+//                        Intent intent = new Intent(getApplicationContext(), BookActivity.class);
+//                        intent.putExtra("newBook", newBook);
+//                        startActivity(intent);
+                        Intent intent = new Intent(getApplicationContext(), BarcodeCaptureActivity.class);
+                        intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
+                        intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
+                        startActivityForResult(intent, 1);
 
-                        // TODO
-                        // Check if either textboxes are empty
-                        // ISBN mobile vision activity
-                        Intent intent = new Intent(getApplicationContext(), BookActivity.class);
-                        intent.putExtra("newBook", newBook);
-                        startActivity(intent);
                     }
                 })
                 .create();
@@ -145,7 +152,21 @@ public class MainActivity extends AppCompatActivity {
         newBookDialog.show();
     }
 
-//    // Check if permissions granted
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK && data != null) {
+                String barcodeval = data.getStringExtra("BarCodeString");
+                BookInfoAsync task = new BookInfoAsync(barcodeval, getApplicationContext(), MainActivity.this);
+                task.execute();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+
+    //    // Check if permissions granted
 //    public static boolean hasPermissions(Context context, String... permissions)  {
 //        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
 //            for (String permission : permissions) {

@@ -9,9 +9,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="true" />
+    <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature android:name="android.hardware.camera2.full" />
 
@@ -43,6 +41,9 @@
             android:parentActivityName=".MainActivity" />
         <activity android:name=".CaptureActivity" />
         <activity android:name=".NewCaptureActivity" />
+        <activity
+            android:name=".Barcode.BarcodeCaptureActivity"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

@@ -14,15 +14,15 @@ class BarcodeGraphicTracker extends Tracker<Barcode> {
         mCallback = callback;
     }
 
-    public interface Callback {
-        void onFound(String barcodeValue);
-    }
-
     /**
      * Update the position/characteristics of the item within the overlay.
      */
     @Override
     public void onUpdate(Detector.Detections<Barcode> detectionResults, Barcode item) {
         mCallback.onFound(item.displayValue);
+    }
+
+    public interface Callback {
+        void onFound(String barcodeValue);
     }
 }

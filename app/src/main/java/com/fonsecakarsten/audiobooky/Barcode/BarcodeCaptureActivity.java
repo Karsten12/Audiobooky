@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -33,19 +32,14 @@ import java.io.IOException;
  * size, and ID of each barcode.
  */
 public final class BarcodeCaptureActivity extends AppCompatActivity {
-    private static final String TAG = "Barcode-reader";
-
-    // intent request code to handle updating play services if needed.
-    private static final int RC_HANDLE_GMS = 9001;
-
-    // permission request codes need to be < 256
-    private static final int RC_HANDLE_CAMERA_PERM = 2;
-
     // constants used to pass extra data in the intent
     public static final String AutoFocus = "AutoFocus";
     public static final String UseFlash = "UseFlash";
-    public static final String BarcodeObject = "Barcode";
-
+    private static final String TAG = "Barcode-reader";
+    // intent request code to handle updating play services if needed.
+    private static final int RC_HANDLE_GMS = 9001;
+    // permission request codes need to be < 256
+    private static final int RC_HANDLE_CAMERA_PERM = 2;
     private CameraSource mCameraSource;
     private CameraSourcePreview mPreview;
 
@@ -80,8 +74,6 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
      * sending the request.
      */
     private void requestCameraPermission() {
-        Log.w(TAG, "Camera permission is not granted. Requesting permission");
-
         final String[] permissions = new String[]{Manifest.permission.CAMERA};
 
         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
@@ -116,7 +108,10 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
         BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(new BarcodeGraphicTracker.Callback() {
             @Override
             public void onFound(String barcodeValue) {
-                System.out.println(barcodeValue);
+                Intent data = new Intent();
+                data.putExtra("BarCodeString", barcodeValue);
+                setResult(RESULT_OK, data);
+                finish();
             }
         });
         barcodeDetector.setProcessor(new MultiProcessor.Builder<>(barcodeFactory).build());
@@ -183,22 +178,17 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode != RC_HANDLE_CAMERA_PERM) {
-            Log.d(TAG, "Got unexpected permission result: " + requestCode);
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             return;
         }
 
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "Camera permission granted - initialize the camera source");
             // we have permission, so create the camerasource
             boolean autoFocus = getIntent().getBooleanExtra(AutoFocus, false);
             boolean useFlash = getIntent().getBooleanExtra(UseFlash, false);
             createCameraSource(autoFocus, useFlash);
             return;
         }
-
-        Log.e(TAG, "Permission not granted: results len = " + grantResults.length +
-                " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
 
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -230,7 +220,6 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
             try {
                 mPreview.start(mCameraSource);
             } catch (IOException e) {
-                Log.e(TAG, "Unable to start camera source.", e);
                 mCameraSource.release();
                 mCameraSource = null;
             }

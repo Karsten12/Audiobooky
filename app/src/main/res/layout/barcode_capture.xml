@@ -7,11 +7,9 @@
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
-    <com.google.android.gms.samples.vision.barcodereader.ui.camera.CameraSourcePreview
+    <com.fonsecakarsten.audiobooky.camera.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </com.google.android.gms.samples.vision.barcodereader.ui.camera.CameraSourcePreview>
+        android:layout_height="match_parent" />
 
 </LinearLayout>
