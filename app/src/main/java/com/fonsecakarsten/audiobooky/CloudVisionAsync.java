@@ -27,6 +27,7 @@ import java.util.List;
 
 /**
  * Created by Karsten on 6/15/2017.
+ * An async class that sends and processes all book pictures into text via OCR software
  */
 
 class CloudVisionAsync extends AsyncTask<String, Void, ArrayList<String>> {

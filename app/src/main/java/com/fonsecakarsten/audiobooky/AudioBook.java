@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Karsten on 6/16/2017.
+ * Default audiobook template
  */
 
 class AudioBook implements Serializable {

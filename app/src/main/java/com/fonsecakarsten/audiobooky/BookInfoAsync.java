@@ -13,11 +13,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Created by Karsten on 6/30/2017.
+ * An async class devoted to aggregating all relevant details about a given book which is found via
+ * barcode scanner
  */
 
 class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
@@ -45,31 +47,35 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
     protected AudioBook doInBackground(String... params) {
         AudioBook book = new AudioBook();
         String googleBookURL = String.format("https://www.googleapis.com/books/v1/volumes?q=isbn:%s", ISBN);
-        String imageURL = String.format("http://covers.openlibrary.org/b/isbn/%s-L.jpg", ISBN);
+        String imageURL;
 
         String title = "Hello World";
         String author = null;
         Bitmap bitmap = null;
 
-        // Get book cover image
-        try {
-            java.net.URL url = new java.net.URL(imageURL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            bitmap = BitmapFactory.decodeStream(input);
+        // Retrieve book cover image from openLibrary.org
+        String[] sizes = {"L", "M", "S"};
+        for (String size : sizes) {
+            imageURL = String.format("http://covers.openlibrary.org/b/isbn/%s-%s.jpg", ISBN, size);
+            try {
+                URL url = new URL(imageURL);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                bitmap = BitmapFactory.decodeStream(connection.getInputStream());
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (bitmap != null) {
+                break;
+            }
         }
 
         File f = null;
         if (bitmap != null) {
-            // Create a file to store the bitmap
-            File directory = context.getDir("CoverImages", Context.MODE_PRIVATE);
-            f = new File(directory, title);
-            // Store bitmap into file
+            // Create a file inside of CoverImages folder to store the book image
+            f = new File(context.getDir("CoverImages", Context.MODE_PRIVATE), title);
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(f);
@@ -97,7 +103,6 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         Intent intent = new Intent(context, BookActivity.class);
         intent.putExtra("newBook", book);
         progressDialog.dismiss();
-        activity.finish();
         activity.startActivity(intent);
 
     }
