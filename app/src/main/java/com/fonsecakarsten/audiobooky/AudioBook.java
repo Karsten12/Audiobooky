@@ -1,7 +1,5 @@
 package com.fonsecakarsten.audiobooky;
 
-import android.graphics.Bitmap;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -10,7 +8,7 @@ import java.util.ArrayList;
  */
 
 class AudioBook implements Serializable {
-    private Bitmap coverImage;
+    private String coverImagePath;
     private String title;
     private String author;
     private String description;
@@ -23,12 +21,12 @@ class AudioBook implements Serializable {
         pageText.add(newPage);
     }
 
-    public Bitmap getCoverImage() {
-        return coverImage;
+    public String getCoverImagePath() {
+        return coverImagePath;
     }
 
-    public void setCoverImage(Bitmap coverImage) {
-        this.coverImage = coverImage;
+    public void setCoverImagePath(String coverImagePath) {
+        this.coverImagePath = coverImagePath;
     }
 
     public String getTitle() {

@@ -6,11 +6,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,10 +20,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
@@ -55,6 +57,13 @@ public class BookActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
 
+        ImageView imageView = (ImageView) findViewById(R.id.book_image);
+
+        // Get book from calling Activity
+        book = (AudioBook) getIntent().getSerializableExtra("newBook");
+
+        Glide.with(this).load(Uri.parse(book.getCoverImagePath())).into(imageView);
+
         // Set up recyclerView
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.book_recview);
         mAdapter = new recycleAdapter();
@@ -62,9 +71,6 @@ public class BookActivity extends AppCompatActivity {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), mLayoutManager.getOrientation()));
-
-        // Get book from calling Activity
-        book = (AudioBook) getIntent().getSerializableExtra("newBook");
 
         // Set up collapsing toolbar complex view
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -134,7 +140,6 @@ public class BookActivity extends AppCompatActivity {
         ObjectOutputStream os = null;
 
         try {
-            //fos = getApplicationContext().openFileOutput(title, Context.MODE_PRIVATE);
             fos = new FileOutputStream(bookFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -278,10 +283,10 @@ public class BookActivity extends AppCompatActivity {
     }
 
     // Generate palette synchronously and return it
-    public Palette createPaletteSync() {
-        Palette p = Palette.from(book.getCoverImage()).generate();
-        return p;
-    }
+//    public Palette createPaletteSync() {
+//        Palette p = Palette.from(book.getCoverImage()).generate();
+//        return p;
+//    }
 
     private class recycleAdapter extends RecyclerView.Adapter<BookActivity.recycleAdapter.viewholder> {
 
