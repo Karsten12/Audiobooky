@@ -404,31 +404,10 @@ public class CameraSource {
     }
 
     /**
-     * Gets the current focus mode setting.
-     *
-     * @return current focus mode. This value is null if the camera is not yet created. Applications should call {@link
-     * #autoFocus(AutoFocusCallback)} to start the focus if focus
-     * mode is FOCUS_MODE_AUTO or FOCUS_MODE_MACRO.
-     * @see Camera.Parameters#FOCUS_MODE_AUTO
-     * @see Camera.Parameters#FOCUS_MODE_INFINITY
-     * @see Camera.Parameters#FOCUS_MODE_MACRO
-     * @see Camera.Parameters#FOCUS_MODE_FIXED
-     * @see Camera.Parameters#FOCUS_MODE_EDOF
-     * @see Camera.Parameters#FOCUS_MODE_CONTINUOUS_VIDEO
-     * @see Camera.Parameters#FOCUS_MODE_CONTINUOUS_PICTURE
-     */
-    @Nullable
-    @FocusMode
-    public String getFocusMode() {
-        return mFocusMode;
-    }
-
-    /**
      * Sets the focus mode.
      *
      * @param mode the focus mode
      * @return {@code true} if the focus mode is set, {@code false} otherwise
-     * @see #getFocusMode()
      */
     public boolean setFocusMode(@FocusMode String mode) {
         synchronized (mCameraLock) {
@@ -484,76 +463,6 @@ public class CameraSource {
 
             return false;
         }
-    }
-
-    /**
-     * Starts camera auto-focus and registers a callback function to run when
-     * the camera is focused.  This method is only valid when preview is active
-     * (between {@link #start()} or {@link #start(SurfaceHolder)} and before {@link #stop()} or {@link #release()}).
-     * <p/>
-     * <p>Callers should check
-     * {@link #getFocusMode()} to determine if
-     * this method should be called. If the camera does not support auto-focus,
-     * it is a no-op and {@link AutoFocusCallback#onAutoFocus(boolean)}
-     * callback will be called immediately.
-     * <p/>
-     * <p>If the current flash mode is not
-     * {@link Camera.Parameters#FLASH_MODE_OFF}, flash may be
-     * fired during auto-focus, depending on the driver and camera hardware.<p>
-     *
-     * @param cb the callback to run
-     * @see #cancelAutoFocus()
-     */
-    public void autoFocus(@Nullable AutoFocusCallback cb) {
-        synchronized (mCameraLock) {
-            if (mCamera != null) {
-                CameraAutoFocusCallback autoFocusCallback = null;
-                if (cb != null) {
-                    autoFocusCallback = new CameraAutoFocusCallback();
-                    autoFocusCallback.mDelegate = cb;
-                }
-                mCamera.autoFocus(autoFocusCallback);
-            }
-        }
-    }
-
-    /**
-     * Cancels any auto-focus function in progress.
-     * Whether or not auto-focus is currently in progress,
-     * this function will return the focus position to the default.
-     * If the camera does not support auto-focus, this is a no-op.
-     *
-     * @see #autoFocus(AutoFocusCallback)
-     */
-    public void cancelAutoFocus() {
-        synchronized (mCameraLock) {
-            if (mCamera != null) {
-                mCamera.cancelAutoFocus();
-            }
-        }
-    }
-
-    /**
-     * Sets camera auto-focus move callback.
-     *
-     * @param cb the callback to run
-     * @return {@code true} if the operation is supported (i.e. from Jelly Bean), {@code false} otherwise
-     */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public boolean setAutoFocusMoveCallback(@Nullable AutoFocusMoveCallback cb) {
-
-        synchronized (mCameraLock) {
-            if (mCamera != null) {
-                CameraAutoFocusMoveCallback autoFocusMoveCallback = null;
-                if (cb != null) {
-                    autoFocusMoveCallback = new CameraAutoFocusMoveCallback();
-                    autoFocusMoveCallback.mDelegate = cb;
-                }
-                mCamera.setAutoFocusMoveCallback(autoFocusMoveCallback);
-            }
-        }
-
-        return true;
     }
 
     /**

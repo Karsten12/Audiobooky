@@ -30,11 +30,9 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -96,42 +94,6 @@ public class BookActivity extends AppCompatActivity {
         });
 
     }
-
-    // Open saved audio book
-    public void openBook(String title) {
-        File mydir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
-        File bookFile = new File(mydir, title);
-        FileInputStream fis = null;
-        ObjectInputStream is = null;
-
-        try {
-            //fis = getApplicationContext().openFileInput(title);
-            fis = new FileInputStream(bookFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            is = new ObjectInputStream(fis);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            book = (AudioBook) is.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     // Create new audio book
     public void saveBook() {
         File mydir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);

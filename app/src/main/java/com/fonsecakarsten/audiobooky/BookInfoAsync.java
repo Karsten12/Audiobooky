@@ -9,10 +9,17 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -46,23 +53,22 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
     @Override
     protected AudioBook doInBackground(String... params) {
         AudioBook book = new AudioBook();
-        String googleBookURL = String.format("https://www.googleapis.com/books/v1/volumes?q=isbn:%s", ISBN);
-        String imageURL;
 
-        String title = "Hello World";
+        String title = null;
         String author = null;
         Bitmap bitmap = null;
 
         // Retrieve book cover image from openLibrary.org
+        String imageURL;
         String[] sizes = {"L", "M", "S"};
         for (String size : sizes) {
             imageURL = String.format("http://covers.openlibrary.org/b/isbn/%s-%s.jpg", ISBN, size);
             try {
                 URL url = new URL(imageURL);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                bitmap = BitmapFactory.decodeStream(connection.getInputStream());
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setDoInput(true);
+                con.connect();
+                bitmap = BitmapFactory.decodeStream(con.getInputStream());
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -72,8 +78,26 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
             }
         }
 
+        // Get book info from Google books
+        String jsonStr = getJsonString(String.format("https://www.googleapis.com/books/v1/volumes?q=isbn:%s", ISBN));
+        if (jsonStr != null) {
+            try {
+                JSONObject bookInfo = new JSONObject(jsonStr)
+                        .getJSONArray("items")
+                        .getJSONObject(0)
+                        .getJSONObject("volumeInfo");
+
+                title = bookInfo.getString("title");
+                author = bookInfo.getJSONArray("authors").getString(0);
+
+            } catch (final JSONException e) {
+                System.out.println("Error");
+            }
+        }
+
+
         File f = null;
-        if (bitmap != null) {
+        if (bitmap != null && title != null) {
             // Create a file inside of CoverImages folder to store the book image
             f = new File(context.getDir("CoverImages", Context.MODE_PRIVATE), title);
             FileOutputStream fos = null;
@@ -92,8 +116,42 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
 
         book.setCoverImagePath(Uri.fromFile(f).toString());
         book.setTitle(title);
-        book.setAuthor("Karsten Fonseca");
+        book.setAuthor(author);
         return book;
+    }
+
+    private String getJsonString(String reqUrl) {
+        String response = null;
+        try {
+            URL url = new URL(reqUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            // read the response
+            InputStream in = new BufferedInputStream(conn.getInputStream());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            StringBuilder sb = new StringBuilder();
+
+            String line;
+            try {
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line).append('\n');
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            response = sb.toString();
+        } catch (Exception e) {
+            System.out.println();
+        }
+
+        return response;
     }
 
     @Override
@@ -104,6 +162,5 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         intent.putExtra("newBook", book);
         progressDialog.dismiss();
         activity.startActivity(intent);
-
     }
 }

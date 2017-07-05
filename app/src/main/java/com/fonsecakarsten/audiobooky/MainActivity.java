@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
 import com.fonsecakarsten.audiobooky.Barcode.BarcodeCaptureActivity;
 
 import java.io.File;
@@ -30,8 +32,6 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static com.fonsecakarsten.audiobooky.R.mipmap.ic_launcher;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -156,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK && data != null) {
-                String barcodeval = data.getStringExtra("BarCodeString");
-                BookInfoAsync task = new BookInfoAsync(barcodeval, getApplicationContext(), MainActivity.this);
+                BookInfoAsync task = new BookInfoAsync(data.getStringExtra("BarCodeString"),
+                        getApplicationContext(), MainActivity.this);
                 task.execute();
             }
         } else {
@@ -211,8 +211,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final viewholder holder, int position) {
-            //holder.imageView.setImageBitmap(mBooks.get(position).getCoverImage());
-            holder.imageView.setImageResource(ic_launcher);
+            Glide.with(MainActivity.this).load(Uri.parse(mBooks.get(position).getCoverImagePath())).into(holder.imageView);
             holder.bookName.setText(mBooks.get(position).getTitle());
             holder.bookAuthor.setText(mBooks.get(position).getAuthor());
 

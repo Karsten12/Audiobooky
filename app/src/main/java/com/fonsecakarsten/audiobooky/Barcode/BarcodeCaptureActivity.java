@@ -35,7 +35,6 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
     // constants used to pass extra data in the intent
     public static final String AutoFocus = "AutoFocus";
     public static final String UseFlash = "UseFlash";
-    private static final String TAG = "Barcode-reader";
     // intent request code to handle updating play services if needed.
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -101,9 +100,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
     private void createCameraSource(boolean autoFocus, boolean useFlash) {
 
         // A barcode detector is created to track barcodes.  An associated multi-processor instance
-        // is set to receive the barcode detection results, track the barcodes, and maintain
-        // graphics for each barcode on screen.  The factory is used by the multi-processor to
-        // create a separate tracker instance for each barcode.
+        // is set to receive the barcode detection results and track the barcode
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(getApplicationContext()).build();
         BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(new BarcodeGraphicTracker.Callback() {
             @Override
@@ -124,7 +121,6 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
 
             if (hasLowStorage) {
                 Toast.makeText(this, "Low storage", Toast.LENGTH_LONG).show();
-                //Log.w(TAG, getString(R.string.low_storage_error));
             }
         }
 

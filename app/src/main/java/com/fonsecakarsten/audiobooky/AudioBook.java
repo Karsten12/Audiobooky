@@ -5,12 +5,13 @@ import java.util.ArrayList;
 
 /**
  * Created by Karsten on 6/16/2017.
- * Default audiobook template
+ * Audiobook template
  */
 
 class AudioBook implements Serializable {
     private String coverImagePath;
     private String title;
+    private String subtitle;
     private String author;
     private String description;
     private String publisher;
@@ -18,31 +19,38 @@ class AudioBook implements Serializable {
     private String ISBN;
     private ArrayList<String> pageText = new ArrayList<>();
 
-    public void setPageText(String newPage) {
+    void setPageText(String newPage) {
         pageText.add(newPage);
     }
 
-    public String getCoverImagePath() {
+    String getCoverImagePath() {
         return coverImagePath;
     }
 
-    public void setCoverImagePath(String coverImagePath) {
+    void setCoverImagePath(String coverImagePath) {
         this.coverImagePath = coverImagePath;
     }
 
-    public String getTitle() {
+    String getTitle() {
+        if (subtitle != null) {
+            return title + ": " + subtitle;
+        }
         return title;
     }
 
-    public void setTitle(String title) {
+    void setTitle(String title) {
         this.title = title;
     }
 
-    public String getAuthor() {
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+    }
+
+    String getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author) {
+    void setAuthor(String author) {
         this.author = author;
     }
 
