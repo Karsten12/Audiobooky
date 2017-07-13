@@ -55,6 +55,7 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         AudioBook book = new AudioBook();
 
         String title = null;
+        String subtitle = null;
         String author = null;
         Bitmap bitmap = null;
 
@@ -71,7 +72,7 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
                 bitmap = BitmapFactory.decodeStream(con.getInputStream());
 
             } catch (IOException e) {
-                e.printStackTrace();
+                // Error occurred
             }
             if (bitmap != null) {
                 break;
@@ -88,6 +89,7 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
                         .getJSONObject("volumeInfo");
 
                 title = bookInfo.getString("title");
+                subtitle = bookInfo.getString("subtitle");
                 author = bookInfo.getJSONArray("authors").getString(0);
 
             } catch (final JSONException e) {
@@ -104,17 +106,20 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
             try {
                 fos = new FileOutputStream(f);
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                // Error occurred
             }
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             try {
                 fos.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                // Error occurred
             }
         }
-
+        if (subtitle != null) {
+            book.setSubtitle(subtitle);
+        }
         book.setCoverImagePath(Uri.fromFile(f).toString());
+        book.setAbsolutePath(f.getAbsolutePath());
         book.setTitle(title);
         book.setAuthor(author);
         return book;
@@ -137,20 +142,18 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
                     sb.append(line).append('\n');
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                // Error occurred
             } finally {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    // Error occurred
                 }
             }
-
             response = sb.toString();
         } catch (Exception e) {
-            System.out.println();
+            // Error occurred
         }
-
         return response;
     }
 
@@ -160,7 +163,7 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
 
         Intent intent = new Intent(context, BookActivity.class);
         intent.putExtra("newBook", book);
-        progressDialog.dismiss();
         activity.startActivity(intent);
+        progressDialog.dismiss();
     }
 }

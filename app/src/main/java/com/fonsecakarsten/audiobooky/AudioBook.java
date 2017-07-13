@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 class AudioBook implements Serializable {
     private String coverImagePath;
+    private String absolutePath;
     private String title;
     private String subtitle;
     private String author;
@@ -92,5 +93,13 @@ class AudioBook implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAbsolutePath() {
+        return absolutePath;
+    }
+
+    public void setAbsolutePath(String absolutePath) {
+        this.absolutePath = absolutePath;
     }
 }

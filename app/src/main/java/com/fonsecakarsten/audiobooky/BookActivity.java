@@ -6,11 +6,17 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,10 +32,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.fonsecakarsten.audiobooky.Database.AudiobookDbHelper;
+import com.fonsecakarsten.audiobooky.Database.myContract;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -74,9 +83,9 @@ public class BookActivity extends AppCompatActivity {
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(book.getTitle());
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
-//        Palette palette = createPaletteSync();
-//        collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
-//        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark)));
+        Palette palette = createPaletteSync();
+        collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
+        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark)));
 
         FloatingActionButton playFab = (FloatingActionButton) findViewById(R.id.play_fab);
         FloatingActionButton addFab = (FloatingActionButton) findViewById(R.id.add_chapter_fab);
@@ -84,6 +93,7 @@ public class BookActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // TODO
+                idk(book.getTitle());
             }
         });
         addFab.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +104,7 @@ public class BookActivity extends AppCompatActivity {
         });
 
     }
+
     // Create new audio book
     public void saveBook() {
         File mydir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
@@ -208,6 +219,27 @@ public class BookActivity extends AppCompatActivity {
         }
     }
 
+    public void idk(String name) {
+        // To access our database, we instantiate our subclass of SQLiteOpenHelper
+        // and pass the context, which is the current activity.
+        AudiobookDbHelper mDbHelper = new AudiobookDbHelper(this, name);
+
+        // Create and/or open a database to read from it
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        // Perform this raw SQL query "SELECT * FROM pets"
+        // to get a Cursor that contains all rows from the pets table.
+        try (Cursor cursor = db.rawQuery("SELECT * FROM " + myContract.bookEntry.TABLE_NAME, null)) {
+            // Display the number of rows in the Cursor (which reflects the number of rows in the
+            // pets table in the database).
+            System.out.println(cursor.getCount());
+        }
+        // Always close the cursor when you're done reading from it. This releases all its
+        // resources and makes it invalid.
+
+    }
+
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -224,6 +256,20 @@ public class BookActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         saveBook();
+    }
+
+    // Generate palette synchronously and return it
+    public Palette createPaletteSync() {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 8;
+        Bitmap bmp = null;
+
+        try {
+            bmp = BitmapFactory.decodeStream(new FileInputStream(new File(book.getAbsolutePath())), null, options);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return Palette.from(bmp).generate();
     }
 
     private void pickUserAccount() {
@@ -243,12 +289,6 @@ public class BookActivity extends AppCompatActivity {
     public void onTokenReceived(String token) {
         accessToken = token;
     }
-
-    // Generate palette synchronously and return it
-//    public Palette createPaletteSync() {
-//        Palette p = Palette.from(book.getCoverImage()).generate();
-//        return p;
-//    }
 
     private class recycleAdapter extends RecyclerView.Adapter<BookActivity.recycleAdapter.viewholder> {
 

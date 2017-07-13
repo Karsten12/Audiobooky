@@ -76,7 +76,7 @@ class CloudVisionAsync extends AsyncTask<String, Void, ArrayList<String>> {
             return convertResponseToString(response);
 
         } catch (IOException e) {
-            //Log.d(LOG_TAG, "Request failed: " + e.getMessage());
+            // Request failed
         }
         return null;
     }
