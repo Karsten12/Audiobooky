@@ -3,6 +3,7 @@ package com.fonsecakarsten.audiobooky;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,6 +37,10 @@ import com.fonsecakarsten.audiobooky.Database.audioBookDbHelper;
 import com.fonsecakarsten.audiobooky.Database.myContract;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -236,11 +241,33 @@ public class BookActivity extends AppCompatActivity {
         // and pass the context, which is the current activity.
         audioBookDbHelper mDbHelper = new audioBookDbHelper(this, bookTitle);
 
-        // Create and/or open a database to read from it
+        // Create and/or open a database to read from it, this allows for read access as well
         db = mDbHelper.getReadableDatabase();
 
         // TODO
-        // Get all chapters names and add it to mAdapter
+        // Get all chapters names and add it to recViewAdapter
+    }
+
+    // Add the new chapter to the database
+    public void writeDatabase(String chapterTitle, ArrayList<String> chapterText) {
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+
+        // Add chapter title
+        values.put(myContract.bookEntry.COLUMN_NAME_TITLE, chapterTitle);
+
+        // Add arrayList containing the chapterText
+        JSONObject json = new JSONObject();
+        try {
+            json.put("chapterArray", new JSONArray(chapterText));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String arrayList = json.toString();
+        values.put(myContract.bookEntry.COLUMN_NAME_CHAPTER_DATA, arrayList);
+
+        // Insert the new row, returning the primary key value of the new row
+        long newRowId = db.insert(myContract.bookEntry.TABLE_NAME, null, values);
     }
 
     public void getChapter(String chapter) {
