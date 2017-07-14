@@ -43,7 +43,6 @@ class CloudVisionAsync extends AsyncTask<String, Void, ArrayList<String>> {
 
     @Override
     protected ArrayList<String> doInBackground(String... params) {
-        Bitmap bitmap = resizeBitmap(URI);
         try {
             GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
             HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
@@ -61,7 +60,7 @@ class CloudVisionAsync extends AsyncTask<String, Void, ArrayList<String>> {
 
             List<AnnotateImageRequest> imageList = new ArrayList<>();
             AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
-            Image base64EncodedImage = getBase64EncodedJpeg(bitmap);
+            Image base64EncodedImage = getBase64EncodedJpeg(resizeBitmap(URI));
             annotateImageRequest.setImage(base64EncodedImage);
             annotateImageRequest.setFeatures(featureList);
             imageList.add(annotateImageRequest);

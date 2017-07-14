@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +24,7 @@ import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.fonsecakarsten.audiobooky.Barcode.BarcodeCaptureActivity;
+import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -111,6 +113,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    // Create and/or open the database of all books and get the title, author, and imagePath
+    public void readDatabase() {
+        // To access our database, we instantiate our subclass of SQLiteOpenHelper
+        // and pass the context, which is the current activity.
+        BookDbHelper mDbHelper = new BookDbHelper(this);
+
+        // Create and/or open a database to read from it, this allows for read access as well
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        // TODO
+        // Get all book names and add it to recViewAdapter
+    }
+
     public void addNewBook() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View layout = inflater.inflate(R.layout.newbook_dialog, (ViewGroup) findViewById(R.id.newbook_dialog_root), false);
@@ -120,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog newBookDialog = new AlertDialog.Builder(this)
                 .setView(layout)
                 .setTitle("Add a new audiobook!")
+                .setCancelable(false)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

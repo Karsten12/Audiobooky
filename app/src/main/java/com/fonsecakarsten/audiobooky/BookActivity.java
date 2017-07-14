@@ -33,8 +33,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.fonsecakarsten.audiobooky.Database.audioBookDbHelper;
-import com.fonsecakarsten.audiobooky.Database.myContract;
+import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
+import com.fonsecakarsten.audiobooky.Database.BookContract;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
@@ -60,7 +60,13 @@ public class BookActivity extends AppCompatActivity {
     private recycleAdapter mAdapter;
     private AudioBook book;
     private String bookTitle;
+    private String tempChapTitle = null;
     private SQLiteDatabase db;
+
+    private static boolean checkDatabaseExist(Context context, String dbName) {
+        File dbFile = context.getDatabasePath(dbName);
+        return dbFile.exists();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +161,7 @@ public class BookActivity extends AppCompatActivity {
         AlertDialog newChapterDialog = new AlertDialog.Builder(this)
                 .setView(layout)
                 .setTitle("Add a new chapter!")
+                .setCancelable(false)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -165,10 +172,15 @@ public class BookActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        // TODO
-                        // Check if bookTitle textbox is empty
-                        Intent intent = new Intent(getApplicationContext(), NewCaptureActivity.class);
-                        startActivityForResult(intent, 1);
+                        if (!title.getText().toString().isEmpty()) {
+                            tempChapTitle = title.getText().toString();
+                            Intent intent = new Intent(getApplicationContext(), NewCaptureActivity.class);
+                            startActivityForResult(intent, 1);
+                        } else {
+                            // TODO
+                            // Keep dialog open if title string is empty
+                            Toast.makeText(BookActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 })
                 .create();
@@ -230,16 +242,11 @@ public class BookActivity extends AppCompatActivity {
         }
     }
 
-    private static boolean checkDatabaseExist(Context context, String dbName) {
-        File dbFile = context.getDatabasePath(dbName);
-        return dbFile.exists();
-    }
-
     // Create and/or open the database and get the chapter list
     public void readDatabase() {
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
-        audioBookDbHelper mDbHelper = new audioBookDbHelper(this, bookTitle);
+        BookChapterDbHelper mDbHelper = new BookChapterDbHelper(this, bookTitle);
 
         // Create and/or open a database to read from it, this allows for read access as well
         db = mDbHelper.getReadableDatabase();
@@ -254,7 +261,7 @@ public class BookActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
 
         // Add chapter title
-        values.put(myContract.bookEntry.COLUMN_NAME_TITLE, chapterTitle);
+        values.put(BookContract.bookChapterEntry.COLUMN_NAME_TITLE, chapterTitle);
 
         // Add arrayList containing the chapterText
         JSONObject json = new JSONObject();
@@ -264,10 +271,10 @@ public class BookActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         String arrayList = json.toString();
-        values.put(myContract.bookEntry.COLUMN_NAME_CHAPTER_DATA, arrayList);
+        values.put(BookContract.bookChapterEntry.COLUMN_NAME_CHAPTER_DATA, arrayList);
 
         // Insert the new row, returning the primary key value of the new row
-        long newRowId = db.insert(myContract.bookEntry.TABLE_NAME, null, values);
+        long newRowId = db.insert(BookContract.bookChapterEntry.TABLE_NAME, null, values);
     }
 
     public void getChapter(String chapter) {
@@ -275,7 +282,7 @@ public class BookActivity extends AppCompatActivity {
         // Get position from recyclerView
         // Pass text into readActivity
         String empName = "";
-        try (Cursor cursor = db.rawQuery("SELECT INPUTCOLUMNNAME FROM " + myContract.bookEntry.TABLE_NAME + "WHERE EmpNo=?", new String[]{"BLANK"})) {
+        try (Cursor cursor = db.rawQuery("SELECT INPUTCOLUMNNAME FROM " + BookContract.bookChapterEntry.TABLE_NAME + "WHERE EmpNo=?", new String[]{"BLANK"})) {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 empName = cursor.getString(cursor.getColumnIndex("EmployeeName"));
