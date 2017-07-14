@@ -32,7 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.fonsecakarsten.audiobooky.Database.AudiobookDbHelper;
+import com.fonsecakarsten.audiobooky.Database.audioBookDbHelper;
 import com.fonsecakarsten.audiobooky.Database.myContract;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
@@ -54,6 +54,8 @@ public class BookActivity extends AppCompatActivity {
     Account mAccount;
     private recycleAdapter mAdapter;
     private AudioBook book;
+    private String bookTitle;
+    private SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +66,12 @@ public class BookActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
 
-        ImageView imageView = (ImageView) findViewById(R.id.book_image);
-
         // Get book from calling Activity
         book = (AudioBook) getIntent().getSerializableExtra("newBook");
+        bookTitle = book.getTitle();
 
+        // Set imageView to book cover
+        ImageView imageView = (ImageView) findViewById(R.id.book_image);
         Glide.with(this).load(Uri.parse(book.getCoverImagePath())).into(imageView);
 
         // Set up recyclerView
@@ -81,7 +84,7 @@ public class BookActivity extends AppCompatActivity {
 
         // Set up collapsing toolbar complex view
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbarLayout.setTitle(book.getTitle());
+        collapsingToolbarLayout.setTitle(bookTitle);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         Palette palette = createPaletteSync();
         collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
@@ -93,7 +96,6 @@ public class BookActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // TODO
-                idk(book.getTitle());
             }
         });
         addFab.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +104,6 @@ public class BookActivity extends AppCompatActivity {
                 addChapter();
             }
         });
-
     }
 
     // Create new audio book
@@ -139,7 +140,7 @@ public class BookActivity extends AppCompatActivity {
         }
     }
 
-    // Add a chapter to the current audiobook
+    // Add a chapter to the current audioBook
     public void addChapter() {
         getAuthToken();
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -160,7 +161,7 @@ public class BookActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
 
                         // TODO
-                        // Check if title textbox is empty
+                        // Check if bookTitle textbox is empty
                         Intent intent = new Intent(getApplicationContext(), NewCaptureActivity.class);
                         startActivityForResult(intent, 1);
                     }
@@ -174,14 +175,19 @@ public class BookActivity extends AppCompatActivity {
 
     // Get images from newCaptureActivity and process them, converting them with CloudVisionAsync
     private void processImages(ArrayList<String> imageArray) {
+        ArrayList<String> chapterText = new ArrayList<>();
         for (int i = 0; i < imageArray.size(); i++) {
+            // Process each image 1 at a time
             CloudVisionAsync task = new CloudVisionAsync(accessToken, imageArray.get(i));
             try {
-                book.setPageText(task.get().get(0));
+                //book.setPageText(task.get().get(0));
+                chapterText.add(task.get().get(0));
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
+        // TODO
+        // Add chapterText to the dataBase
     }
 
     @Override
@@ -219,26 +225,37 @@ public class BookActivity extends AppCompatActivity {
         }
     }
 
-    public void idk(String name) {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        AudiobookDbHelper mDbHelper = new AudiobookDbHelper(this, name);
-
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        // Perform this raw SQL query "SELECT * FROM pets"
-        // to get a Cursor that contains all rows from the pets table.
-        try (Cursor cursor = db.rawQuery("SELECT * FROM " + myContract.bookEntry.TABLE_NAME, null)) {
-            // Display the number of rows in the Cursor (which reflects the number of rows in the
-            // pets table in the database).
-            System.out.println(cursor.getCount());
-        }
-        // Always close the cursor when you're done reading from it. This releases all its
-        // resources and makes it invalid.
-
+    private static boolean checkDatabaseExist(Context context, String dbName) {
+        File dbFile = context.getDatabasePath(dbName);
+        return dbFile.exists();
     }
 
+    // Create and/or open the database and get the chapter list
+    public void readDatabase() {
+        // To access our database, we instantiate our subclass of SQLiteOpenHelper
+        // and pass the context, which is the current activity.
+        audioBookDbHelper mDbHelper = new audioBookDbHelper(this, bookTitle);
+
+        // Create and/or open a database to read from it
+        db = mDbHelper.getReadableDatabase();
+
+        // TODO
+        // Get all chapters names and add it to mAdapter
+    }
+
+    public void getChapter(String chapter) {
+        // TODO
+        // Get position from recyclerView
+        // Pass text into readActivity
+        String empName = "";
+        try (Cursor cursor = db.rawQuery("SELECT INPUTCOLUMNNAME FROM " + myContract.bookEntry.TABLE_NAME + "WHERE EmpNo=?", new String[]{"BLANK"})) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                empName = cursor.getString(cursor.getColumnIndex("EmployeeName"));
+            }
+            //return empName;
+        }
+    }
 
     @Override
     protected void onPause() {
@@ -305,7 +322,7 @@ public class BookActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return 20;
+            return 10;
         }
 
         class viewholder extends RecyclerView.ViewHolder {

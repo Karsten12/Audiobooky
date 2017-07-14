@@ -10,7 +10,7 @@ import com.fonsecakarsten.audiobooky.Database.myContract.bookEntry;
  * Created by Karsten on 7/13/2017.
  */
 
-public class AudiobookDbHelper extends SQLiteOpenHelper {
+public class audioBookDbHelper extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 1;
 
@@ -23,7 +23,7 @@ public class AudiobookDbHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + bookEntry.TABLE_NAME;
 
-    public AudiobookDbHelper(Context context, String dbName) {
+    public audioBookDbHelper(Context context, String dbName) {
         super(context, dbName, null, DATABASE_VERSION);
     }
 
