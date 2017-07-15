@@ -34,7 +34,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
-import com.fonsecakarsten.audiobooky.Database.BookContract;
+import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
@@ -58,6 +58,7 @@ public class BookActivity extends AppCompatActivity {
     private static String accessToken;
     Account mAccount;
     private recycleAdapter mAdapter;
+    private ArrayList<String> mChapters = new ArrayList<>();
     private AudioBook book;
     private String bookTitle;
     private String tempChapTitle = null;
@@ -251,8 +252,22 @@ public class BookActivity extends AppCompatActivity {
         // Create and/or open a database to read from it, this allows for read access as well
         db = mDbHelper.getReadableDatabase();
 
-        // TODO
-        // Get all chapters names and add it to recViewAdapter
+        // SELECT all_columns FROM table_name
+        Cursor c = db.query(
+                bookChapterEntry.TABLE_NAME,    // The table to query
+                null,                           // The columns to return
+                null,                      // The columns for the WHERE clause
+                null,                  // The values for the WHERE clause
+                null,                           // don't group the rows
+                null,                           // don't filter by row groups
+                null);                          // The sort order
+
+        // Get all the chapter names and add it to the arraylist
+        while (c.moveToNext()) {
+            int chapterNameColumn = c.getColumnIndex(bookChapterEntry.COLUMN_NAME_TITLE);
+            mChapters.add(c.getString(chapterNameColumn));
+        }
+        c.close();
     }
 
     // Add the new chapter to the database
@@ -261,7 +276,7 @@ public class BookActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
 
         // Add chapter title
-        values.put(BookContract.bookChapterEntry.COLUMN_NAME_TITLE, chapterTitle);
+        values.put(bookChapterEntry.COLUMN_NAME_TITLE, chapterTitle);
 
         // Add arrayList containing the chapterText
         JSONObject json = new JSONObject();
@@ -271,24 +286,48 @@ public class BookActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         String arrayList = json.toString();
-        values.put(BookContract.bookChapterEntry.COLUMN_NAME_CHAPTER_DATA, arrayList);
+        values.put(bookChapterEntry.COLUMN_NAME_CHAPTER_DATA, arrayList);
 
         // Insert the new row, returning the primary key value of the new row
-        long newRowId = db.insert(BookContract.bookChapterEntry.TABLE_NAME, null, values);
+        long newRowId = db.insert(bookChapterEntry.TABLE_NAME, null, values);
     }
 
-    public void getChapter(String chapter) {
+    // Get the chapter
+    public void getChapter(int chapter) {
         // TODO
-        // Get position from recyclerView
         // Pass text into readActivity
-        String empName = "";
-        try (Cursor cursor = db.rawQuery("SELECT INPUTCOLUMNNAME FROM " + BookContract.bookChapterEntry.TABLE_NAME + "WHERE EmpNo=?", new String[]{"BLANK"})) {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                empName = cursor.getString(cursor.getColumnIndex("EmployeeName"));
+        String selection = bookChapterEntry._ID + "=?";
+        String[] selectionArgs = {String.valueOf(chapter)};
+
+        // SELECT all_columns FROM table_name WHERE bookChapterEntry._ID == chapter
+        Cursor c = db.query(
+                bookChapterEntry.TABLE_NAME,    // The table to query
+                null,                           // The columns to return
+                selection,                      // The columns for the WHERE clause
+                selectionArgs,                  // The values for the WHERE clause
+                null,                           // don't group the rows
+                null,                           // don't filter by row groups
+                null);                          // The sort order
+        int chapterNameColumn = c.getColumnIndex(bookChapterEntry.COLUMN_NAME_TITLE);
+        int chapterDataColumn = c.getColumnIndex(bookChapterEntry.COLUMN_NAME_CHAPTER_DATA);
+        String chapterName = c.getString(chapterNameColumn);
+        String idk = c.getString(chapterDataColumn);
+        c.close();
+
+        ArrayList<String> chapterText = new ArrayList<>();
+        JSONObject json = null;
+        JSONArray array = null;
+        try {
+            json = new JSONObject(idk);
+            array = json.getJSONArray("chapterArray");
+            for (int i = 0; i < array.length(); i++) {
+                chapterText.add(array.getString(i));
             }
-            //return empName;
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+
     }
 
     @Override
@@ -350,13 +389,21 @@ public class BookActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(BookActivity.recycleAdapter.viewholder holder, int position) {
-
+        public void onBindViewHolder(final BookActivity.recycleAdapter.viewholder holder, final int position) {
+            holder.chapterName.setText(mChapters.get(position));
+            holder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getChapter(holder.getAdapterPosition());
+                    // TODO
+                    // Intent to reading activity
+                }
+            });
         }
 
         @Override
         public int getItemCount() {
-            return 10;
+            return mChapters.size();
         }
 
         class viewholder extends RecyclerView.ViewHolder {

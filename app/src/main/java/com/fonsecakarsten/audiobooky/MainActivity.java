@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.fonsecakarsten.audiobooky.Barcode.BarcodeCaptureActivity;
+import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
 import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
 
 import java.io.File;
@@ -40,7 +42,9 @@ public class MainActivity extends AppCompatActivity {
 
     String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.GET_ACCOUNTS};
     private ArrayList<AudioBook> mBooks = new ArrayList<>();
+    private ArrayList<String> mBook2 = new ArrayList<>();
     private recycleAdapter mAdapter;
+    private SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,18 +117,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    // Create and/or open the database of all books and get the title, author, and imagePath
+    // Create and/or open the database and get the chapter list
     public void readDatabase() {
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
         BookDbHelper mDbHelper = new BookDbHelper(this);
 
         // Create and/or open a database to read from it, this allows for read access as well
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        db = mDbHelper.getReadableDatabase();
 
-        // TODO
-        // Get all book names and add it to recViewAdapter
+        // SELECT all_columns FROM table_name
+        Cursor c = db.query(
+                bookEntry.TABLE_NAME,    // The table to query
+                null,                    // The columns to return
+                null,                    // The columns for the WHERE clause
+                null,                    // The values for the WHERE clause
+                null,                    // don't group the rows
+                null,                    // don't filter by row groups
+                null);                   // The sort order
+
+        // Get all the chapter names and add it to the arraylist
+        while (c.moveToNext()) {
+            int chapterNameColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_TITLE);
+            mBook2.add(c.getString(chapterNameColumn));
+        }
+        c.close();
     }
 
     public void addNewBook() {
