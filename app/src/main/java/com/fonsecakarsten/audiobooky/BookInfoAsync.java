@@ -34,11 +34,13 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
     private Context context;
     private Activity activity;
     private ProgressDialog progressDialog;
+    private Intent intent;
 
     BookInfoAsync(String isbn, Context con, Activity acc) {
         this.ISBN = isbn;
         this.context = con;
         this.activity = acc;
+        this.intent = new Intent(context, BookActivity.class);
     }
 
     @Override
@@ -58,22 +60,19 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         String subtitle = null;
         String author = null;
         Bitmap bitmap = null;
+        String publisher = null;
+        String publishDate = null;
+        String description = null;
+        int rating = 0;
+
 
         // Retrieve book cover image from openLibrary.org
         String imageURL;
         String[] sizes = {"L", "M", "S"};
         for (String size : sizes) {
             imageURL = String.format("http://covers.openlibrary.org/b/isbn/%s-%s.jpg", ISBN, size);
-            try {
-                URL url = new URL(imageURL);
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setDoInput(true);
-                con.connect();
-                bitmap = BitmapFactory.decodeStream(con.getInputStream());
+            bitmap = getimageBitmap(imageURL);
 
-            } catch (IOException e) {
-                // Error occurred
-            }
             if (bitmap != null) {
                 break;
             }
@@ -91,6 +90,13 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
                 title = bookInfo.getString("title");
                 subtitle = bookInfo.getString("subtitle");
                 author = bookInfo.getJSONArray("authors").getString(0);
+                publisher = bookInfo.getString("publisher");
+                publishDate = bookInfo.getString("publishedDate");
+                description = bookInfo.getString("description");
+                rating = bookInfo.getInt("averageRating");
+                if (bitmap == null) {
+                    bitmap = getimageBitmap(bookInfo.getJSONArray("imageLinks").getString(1));
+                }
 
             } catch (final JSONException e) {
                 System.out.println("Error");
@@ -118,11 +124,44 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         if (subtitle != null) {
             book.setSubtitle(subtitle);
         }
-        book.setCoverImagePath(Uri.fromFile(f).toString());
-        book.setAbsolutePath(f.getAbsolutePath());
-        book.setTitle(title);
-        book.setAuthor(author);
+        //book.setTitle(title);
+        //book.setAuthor(author);
+        //book.setCoverImagePath(Uri.fromFile(f).toString());
+        book.setSubtitle(subtitle);
+        book.setPublisher(publisher);
+        //book.setAbsolutePath(f.getAbsolutePath());
+        book.setPublishDate(publishDate);
+        book.setDescription(description);
+        book.setRating(rating);
+        book.setISBN(ISBN);
+
+        intent.putExtra("BOOK_TITLE", title);
+        intent.putExtra("BOOK_SUBTITLE", subtitle);
+        intent.putExtra("BOOK_AUTHOR", author);
+        intent.putExtra("BOOK_GRAPHIC", Uri.fromFile(f).toString());
+        intent.putExtra("BOOK_GRAPHIC_ABSOLUTEPATH", f.getAbsolutePath());
+//        intent.putExtra("BOOK_PUBLISHER", publisher);
+//        intent.putExtra("BOOK_PUBLISHDATE", publishDate);
+//        intent.putExtra("BOOK_DESCRIPTION", description);
+//        intent.putExtra("BOOK_RATING", rating);
+//        intent.putExtra("BOOK_ISBN", ISBN);
+
         return book;
+    }
+
+
+    private Bitmap getimageBitmap(String imageURL) {
+        Bitmap bitmap = null;
+        try {
+            URL url = new URL(imageURL);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setDoInput(true);
+            con.connect();
+            bitmap = BitmapFactory.decodeStream(con.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
     }
 
     private String getJsonString(String reqUrl) {
@@ -160,8 +199,7 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
     @Override
     protected void onPostExecute(AudioBook book) {
         super.onPostExecute(book);
-
-        Intent intent = new Intent(context, BookActivity.class);
+        //Intent intent = new Intent(context, BookActivity.class);
         intent.putExtra("newBook", book);
         activity.startActivity(intent);
         progressDialog.dismiss();

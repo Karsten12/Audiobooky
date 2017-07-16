@@ -34,7 +34,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
+import com.fonsecakarsten.audiobooky.Database.BookContract;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
+import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
@@ -45,9 +47,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -59,12 +58,12 @@ public class BookActivity extends AppCompatActivity {
     Account mAccount;
     private recycleAdapter mAdapter;
     private ArrayList<String> mChapters = new ArrayList<>();
-    private AudioBook book;
     private String bookTitle;
+    private String bookGraphicAbsolutePath;
     private String tempChapTitle = null;
     private SQLiteDatabase db;
 
-    private static boolean checkDatabaseExist(Context context, String dbName) {
+    private boolean checkDatabaseExist(Context context, String dbName) {
         File dbFile = context.getDatabasePath(dbName);
         return dbFile.exists();
     }
@@ -77,14 +76,26 @@ public class BookActivity extends AppCompatActivity {
         // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Get book from calling Activity
-        book = (AudioBook) getIntent().getSerializableExtra("newBook");
-        bookTitle = book.getTitle();
+        Bundle extras = getIntent().getExtras();
+        bookTitle = extras.getString("BOOK_TITLE");
+        String bookAuthor = extras.getString("BOOK_AUTHOR");
+        String bookGraphic = extras.getString("BOOK_GRAPHIC");
+        bookGraphicAbsolutePath = extras.getString("BOOK_GRAPHIC_ABSOLUTEPATH");
 
         // Set imageView to book cover
         ImageView imageView = (ImageView) findViewById(R.id.book_image);
-        Glide.with(this).load(Uri.parse(book.getCoverImagePath())).into(imageView);
+        Glide.with(this).load(Uri.parse(bookGraphic)).into(imageView);
+
+
+        // If database exists, then Calling activity is MainActivity, so read Database for chapterList
+        if (checkDatabaseExist(this, bookTitle)) {
+            readDatabase(extras.getInt("BOOK_POSITION"));
+        } else {
+            // Database doesn't exist. Need to add it to bookDatabase and create a new database for this book
+            addBookToDatabase(bookAuthor, bookGraphic);
+        }
 
         // Set up recyclerView
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.book_recview);
@@ -97,10 +108,12 @@ public class BookActivity extends AppCompatActivity {
         // Set up collapsing toolbar complex view
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(bookTitle);
-        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         Palette palette = createPaletteSync();
+        //collapsingToolbarLayout.setCollapsedTitleTextColor(palette.getMutedSwatch().getTitleTextColor());
+        //collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
-        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark)));
+        //collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark)));
+        getWindow().setStatusBarColor(palette.getMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
 
         FloatingActionButton playFab = (FloatingActionButton) findViewById(R.id.play_fab);
         FloatingActionButton addFab = (FloatingActionButton) findViewById(R.id.add_chapter_fab);
@@ -119,38 +132,38 @@ public class BookActivity extends AppCompatActivity {
     }
 
     // Create new audio book
-    public void saveBook() {
-        File mydir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
-        File bookFile = new File(mydir, book.getTitle());
-        FileOutputStream fos = null;
-        ObjectOutputStream os = null;
-
-        try {
-            fos = new FileOutputStream(bookFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            os = new ObjectOutputStream(fos);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            os.writeObject(book);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            os.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void saveBook() {
+//        File mydir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
+//        File bookFile = new File(mydir, book.getTitle());
+//        FileOutputStream fos = null;
+//        ObjectOutputStream os = null;
+//
+//        try {
+//            fos = new FileOutputStream(bookFile);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            os = new ObjectOutputStream(fos);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            os.writeObject(book);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            os.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            fos.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     // Add a chapter to the current audioBook
     public void addChapter() {
@@ -244,7 +257,24 @@ public class BookActivity extends AppCompatActivity {
     }
 
     // Create and/or open the database and get the chapter list
-    public void readDatabase() {
+    public void readDatabase(Integer tablePosition) {
+        String Selection = BookContract.bookEntry._ID + "=?";
+        String[] idk = {String.valueOf(tablePosition)};
+
+        if (tablePosition != null) {
+            BookDbHelper bookDatabase = new BookDbHelper(this);
+            Cursor c1 = bookDatabase.getReadableDatabase().query(
+                    BookContract.bookEntry.TABLE_NAME,              // queries the list of books
+                    null,                                           // queries all columns
+                    Selection,                     // return the row (basically the book) where the id
+                    idk,                                            //  == tablePosition
+                    null,                                           // don't group the rows
+                    null,                                           // don't filter by row groups
+                    null);                                          // The sort order
+
+            c1.close();
+        }
+
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
         BookChapterDbHelper mDbHelper = new BookChapterDbHelper(this, bookTitle);
@@ -272,6 +302,7 @@ public class BookActivity extends AppCompatActivity {
 
     // Add the new chapter to the database
     public void writeDatabase(String chapterTitle, ArrayList<String> chapterText) {
+
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
 
@@ -289,7 +320,29 @@ public class BookActivity extends AppCompatActivity {
         values.put(bookChapterEntry.COLUMN_NAME_CHAPTER_DATA, arrayList);
 
         // Insert the new row, returning the primary key value of the new row
-        long newRowId = db.insert(bookChapterEntry.TABLE_NAME, null, values);
+        db.insert(bookChapterEntry.TABLE_NAME, null, values);
+    }
+
+    // Add the newBook to the Bookdatabase
+    public void addBookToDatabase(String Author, String bookGraphic) {
+
+        AudioBook book = (AudioBook) getIntent().getSerializableExtra("newBook");
+        ContentValues values = new ContentValues();
+
+        values.put(BookContract.bookEntry.COLUMN_NAME_TITLE, bookTitle);
+        values.put(BookContract.bookEntry.COLUMN_NAME_AUTHOR, Author);
+        values.put(BookContract.bookEntry.COLUMN_NAME_COVER_IMAGE_PATH, bookGraphic);
+        values.put(BookContract.bookEntry.COLUMN_NAME_ABSOLUTE_PATH, bookGraphicAbsolutePath);
+
+        values.put(BookContract.bookEntry.COLUMN_NAME_SUBTITLE, book.getSubtitle());
+        values.put(BookContract.bookEntry.COLUMN_NAME_DESCRIPTION, book.getDescription());
+        values.put(BookContract.bookEntry.COLUMN_NAME_PUBLISHER, book.getPublisher());
+        values.put(BookContract.bookEntry.COLUMN_NAME_PUBLISH_DATE, book.getPublishDate());
+        values.put(BookContract.bookEntry.COLUMN_NAME_ISBN, book.getISBN());
+        values.put(BookContract.bookEntry.COLUMN_NAME_COVER_IMAGE_PATH, bookGraphic);
+
+        SQLiteDatabase bookDatabase = new BookDbHelper(this).getWritableDatabase();
+        bookDatabase.insert(BookContract.bookEntry.TABLE_NAME, null, values);
     }
 
     // Get the chapter
@@ -331,21 +384,10 @@ public class BookActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        saveBook();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        saveBook();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-        saveBook();
+        //saveBook();
+        //readDatabase(null);
     }
 
     // Generate palette synchronously and return it
@@ -355,7 +397,7 @@ public class BookActivity extends AppCompatActivity {
         Bitmap bmp = null;
 
         try {
-            bmp = BitmapFactory.decodeStream(new FileInputStream(new File(book.getAbsolutePath())), null, options);
+            bmp = BitmapFactory.decodeStream(new FileInputStream(new File(bookGraphicAbsolutePath)), null, options);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

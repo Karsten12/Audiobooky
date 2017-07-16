@@ -1,7 +1,6 @@
 package com.fonsecakarsten.audiobooky;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * Created by Karsten on 6/16/2017.
@@ -9,20 +8,17 @@ import java.util.ArrayList;
  */
 
 class AudioBook implements Serializable {
-    private String coverImagePath;
-    private String absolutePath;
     private String title;
-    private String subtitle;
     private String author;
-    private String description;
-    private String publisher;
-    private String publishDate;
-    private String ISBN;
-    private ArrayList<String> pageText = new ArrayList<>();
+    private String coverImagePath;
 
-    void setPageText(String newPage) {
-        pageText.add(newPage);
-    }
+    private String subtitle;
+    private String publisher;
+    private String absolutePath;
+    private String publishDate;
+    private String description;
+    private int rating;
+    private String ISBN;
 
     String getCoverImagePath() {
         return coverImagePath;
@@ -43,6 +39,10 @@ class AudioBook implements Serializable {
         this.title = title;
     }
 
+    public String getSubtitle() {
+        return subtitle;
+    }
+
     public void setSubtitle(String subtitle) {
         this.subtitle = subtitle;
     }
@@ -54,14 +54,6 @@ class AudioBook implements Serializable {
     void setAuthor(String author) {
         this.author = author;
     }
-
-    public String getPageText(int page) {
-        return pageText.get(page);
-    }
-
-//    public int getChapters() {
-//        return null
-//    }
 
     public String getISBN() {
         return ISBN;
@@ -101,5 +93,13 @@ class AudioBook implements Serializable {
 
     public void setAbsolutePath(String absolutePath) {
         this.absolutePath = absolutePath;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 }

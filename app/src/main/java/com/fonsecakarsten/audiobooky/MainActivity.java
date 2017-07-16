@@ -2,7 +2,6 @@ package com.fonsecakarsten.audiobooky;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,11 +27,6 @@ import com.fonsecakarsten.audiobooky.Barcode.BarcodeCaptureActivity;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
 import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -42,9 +36,11 @@ public class MainActivity extends AppCompatActivity {
 
     String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.GET_ACCOUNTS};
     private ArrayList<AudioBook> mBooks = new ArrayList<>();
-    private ArrayList<String> mBook2 = new ArrayList<>();
+    private ArrayList<String> mBooksTitle = new ArrayList<>();
+    private ArrayList<String> mBooksAuthor = new ArrayList<>();
+    private ArrayList<String> mBooksGraphic = new ArrayList<>();
+    private ArrayList<String> mBooksAbsolutePath = new ArrayList<>();
     private recycleAdapter mAdapter;
-    private SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,63 +69,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        openAddAllBooks();
+        readDatabase();
     }
 
-    //  Get a list of all audiobooks from internal app subdirectory "books" and add them to mbooks
-    public void openAddAllBooks() {
-        File appDir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
-        File subDirectory = appDir.getAbsoluteFile();
-        FileInputStream fis;
-        ObjectInputStream is;
-        AudioBook audioBook;
-
-        for (String list : subDirectory.list()) {
-            fis = null;
-            is = null;
-            audioBook = null;
-            try {
-                fis = new FileInputStream(new File(appDir, list));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            try {
-                is = new ObjectInputStream(fis);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                audioBook = (AudioBook) is.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                fis.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            mBooks.add(audioBook);
-        }
-    }
-
-    // Create and/or open the database and get the chapter list
+    // Create and/or open the database and get the book list
     public void readDatabase() {
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
         BookDbHelper mDbHelper = new BookDbHelper(this);
 
         // Create and/or open a database to read from it, this allows for read access as well
-        db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        String[] columnsToGet = {bookEntry.COLUMN_NAME_TITLE, bookEntry.COLUMN_NAME_AUTHOR, bookEntry.COLUMN_NAME_COVER_IMAGE_PATH, bookEntry.COLUMN_NAME_ABSOLUTE_PATH};
 
         // SELECT all_columns FROM table_name
         Cursor c = db.query(
                 bookEntry.TABLE_NAME,    // The table to query
-                null,                    // The columns to return
+                columnsToGet,            // The columns to return
                 null,                    // The columns for the WHERE clause
                 null,                    // The values for the WHERE clause
                 null,                    // don't group the rows
@@ -138,10 +94,23 @@ public class MainActivity extends AppCompatActivity {
 
         // Get all the chapter names and add it to the arraylist
         while (c.moveToNext()) {
-            int chapterNameColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_TITLE);
-            mBook2.add(c.getString(chapterNameColumn));
+            int bookNameColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_TITLE);
+            int bookAuthorColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_AUTHOR);
+            int bookGraphic = c.getColumnIndex(bookEntry.COLUMN_NAME_COVER_IMAGE_PATH);
+            int bookGraphicAbsolutePath = c.getColumnIndex(bookEntry.COLUMN_NAME_ABSOLUTE_PATH);
+            mBooksTitle.add(c.getString(bookNameColumn));
+            mBooksAuthor.add(c.getString(bookAuthorColumn));
+            mBooksGraphic.add(c.getString(bookGraphic));
+            mBooksAbsolutePath.add(c.getString(bookGraphicAbsolutePath));
         }
         c.close();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        readDatabase();
+        mAdapter.notifyDataSetChanged();
     }
 
     public void addNewBook() {
@@ -245,17 +214,23 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final viewholder holder, int position) {
-            Glide.with(MainActivity.this).load(Uri.parse(mBooks.get(position).getCoverImagePath())).into(holder.imageView);
-            holder.bookName.setText(mBooks.get(position).getTitle());
-            holder.bookAuthor.setText(mBooks.get(position).getAuthor());
+
+            Glide.with(MainActivity.this).load(Uri.parse(mBooksGraphic.get(position))).into(holder.imageView);
+            holder.bookName.setText(mBooksTitle.get(position));
+            holder.bookAuthor.setText(mBooksAuthor.get(position));
 
             holder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Go to listenAudio activity
-                    AudioBook book = mBooks.get(holder.getAdapterPosition());
+                    // Go to bookactivity
                     Intent intent = new Intent(getApplicationContext(), BookActivity.class);
-                    intent.putExtra("newBook", book);
+
+                    intent.putExtra("BOOK_TITLE", mBooksTitle.get(holder.getAdapterPosition()));
+                    intent.putExtra("BOOK_AUTHOR", mBooksAuthor.get(holder.getAdapterPosition()));
+                    intent.putExtra("BOOK_GRAPHIC", mBooksGraphic.get(holder.getAdapterPosition()));
+                    intent.putExtra("BOOK_GRAPHIC_ABSOLUTEPATH", mBooksAbsolutePath.get(holder.getAdapterPosition()));
+                    intent.putExtra("BOOK_POSITION", Integer.valueOf(holder.getAdapterPosition()));
+
                     startActivity(intent);
                 }
             });
@@ -263,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return mBooks.size();
+            return mBooksTitle.size();
         }
 
         class viewholder extends RecyclerView.ViewHolder {
