@@ -266,10 +266,10 @@ public class CameraSource {
      * @throws IOException if the supplied surface holder could not be used as the preview display
      */
     @RequiresPermission(Manifest.permission.CAMERA)
-    public CameraSource start(SurfaceHolder surfaceHolder) throws IOException {
+    public void start(SurfaceHolder surfaceHolder) throws IOException {
         synchronized (mCameraLock) {
             if (mCamera != null) {
-                return this;
+                return;
             }
 
             mCamera = createCamera();
@@ -280,7 +280,6 @@ public class CameraSource {
             mFrameProcessor.setActive(true);
             mProcessingThread.start();
         }
-        return this;
     }
 
     //==============================================================================================

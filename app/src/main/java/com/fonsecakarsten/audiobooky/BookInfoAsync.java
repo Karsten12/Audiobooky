@@ -124,12 +124,9 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         if (subtitle != null) {
             book.setSubtitle(subtitle);
         }
-        //book.setTitle(title);
-        //book.setAuthor(author);
-        //book.setCoverImagePath(Uri.fromFile(f).toString());
+
         book.setSubtitle(subtitle);
         book.setPublisher(publisher);
-        //book.setAbsolutePath(f.getAbsolutePath());
         book.setPublishDate(publishDate);
         book.setDescription(description);
         book.setRating(rating);
@@ -140,11 +137,6 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         intent.putExtra("BOOK_AUTHOR", author);
         intent.putExtra("BOOK_GRAPHIC", Uri.fromFile(f).toString());
         intent.putExtra("BOOK_GRAPHIC_ABSOLUTEPATH", f.getAbsolutePath());
-//        intent.putExtra("BOOK_PUBLISHER", publisher);
-//        intent.putExtra("BOOK_PUBLISHDATE", publishDate);
-//        intent.putExtra("BOOK_DESCRIPTION", description);
-//        intent.putExtra("BOOK_RATING", rating);
-//        intent.putExtra("BOOK_ISBN", ISBN);
 
         return book;
     }

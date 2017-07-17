@@ -73,16 +73,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Create and/or open the database and get the book list
-    public void readDatabase() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
+    private void readDatabase() {
+        // instantiate subclass of SQLiteOpenHelper
         BookDbHelper mDbHelper = new BookDbHelper(this);
 
         // Create and/or open a database to read from it, this allows for read access as well
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         String[] columnsToGet = {bookEntry.COLUMN_NAME_TITLE, bookEntry.COLUMN_NAME_AUTHOR, bookEntry.COLUMN_NAME_COVER_IMAGE_PATH, bookEntry.COLUMN_NAME_ABSOLUTE_PATH};
 
-        // SELECT all_columns FROM table_name
+        // SELECT columnsToGet FROM table_name
         Cursor c = db.query(
                 bookEntry.TABLE_NAME,    // The table to query
                 columnsToGet,            // The columns to return
@@ -92,16 +91,23 @@ public class MainActivity extends AppCompatActivity {
                 null,                    // don't filter by row groups
                 null);                   // The sort order
 
-        // Get all the chapter names and add it to the arraylist
-        while (c.moveToNext()) {
-            int bookNameColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_TITLE);
-            int bookAuthorColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_AUTHOR);
-            int bookGraphic = c.getColumnIndex(bookEntry.COLUMN_NAME_COVER_IMAGE_PATH);
-            int bookGraphicAbsolutePath = c.getColumnIndex(bookEntry.COLUMN_NAME_ABSOLUTE_PATH);
-            mBooksTitle.add(c.getString(bookNameColumn));
-            mBooksAuthor.add(c.getString(bookAuthorColumn));
-            mBooksGraphic.add(c.getString(bookGraphic));
-            mBooksAbsolutePath.add(c.getString(bookGraphicAbsolutePath));
+        if (c.getCount() > mBooksTitle.size()) {
+            // Get all the chapter names and add it to the arraylist
+            mBooksTitle.clear();
+            mBooksAuthor.clear();
+            mBooksGraphic.clear();
+            mBooksAbsolutePath.clear();
+            while (c.moveToNext()) {
+                int bookNameColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_TITLE);
+                int bookAuthorColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_AUTHOR);
+                int bookGraphic = c.getColumnIndex(bookEntry.COLUMN_NAME_COVER_IMAGE_PATH);
+                int bookGraphicAbsolutePath = c.getColumnIndex(bookEntry.COLUMN_NAME_ABSOLUTE_PATH);
+                mBooksTitle.add(c.getString(bookNameColumn));
+                mBooksAuthor.add(c.getString(bookAuthorColumn));
+                mBooksGraphic.add(c.getString(bookGraphic));
+                mBooksAbsolutePath.add(c.getString(bookGraphicAbsolutePath));
+            }
+            mAdapter.notifyDataSetChanged();
         }
         c.close();
     }
@@ -110,10 +116,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         readDatabase();
-        mAdapter.notifyDataSetChanged();
     }
 
-    public void addNewBook() {
+    private void addNewBook() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View layout = inflater.inflate(R.layout.newbook_dialog, (ViewGroup) findViewById(R.id.newbook_dialog_root), false);
         final EditText title = (EditText) layout.findViewById(R.id.dialog_title);
@@ -132,16 +137,10 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-//                        AudioBook newBook = new AudioBook();
-//                        newBook.setTitle(title.getText().toString());
-//                        newBook.setAuthor(author.getText().toString());
 //
-//                        // TODO
-//                        // Check if either textboxes are empty
-//                        // ISBN mobile vision activity
-//                        Intent intent = new Intent(getApplicationContext(), BookActivity.class);
-//                        intent.putExtra("newBook", newBook);
-//                        startActivity(intent);
+//                      // TODO
+//                      // Check if either textboxes are empty
+//                      // ISBN mobile vision activity
                         Intent intent = new Intent(getApplicationContext(), BarcodeCaptureActivity.class);
                         intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
                         intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
@@ -222,14 +221,13 @@ public class MainActivity extends AppCompatActivity {
             holder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Go to bookactivity
+                    // Go to bookActivity
                     Intent intent = new Intent(getApplicationContext(), BookActivity.class);
 
                     intent.putExtra("BOOK_TITLE", mBooksTitle.get(holder.getAdapterPosition()));
                     intent.putExtra("BOOK_AUTHOR", mBooksAuthor.get(holder.getAdapterPosition()));
                     intent.putExtra("BOOK_GRAPHIC", mBooksGraphic.get(holder.getAdapterPosition()));
                     intent.putExtra("BOOK_GRAPHIC_ABSOLUTEPATH", mBooksAbsolutePath.get(holder.getAdapterPosition()));
-                    intent.putExtra("BOOK_POSITION", Integer.valueOf(holder.getAdapterPosition()));
 
                     startActivity(intent);
                 }

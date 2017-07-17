@@ -26,6 +26,7 @@ public class BookContract {
         public static final String COLUMN_NAME_PUBLISHER = "publisher";
         public static final String COLUMN_NAME_PUBLISH_DATE = "publish_date";
         public static final String COLUMN_NAME_ISBN = "ISBN";
+        public static final String COLUMN_NAME_RATING = "rating";
         public static final String COLUMN_NAME_COVER_IMAGE_PATH = "cover_image_path";
         public static final String COLUMN_NAME_ABSOLUTE_PATH = "absolute_image_path";
     }

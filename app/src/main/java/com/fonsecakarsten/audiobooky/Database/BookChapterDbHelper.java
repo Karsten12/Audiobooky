@@ -12,7 +12,7 @@ import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
 
 public class BookChapterDbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 1;
 
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + bookChapterEntry.TABLE_NAME + " (" +

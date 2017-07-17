@@ -25,6 +25,7 @@ public class BookDbHelper extends SQLiteOpenHelper {
                     bookEntry.COLUMN_NAME_PUBLISHER + " TEXT," +
                     bookEntry.COLUMN_NAME_PUBLISH_DATE + " TEXT," +
                     bookEntry.COLUMN_NAME_ISBN + " TEXT," +
+                    bookEntry.COLUMN_NAME_RATING + " INTEGER," +
                     bookEntry.COLUMN_NAME_COVER_IMAGE_PATH + " TEXT," +
                     bookEntry.COLUMN_NAME_ABSOLUTE_PATH + " TEXT)";
 

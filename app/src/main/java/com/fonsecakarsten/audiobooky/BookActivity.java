@@ -91,7 +91,7 @@ public class BookActivity extends AppCompatActivity {
 
         // If database exists, then Calling activity is MainActivity, so read Database for chapterList
         if (checkDatabaseExist(this, bookTitle)) {
-            readDatabase(extras.getInt("BOOK_POSITION"));
+            readDatabase();
         } else {
             // Database doesn't exist. Need to add it to bookDatabase and create a new database for this book
             addBookToDatabase(bookAuthor, bookGraphic);
@@ -131,42 +131,8 @@ public class BookActivity extends AppCompatActivity {
         });
     }
 
-    // Create new audio book
-//    public void saveBook() {
-//        File mydir = getApplicationContext().getDir("books", Context.MODE_PRIVATE);
-//        File bookFile = new File(mydir, book.getTitle());
-//        FileOutputStream fos = null;
-//        ObjectOutputStream os = null;
-//
-//        try {
-//            fos = new FileOutputStream(bookFile);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            os = new ObjectOutputStream(fos);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            os.writeObject(book);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            os.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            fos.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     // Add a chapter to the current audioBook
-    public void addChapter() {
+    private void addChapter() {
         getAuthToken();
         LayoutInflater inflater = LayoutInflater.from(this);
         View layout = inflater.inflate(R.layout.newchapter_dialog, (ViewGroup) findViewById(R.id.newchapter_dialog_root), false);
@@ -256,27 +222,26 @@ public class BookActivity extends AppCompatActivity {
         }
     }
 
+
+    public void getBookDetails() {
+        String Selection = BookContract.bookEntry.COLUMN_NAME_TITLE + "=?";
+        String[] rowQuery = {bookTitle};
+        BookDbHelper bookDatabase = new BookDbHelper(this);
+        Cursor c1 = bookDatabase.getReadableDatabase().query(
+                BookContract.bookEntry.TABLE_NAME,      // queries the list of books
+                null,                                   // queries all columns
+                Selection,                              // return the row (basically the book) where the id
+                rowQuery,                               //  == tablePosition
+                null,                                   // don't group the rows
+                null,                                   // don't filter by row groups
+                null);                                  // The sort order
+
+        c1.close();
+    }
+
     // Create and/or open the database and get the chapter list
-    public void readDatabase(Integer tablePosition) {
-        String Selection = BookContract.bookEntry._ID + "=?";
-        String[] idk = {String.valueOf(tablePosition)};
-
-        if (tablePosition != null) {
-            BookDbHelper bookDatabase = new BookDbHelper(this);
-            Cursor c1 = bookDatabase.getReadableDatabase().query(
-                    BookContract.bookEntry.TABLE_NAME,              // queries the list of books
-                    null,                                           // queries all columns
-                    Selection,                     // return the row (basically the book) where the id
-                    idk,                                            //  == tablePosition
-                    null,                                           // don't group the rows
-                    null,                                           // don't filter by row groups
-                    null);                                          // The sort order
-
-            c1.close();
-        }
-
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
+    private void readDatabase() {
+        // instantiate subclass of SQLiteOpenHelper
         BookChapterDbHelper mDbHelper = new BookChapterDbHelper(this, bookTitle);
 
         // Create and/or open a database to read from it, this allows for read access as well
@@ -324,7 +289,7 @@ public class BookActivity extends AppCompatActivity {
     }
 
     // Add the newBook to the Bookdatabase
-    public void addBookToDatabase(String Author, String bookGraphic) {
+    private void addBookToDatabase(String Author, String bookGraphic) {
 
         AudioBook book = (AudioBook) getIntent().getSerializableExtra("newBook");
         ContentValues values = new ContentValues();
@@ -339,14 +304,19 @@ public class BookActivity extends AppCompatActivity {
         values.put(BookContract.bookEntry.COLUMN_NAME_PUBLISHER, book.getPublisher());
         values.put(BookContract.bookEntry.COLUMN_NAME_PUBLISH_DATE, book.getPublishDate());
         values.put(BookContract.bookEntry.COLUMN_NAME_ISBN, book.getISBN());
+        values.put(BookContract.bookEntry.COLUMN_NAME_RATING, book.getRating());
         values.put(BookContract.bookEntry.COLUMN_NAME_COVER_IMAGE_PATH, bookGraphic);
 
         SQLiteDatabase bookDatabase = new BookDbHelper(this).getWritableDatabase();
         bookDatabase.insert(BookContract.bookEntry.TABLE_NAME, null, values);
+
+        // Create the database for this book
+        BookChapterDbHelper mDbHelper = new BookChapterDbHelper(this, bookTitle);
+        db = mDbHelper.getReadableDatabase();
     }
 
     // Get the chapter
-    public void getChapter(int chapter) {
+    private void getChapter(int chapter) {
         // TODO
         // Pass text into readActivity
         String selection = bookChapterEntry._ID + "=?";
@@ -391,7 +361,7 @@ public class BookActivity extends AppCompatActivity {
     }
 
     // Generate palette synchronously and return it
-    public Palette createPaletteSync() {
+    private Palette createPaletteSync() {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 8;
         Bitmap bmp = null;
