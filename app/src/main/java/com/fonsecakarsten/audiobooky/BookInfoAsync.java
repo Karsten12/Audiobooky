@@ -191,7 +191,6 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
     @Override
     protected void onPostExecute(AudioBook book) {
         super.onPostExecute(book);
-        //Intent intent = new Intent(context, BookActivity.class);
         intent.putExtra("newBook", book);
         activity.startActivity(intent);
         progressDialog.dismiss();

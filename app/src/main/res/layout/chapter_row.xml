@@ -15,14 +15,14 @@
         android:id="@+id/chapter_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:text="Chapter name"
-        android:textSize="16sp"
-        android:textColor="@color/Black"
+        android:layout_centerInParent="true"
         android:ellipsize="end"
+        android:fontFamily="sans-serif"
         android:maxLines="1"
-        android:layout_centerInParent="true" />
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:text="Chapter name"
+        android:textColor="@color/Black"
+        android:textSize="16sp" />
 
 </RelativeLayout>

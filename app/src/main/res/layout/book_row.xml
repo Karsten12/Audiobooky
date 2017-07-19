@@ -28,15 +28,15 @@
         android:id="@+id/book_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:fontFamily="sans-serif"
+        android:maxLines="1"
         android:paddingEnd="16dp"
         android:paddingStart="72dp"
         android:paddingTop="20dp"
         android:text="Book name"
-        android:textSize="16sp"
         android:textColor="@color/Black"
-        android:ellipsize="end"
-        android:maxLines="1" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/book_author"
@@ -44,14 +44,14 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/book_name"
+        android:ellipsize="end"
         android:fontFamily="sans-serif"
+        android:maxLines="1"
         android:paddingEnd="16dp"
         android:paddingStart="72dp"
         android:text="Author"
-        android:textSize="14sp"
         android:textColor="@color/Gray"
-        android:ellipsize="end"
-        android:maxLines="1" />
+        android:textSize="14sp" />
 
 
 </RelativeLayout>

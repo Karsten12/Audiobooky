@@ -17,8 +17,8 @@
         android:layout_above="@+id/preview_list"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:text="Capture"
-        android:onClick="takePicture" />
+        android:onClick="takePicture"
+        android:text="Capture" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/preview_list"

@@ -19,8 +19,8 @@
         android:layout_above="@+id/recycler_view"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:text="Capture"
-        android:onClick="selectImage" />
+        android:onClick="selectImage"
+        android:text="Capture" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -32,9 +32,9 @@
         android:id="@+id/FAB2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_gravity="bottom|end"
         android:src="@mipmap/ic_done"
         app:fabSize="normal"
         app:layout_anchorGravity="bottom|right|end"

@@ -62,6 +62,7 @@ public class BookActivity extends AppCompatActivity {
     private String bookGraphicAbsolutePath;
     private String tempChapTitle = null;
     private SQLiteDatabase db;
+    private int lastChapterRead;
 
     private boolean checkDatabaseExist(Context context, String dbName) {
         File dbFile = context.getDatabasePath(dbName);
@@ -120,7 +121,8 @@ public class BookActivity extends AppCompatActivity {
         playFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
+                getChapter(lastChapterRead);
+
             }
         });
         addFab.setOnClickListener(new View.OnClickListener() {
@@ -350,7 +352,13 @@ public class BookActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
+        // Only if the chapter text size is > 0, then go to readActivity
+        if (chapterText.size() > 0) {
+            Intent intent = new Intent(this, readChapterActivity.class);
+            intent.putExtra("CHAPTER_NAME", chapterName);
+            intent.putStringArrayListExtra("CHAPTER_TEXT", chapterText);
+            startActivity(intent);
+        }
     }
 
     @Override
