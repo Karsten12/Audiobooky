@@ -44,8 +44,7 @@ public class readChapterActivity extends AppCompatActivity {
 
     }
 
-    // Instances of this class are fragments representing a single
-    // object in our collection.
+    // Instances of this class are fragments representing a single object in our collection.
     public static class DemoObjectFragment extends Fragment {
         public static final String ARG_OBJECT = "object";
 

@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,7 +49,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 
 public class BookActivity extends AppCompatActivity {
@@ -58,6 +58,7 @@ public class BookActivity extends AppCompatActivity {
     Account mAccount;
     private recycleAdapter mAdapter;
     private ArrayList<String> mChapters = new ArrayList<>();
+    private ArrayList<Boolean> mChaptersReady = new ArrayList<>();
     private String bookTitle;
     private String bookGraphicAbsolutePath;
     private String tempChapTitle = null;
@@ -172,22 +173,6 @@ public class BookActivity extends AppCompatActivity {
 
     }
 
-    // Get images from newCaptureActivity and process them, converting them with CloudVisionAsync
-    private void processImages(ArrayList<String> imageArray) {
-        ArrayList<String> chapterText = new ArrayList<>();
-        for (int i = 0; i < imageArray.size(); i++) {
-            // Process each image 1 at a time
-            CloudVisionAsync task = new CloudVisionAsync(accessToken, imageArray.get(i));
-            try {
-                //book.setPageText(task.get().get(0));
-                chapterText.add(task.get().get(0));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-        // TODO
-        // Add chapterText to the dataBase
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -196,7 +181,7 @@ public class BookActivity extends AppCompatActivity {
         if (requestCode == 1) {
             // Process images for a new chapter
             if (resultCode == RESULT_OK) {
-                processImages(data.getExtras().getStringArrayList("imageArray"));
+                writeDatabase(tempChapTitle, data.getExtras().getStringArrayList("imageArray"));
             }
         } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
             if (resultCode == RESULT_OK) {
@@ -263,34 +248,27 @@ public class BookActivity extends AppCompatActivity {
         while (c.moveToNext()) {
             int chapterNameColumn = c.getColumnIndex(bookChapterEntry.COLUMN_NAME_TITLE);
             mChapters.add(c.getString(chapterNameColumn));
+            mChaptersReady.add(true);
         }
         c.close();
     }
 
-    // Add the new chapter to the database
-    public void writeDatabase(String chapterTitle, ArrayList<String> chapterText) {
 
-        // Create a new map of values, where column names are the keys
-        ContentValues values = new ContentValues();
-
-        // Add chapter title
-        values.put(bookChapterEntry.COLUMN_NAME_TITLE, chapterTitle);
-
-        // Add arrayList containing the chapterText
-        JSONObject json = new JSONObject();
-        try {
-            json.put("chapterArray", new JSONArray(chapterText));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String arrayList = json.toString();
-        values.put(bookChapterEntry.COLUMN_NAME_CHAPTER_DATA, arrayList);
-
-        // Insert the new row, returning the primary key value of the new row
-        db.insert(bookChapterEntry.TABLE_NAME, null, values);
+    // Get images from newCaptureActivity and process them, converting them with CloudVisionAsync
+    // Then adds the new chapter to the database
+    private void writeDatabase(String chapterTitle, ArrayList<String> imageArray) {
+        // Add book to chapterList to list
+        mChapters.add(chapterTitle);
+        mChaptersReady.add(false);
+        mAdapter.notifyDataSetChanged();
+        int position = mChapters.indexOf(chapterTitle);
+        // chapterText is being processed, show indeterminate progressCircle
+        CloudVisionAsync2 task = new CloudVisionAsync2(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position);
+        task.execute();
+        tempChapTitle = null;
     }
 
-    // Add the newBook to the Bookdatabase
+    // Add the newBook to the bookDatabase
     private void addBookToDatabase(String Author, String bookGraphic) {
 
         AudioBook book = (AudioBook) getIntent().getSerializableExtra("newBook");
@@ -361,13 +339,6 @@ public class BookActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //saveBook();
-        //readDatabase(null);
-    }
-
     // Generate palette synchronously and return it
     private Palette createPaletteSync() {
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -400,7 +371,7 @@ public class BookActivity extends AppCompatActivity {
         accessToken = token;
     }
 
-    private class recycleAdapter extends RecyclerView.Adapter<BookActivity.recycleAdapter.viewholder> {
+    class recycleAdapter extends RecyclerView.Adapter<BookActivity.recycleAdapter.viewholder> {
 
         @Override
         public BookActivity.recycleAdapter.viewholder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -409,14 +380,20 @@ public class BookActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(final BookActivity.recycleAdapter.viewholder holder, final int position) {
+        public void onBindViewHolder(final BookActivity.recycleAdapter.viewholder holder, int position) {
             holder.chapterName.setText(mChapters.get(position));
+            if (mChaptersReady.get(position)) {
+                holder.progressBar.setVisibility(View.GONE);
+            } else {
+                holder.progressBar.setVisibility(View.VISIBLE);
+            }
             holder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getChapter(holder.getAdapterPosition());
-                    // TODO
-                    // Intent to reading activity
+                    int position = holder.getAdapterPosition();
+                    if (mChaptersReady.get(position)) {
+                        getChapter(position);
+                    }
                 }
             });
         }
@@ -429,11 +406,13 @@ public class BookActivity extends AppCompatActivity {
         class viewholder extends RecyclerView.ViewHolder {
             TextView chapterName;
             RelativeLayout root;
+            ProgressBar progressBar;
 
             viewholder(View itemView) {
                 super(itemView);
                 root = (RelativeLayout) itemView.findViewById(R.id.chapter_row_root);
                 chapterName = (TextView) itemView.findViewById(R.id.chapter_name);
+                progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar2);
             }
         }
     }
