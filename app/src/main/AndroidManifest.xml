@@ -45,7 +45,7 @@
             android:name=".Barcode.BarcodeCaptureActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".readChapterActivity"
+            android:name=".ReadChapterActivity"
             android:parentActivityName=".BookActivity" />
     </application>
 

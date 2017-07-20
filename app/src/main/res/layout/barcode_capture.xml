@@ -7,7 +7,7 @@
     android:keepScreenOn="true"
     android:orientation="vertical">
 
-    <com.fonsecakarsten.audiobooky.camera.CameraSourcePreview
+    <com.fonsecakarsten.audiobooky.Camera.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

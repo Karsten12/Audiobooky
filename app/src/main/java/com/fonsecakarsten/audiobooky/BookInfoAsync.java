@@ -161,7 +161,7 @@ class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         try {
             URL url = new URL(reqUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
+            conn.setRequestMethod(context.getString(R.string.get));
             // read the response
             InputStream in = new BufferedInputStream(conn.getInputStream());
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));

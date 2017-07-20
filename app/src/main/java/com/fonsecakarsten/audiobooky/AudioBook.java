@@ -20,14 +20,6 @@ class AudioBook implements Serializable {
     private int rating;
     private String ISBN;
 
-    String getCoverImagePath() {
-        return coverImagePath;
-    }
-
-    void setCoverImagePath(String coverImagePath) {
-        this.coverImagePath = coverImagePath;
-    }
-
     String getTitle() {
         if (subtitle != null) {
             return title + ": " + subtitle;
@@ -39,67 +31,51 @@ class AudioBook implements Serializable {
         this.title = title;
     }
 
-    public String getSubtitle() {
+    String getSubtitle() {
         return subtitle;
     }
 
-    public void setSubtitle(String subtitle) {
+    void setSubtitle(String subtitle) {
         this.subtitle = subtitle;
     }
 
-    String getAuthor() {
-        return author;
-    }
-
-    void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getISBN() {
+    String getISBN() {
         return ISBN;
     }
 
-    public void setISBN(String ISBN) {
+    void setISBN(String ISBN) {
         this.ISBN = ISBN;
     }
 
-    public String getPublishDate() {
+    String getPublishDate() {
         return publishDate;
     }
 
-    public void setPublishDate(String publishDate) {
+    void setPublishDate(String publishDate) {
         this.publishDate = publishDate;
     }
 
-    public String getPublisher() {
+    String getPublisher() {
         return publisher;
     }
 
-    public void setPublisher(String publisher) {
+    void setPublisher(String publisher) {
         this.publisher = publisher;
     }
 
-    public String getDescription() {
+    String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    void setDescription(String description) {
         this.description = description;
     }
 
-    public String getAbsolutePath() {
-        return absolutePath;
-    }
-
-    public void setAbsolutePath(String absolutePath) {
-        this.absolutePath = absolutePath;
-    }
-
-    public int getRating() {
+    int getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    void setRating(int rating) {
         this.rating = rating;
     }
 }

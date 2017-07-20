@@ -68,8 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 addNewBook();
             }
         });
-
-        readDatabase();
     }
 
     // Create and/or open the database and get the book list
@@ -126,15 +124,15 @@ public class MainActivity extends AppCompatActivity {
 
         AlertDialog newBookDialog = new AlertDialog.Builder(this)
                 .setView(layout)
-                .setTitle("Add a new audiobook!")
+                .setTitle(R.string.newBookString)
                 .setCancelable(false)
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 })
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 //

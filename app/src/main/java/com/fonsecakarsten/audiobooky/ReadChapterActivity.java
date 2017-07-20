@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * Created by Karsten on 7/16/2017.
  */
 
-public class readChapterActivity extends AppCompatActivity {
+public class ReadChapterActivity extends AppCompatActivity {
 
     FragmentAdapter adapter;
     ViewPager mViewPager;

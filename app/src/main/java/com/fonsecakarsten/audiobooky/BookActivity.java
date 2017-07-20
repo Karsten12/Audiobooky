@@ -81,10 +81,10 @@ public class BookActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Bundle extras = getIntent().getExtras();
-        bookTitle = extras.getString("BOOK_TITLE");
-        String bookAuthor = extras.getString("BOOK_AUTHOR");
-        String bookGraphic = extras.getString("BOOK_GRAPHIC");
-        bookGraphicAbsolutePath = extras.getString("BOOK_GRAPHIC_ABSOLUTEPATH");
+        bookTitle = extras.getString(getString(R.string.book_title));
+        String bookAuthor = extras.getString(getString(R.string.book_author));
+        String bookGraphic = extras.getString(getString(R.string.book_graphic));
+        bookGraphicAbsolutePath = extras.getString(getString(R.string.book_graphic_absolutePath));
 
         // Set imageView to book cover
         ImageView imageView = (ImageView) findViewById(R.id.book_image);
@@ -143,15 +143,15 @@ public class BookActivity extends AppCompatActivity {
 
         AlertDialog newChapterDialog = new AlertDialog.Builder(this)
                 .setView(layout)
-                .setTitle("Add a new chapter!")
+                .setTitle(R.string.newChapterString)
                 .setCancelable(false)
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 })
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -162,7 +162,7 @@ public class BookActivity extends AppCompatActivity {
                         } else {
                             // TODO
                             // Keep dialog open if title string is empty
-                            Toast.makeText(BookActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(BookActivity.this, R.string.TitleEmptyWarning, Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -181,7 +181,7 @@ public class BookActivity extends AppCompatActivity {
         if (requestCode == 1) {
             // Process images for a new chapter
             if (resultCode == RESULT_OK) {
-                writeDatabase(tempChapTitle, data.getExtras().getStringArrayList("imageArray"));
+                writeDatabase(data.getExtras().getStringArrayList("imageArray"));
             }
         } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
             if (resultCode == RESULT_OK) {
@@ -253,17 +253,16 @@ public class BookActivity extends AppCompatActivity {
         c.close();
     }
 
-
     // Get images from newCaptureActivity and process them, converting them with CloudVisionAsync
     // Then adds the new chapter to the database
-    private void writeDatabase(String chapterTitle, ArrayList<String> imageArray) {
+    private void writeDatabase(ArrayList<String> imageArray) {
         // Add book to chapterList to list
-        mChapters.add(chapterTitle);
+        mChapters.add(tempChapTitle);
         mChaptersReady.add(false);
         mAdapter.notifyDataSetChanged();
-        int position = mChapters.indexOf(chapterTitle);
+        int position = mChapters.indexOf(tempChapTitle);
         // chapterText is being processed, show indeterminate progressCircle
-        CloudVisionAsync2 task = new CloudVisionAsync2(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position);
+        CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position);
         task.execute();
         tempChapTitle = null;
     }
@@ -295,10 +294,8 @@ public class BookActivity extends AppCompatActivity {
         db = mDbHelper.getReadableDatabase();
     }
 
-    // Get the chapter
+    // Get the chapter and go to ReadActivity
     private void getChapter(int chapter) {
-        // TODO
-        // Pass text into readActivity
         String selection = bookChapterEntry._ID + "=?";
         String[] selectionArgs = {String.valueOf(chapter)};
 
@@ -318,8 +315,8 @@ public class BookActivity extends AppCompatActivity {
         c.close();
 
         ArrayList<String> chapterText = new ArrayList<>();
-        JSONObject json = null;
-        JSONArray array = null;
+        JSONObject json;
+        JSONArray array;
         try {
             json = new JSONObject(idk);
             array = json.getJSONArray("chapterArray");
@@ -332,7 +329,7 @@ public class BookActivity extends AppCompatActivity {
 
         // Only if the chapter text size is > 0, then go to readActivity
         if (chapterText.size() > 0) {
-            Intent intent = new Intent(this, readChapterActivity.class);
+            Intent intent = new Intent(this, ReadChapterActivity.class);
             intent.putExtra("CHAPTER_NAME", chapterName);
             intent.putStringArrayListExtra("CHAPTER_TEXT", chapterText);
             startActivity(intent);

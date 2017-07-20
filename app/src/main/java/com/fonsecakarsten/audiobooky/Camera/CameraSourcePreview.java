@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky.camera;
+package com.fonsecakarsten.audiobooky.Camera;
 
 import android.Manifest;
 import android.content.Context;

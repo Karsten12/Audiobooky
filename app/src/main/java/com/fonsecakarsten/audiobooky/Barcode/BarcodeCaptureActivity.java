@@ -16,9 +16,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.fonsecakarsten.audiobooky.Camera.CameraSource;
+import com.fonsecakarsten.audiobooky.Camera.CameraSourcePreview;
 import com.fonsecakarsten.audiobooky.R;
-import com.fonsecakarsten.audiobooky.camera.CameraSource;
-import com.fonsecakarsten.audiobooky.camera.CameraSourcePreview;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.MultiProcessor;

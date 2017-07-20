@@ -328,7 +328,7 @@ public class NewCaptureActivity extends Activity {
                                     // notifyItemRangeChanged(position, mImageArray.size());
                                 }
                             })
-                            .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                            .setNeutralButton(R.string.Ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
