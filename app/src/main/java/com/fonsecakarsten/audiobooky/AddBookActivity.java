@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky.NewCamera;
+package com.fonsecakarsten.audiobooky;
 
 import android.Manifest;
 import android.app.Activity;
@@ -10,8 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -29,14 +27,13 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v13.app.ActivityCompat;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -53,7 +50,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.fonsecakarsten.audiobooky.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,14 +65,14 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class Camera2 extends Activity implements View.OnClickListener {
+public class AddBookActivity extends Activity {
 
     // Conversion from screen rotation to JPEG orientation.
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
     //Tag for the {@link Log}.
-    private static final String TAG = "Camera2";
+    private static final String TAG = "AddBookActivity";
     // Camera state: Showing camera preview.
     private static final int STATE_PREVIEW = 0;
     // Camera state: Waiting for the focus to be locked.
@@ -87,9 +83,9 @@ public class Camera2 extends Activity implements View.OnClickListener {
     private static final int STATE_WAITING_NON_PRECAPTURE = 3;
     // Camera state: Picture was taken.
     private static final int STATE_PICTURE_TAKEN = 4;
-    // Max preview width that is guaranteed by Camera2 API
+    // Max preview width that is guaranteed by AddBookActivity API
     private static final int MAX_PREVIEW_WIDTH = 1920;
-    // Max preview height that is guaranteed by Camera2 API
+    // Max preview height that is guaranteed by AddBookActivity API
     private static final int MAX_PREVIEW_HEIGHT = 1080;
 
     static {
@@ -100,15 +96,15 @@ public class Camera2 extends Activity implements View.OnClickListener {
     }
 
     protected ArrayList<String> mImageArray = new ArrayList<>();
-    protected MyAdapter mAdapter;
+    private imageAdapter mAdapter;
     /**
      * ID of the current {@link CameraDevice}.
      */
     private String mCameraId;
     /**
-     * An {@link AutoFitTextureView} for camera preview.
+     * An {@link CameraView} for camera preview.
      */
-    private AutoFitTextureView mTextureView;
+    private CameraView mTextureView;
     /**
      * A {@link CameraCaptureSession } for camera preview.
      */
@@ -145,7 +141,6 @@ public class Camera2 extends Activity implements View.OnClickListener {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            System.out.println("NEW_IMAGESAVER");
             mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
         }
 
@@ -267,10 +262,6 @@ public class Camera2 extends Activity implements View.OnClickListener {
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
-//            Activity activity = getActivity();
-//            if (null != activity) {
-//                activity.finish();
-//            }
             finish();
         }
 
@@ -355,19 +346,25 @@ public class Camera2 extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.camera2);
-        mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
+        setContentView(R.layout.add_book_activity);
+        mTextureView = (CameraView) findViewById(R.id.texture);
         Button button = (Button) findViewById(R.id.picture);
-        button.setOnClickListener(this);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         mImageArray = new ArrayList<>();
-        mAdapter = new MyAdapter();
+        mAdapter = new imageAdapter();
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
 
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                takePicture();
+                mAdapter.notifyDataSetChanged();
+            }
+        });
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.FAB2);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -416,7 +413,7 @@ public class Camera2 extends Activity implements View.OnClickListener {
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(Camera2.this,
+                            ActivityCompat.requestPermissions(AddBookActivity.this,
                                     new String[]{Manifest.permission.CAMERA},
                                     REQUEST_CAMERA_PERMISSION);
                         }
@@ -558,7 +555,7 @@ public class Camera2 extends Activity implements View.OnClickListener {
     }
 
     /**
-     * Opens the camera specified by {@link Camera2#mCameraId}.
+     * Opens the camera specified by {@link AddBookActivity#mCameraId}.
      */
     private void openCamera(int width, int height) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -817,13 +814,13 @@ public class Camera2 extends Activity implements View.OnClickListener {
                     //Log.d(TAG, mFile.toString());
                     unlockFocus();
 
-                    Camera2.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAdapter.notifyDataSetChanged();
-                            System.out.println("NOTIFY_DATA_CHANGED");
-                        }
-                    });
+//                    AddBookActivity.this.runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            mAdapter.notifyDataSetChanged();
+//                            System.out.println("NOTIFY_DATA_CHANGED");
+//                        }
+//                    });
                 }
             };
 
@@ -863,16 +860,6 @@ public class Camera2 extends Activity implements View.OnClickListener {
             mCaptureSession.setRepeatingRequest(mPreviewRequest, mCaptureCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.picture: {
-                takePicture();
-                break;
-            }
         }
     }
 
@@ -977,24 +964,26 @@ public class Camera2 extends Activity implements View.OnClickListener {
         }
     }
 
-    class MyAdapter extends RecyclerView.Adapter<Camera2.MyAdapter.Myviewholder> {
+    private class imageAdapter extends RecyclerView.Adapter<imageAdapter.Myviewholder> {
 
         @Override
-        public Camera2.MyAdapter.Myviewholder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public imageAdapter.Myviewholder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = getLayoutInflater().inflate(R.layout.image_row, parent, false);
 
-            return new Camera2.MyAdapter.Myviewholder(v);
+            return new Myviewholder(v);
         }
 
         @Override
-        public void onBindViewHolder(final Camera2.MyAdapter.Myviewholder holder, int position) {
+        public void onBindViewHolder(final imageAdapter.Myviewholder holder, int position) {
             final String imagePath = mImageArray.get(position);
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 4;
-            final Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
             // Display image
-            Glide.with(Camera2.this).load(Uri.parse(imagePath)).into(holder.imageView);
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//            options.inSampleSize = 8;
+//            final Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+//            holder.imageView.setImageBitmap(bitmap);
+
+            Glide.with(AddBookActivity.this).load(imagePath).into(holder.imageView);
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -1003,9 +992,9 @@ public class Camera2 extends Activity implements View.OnClickListener {
 
                     // Display the image
                     ImageView image = (ImageView) layout.findViewById(R.id.image_popup_image);
-                    Glide.with(Camera2.this).load(Uri.parse(imagePath)).into(image);
+                    Glide.with(AddBookActivity.this).load(imagePath).into(image);
 
-                    AlertDialog imageDialog = new AlertDialog.Builder(Camera2.this)
+                    AlertDialog imageDialog = new AlertDialog.Builder(AddBookActivity.this)
                             .setView(layout)
                             .setPositiveButton("RETAKE", new DialogInterface.OnClickListener() {
                                 @Override
@@ -1027,7 +1016,6 @@ public class Camera2 extends Activity implements View.OnClickListener {
                             .setNegativeButton("REMOVE", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-
                                     mImageArray.remove(holder.getAdapterPosition());
                                     notifyItemRemoved(holder.getAdapterPosition());
                                     notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray.size());

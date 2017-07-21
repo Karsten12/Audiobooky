@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.fonsecakarsten.audiobooky.NewCamera.AutoFitTextureView
+    <com.fonsecakarsten.audiobooky.CameraView
         android:id="@+id/texture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,8 +24,9 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" />
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/LightBlue" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/FAB2"

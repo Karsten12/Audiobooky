@@ -45,9 +45,7 @@
         <activity
             android:name=".ReadChapterActivity"
             android:parentActivityName=".BookActivity" />
-        <activity
-            android:name=".NewCamera.Camera2"
-            android:theme="@style/captureActivity" />
+        <activity android:name=".AddBookActivity" />
     </application>
 
 </manifest>

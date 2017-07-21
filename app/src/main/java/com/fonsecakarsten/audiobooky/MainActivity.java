@@ -25,7 +25,6 @@ import android.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
 import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
-import com.fonsecakarsten.audiobooky.NewCamera.Camera2;
 
 import java.util.ArrayList;
 
@@ -143,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 //                        intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
 //                        intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
 //                        startActivityForResult(intent, 1);
-                        Intent intent = new Intent(getApplicationContext(), Camera2.class);
+                        Intent intent = new Intent(getApplicationContext(), AddBookActivity.class);
                         startActivity(intent);
 
                     }

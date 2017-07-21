@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.fonsecakarsten.audiobooky.NewCamera;
+package com.fonsecakarsten.audiobooky;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -23,20 +23,20 @@ import android.view.TextureView;
 /**
  * A {@link TextureView} that can be adjusted to a specified aspect ratio.
  */
-public class AutoFitTextureView extends TextureView {
+public class CameraView extends TextureView {
 
     private int mRatioWidth = 0;
     private int mRatioHeight = 0;
 
-    public AutoFitTextureView(Context context) {
+    public CameraView(Context context) {
         this(context, null);
     }
 
-    public AutoFitTextureView(Context context, AttributeSet attrs) {
+    public CameraView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public AutoFitTextureView(Context context, AttributeSet attrs, int defStyle) {
+    public CameraView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
