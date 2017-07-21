@@ -38,6 +38,7 @@ import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
 import com.fonsecakarsten.audiobooky.Database.BookContract;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
 import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
+import com.fonsecakarsten.audiobooky.NewCamera.Camera2;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
@@ -157,7 +158,7 @@ public class BookActivity extends AppCompatActivity {
 
                         if (!title.getText().toString().isEmpty()) {
                             tempChapTitle = title.getText().toString();
-                            Intent intent = new Intent(getApplicationContext(), NewCaptureActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), Camera2.class);
                             startActivityForResult(intent, 1);
                         } else {
                             // TODO

@@ -39,14 +39,15 @@
         <activity
             android:name=".BookActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".CaptureActivity" />
-        <activity android:name=".NewCaptureActivity" />
         <activity
             android:name=".Barcode.BarcodeCaptureActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ReadChapterActivity"
             android:parentActivityName=".BookActivity" />
+        <activity
+            android:name=".NewCamera.Camera2"
+            android:theme="@style/captureActivity" />
     </application>
 
 </manifest>
