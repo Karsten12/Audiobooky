@@ -41,10 +41,6 @@ import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -122,7 +118,7 @@ public class BookActivity extends AppCompatActivity {
         playFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getChapter(lastChapterRead);
+                readChapter(lastChapterRead);
 
             }
         });
@@ -172,7 +168,6 @@ public class BookActivity extends AppCompatActivity {
         newChapterDialog.show();
 
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -294,46 +289,11 @@ public class BookActivity extends AppCompatActivity {
         db = mDbHelper.getReadableDatabase();
     }
 
-    // Get the chapter and go to ReadActivity
-    private void getChapter(int chapter) {
-        String selection = bookChapterEntry._ID + "=?";
-        String[] selectionArgs = {String.valueOf(chapter)};
-
-        // SELECT all_columns FROM table_name WHERE bookChapterEntry._ID == chapter
-        Cursor c = db.query(
-                bookChapterEntry.TABLE_NAME,    // The table to query
-                null,                           // The columns to return
-                selection,                      // The columns for the WHERE clause
-                selectionArgs,                  // The values for the WHERE clause
-                null,                           // don't group the rows
-                null,                           // don't filter by row groups
-                null);                          // The sort order
-        int chapterNameColumn = c.getColumnIndex(bookChapterEntry.COLUMN_NAME_TITLE);
-        int chapterDataColumn = c.getColumnIndex(bookChapterEntry.COLUMN_NAME_CHAPTER_DATA);
-        String chapterName = c.getString(chapterNameColumn);
-        String idk = c.getString(chapterDataColumn);
-        c.close();
-
-        ArrayList<String> chapterText = new ArrayList<>();
-        JSONObject json;
-        JSONArray array;
-        try {
-            json = new JSONObject(idk);
-            array = json.getJSONArray("chapterArray");
-            for (int i = 0; i < array.length(); i++) {
-                chapterText.add(array.getString(i));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        // Only if the chapter text size is > 0, then go to readActivity
-        if (chapterText.size() > 0) {
-            Intent intent = new Intent(this, ReadChapterActivity.class);
-            intent.putExtra("CHAPTER_NAME", chapterName);
-            intent.putStringArrayListExtra("CHAPTER_TEXT", chapterText);
-            startActivity(intent);
-        }
+    // Go to ReadActivity
+    private void readChapter(int chapter) {
+        Intent intent = new Intent(this, ReadChapterActivity.class);
+        intent.putExtra("CHAPTER_NAME", mChapters.get(chapter));
+        startActivity(intent);
     }
 
     // Generate palette synchronously and return it
@@ -387,10 +347,7 @@ public class BookActivity extends AppCompatActivity {
             holder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = holder.getAdapterPosition();
-                    if (mChaptersReady.get(position)) {
-                        getChapter(position);
-                    }
+                    readChapter(holder.getAdapterPosition());
                 }
             });
         }

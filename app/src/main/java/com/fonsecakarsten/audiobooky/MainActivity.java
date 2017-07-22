@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
+import com.fonsecakarsten.audiobooky.Barcode.BarcodeCaptureActivity;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
 import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
 
@@ -138,12 +139,12 @@ public class MainActivity extends AppCompatActivity {
 //                      // TODO
 //                      // Check if either textboxes are empty
 //                      // ISBN mobile vision activity
-//                        Intent intent = new Intent(getApplicationContext(), BarcodeCaptureActivity.class);
-//                        intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
-//                        intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
-//                        startActivityForResult(intent, 1);
-                        Intent intent = new Intent(getApplicationContext(), AddBookActivity.class);
-                        startActivity(intent);
+                        Intent intent = new Intent(getApplicationContext(), BarcodeCaptureActivity.class);
+                        intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
+                        intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
+                        startActivityForResult(intent, 1);
+//                        Intent intent = new Intent(getApplicationContext(), AddBookActivity.class);
+//                        startActivity(intent);
 
                     }
                 })

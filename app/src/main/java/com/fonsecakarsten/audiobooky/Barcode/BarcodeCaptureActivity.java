@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -23,8 +22,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-
-import java.io.IOException;
 
 /**
  * Activity for the multi-tracker app.  This app detects barcodes and displays the value with the
@@ -60,7 +57,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
         // permission is not granted yet, request permission.
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
-            createCameraSource(autoFocus, useFlash);
+            createCameraSource();
         } else {
             requestCameraPermission();
         }
@@ -97,7 +94,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
      * to other detection examples to enable the barcode detector to detect small barcodes
      * at long distances.
      */
-    private void createCameraSource(boolean autoFocus, boolean useFlash) {
+    private void createCameraSource() {
 
         // A barcode detector is created to track barcodes.  An associated multi-processor instance
         // is set to receive the barcode detection results and track the barcode
@@ -128,13 +125,11 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
         // to other detection examples to enable the barcode detector to detect small barcodes
         // at long distances.
         CameraSource.Builder builder = new CameraSource.Builder(getApplicationContext(), barcodeDetector)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedPreviewSize(1600, 1024)
-                .setRequestedFps(15.0f);
+                .setFacing();
 
         // make sure that auto focus is an available option
-        builder = builder.setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null);
-        mCameraSource = builder.setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null).build();
+        builder = builder.setFocusMode();
+        mCameraSource = builder.build();
 
     }
 
@@ -182,7 +177,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
             // we have permission, so create the camerasource
             boolean autoFocus = getIntent().getBooleanExtra(AutoFocus, false);
             boolean useFlash = getIntent().getBooleanExtra(UseFlash, false);
-            createCameraSource(autoFocus, useFlash);
+            createCameraSource();
             return;
         }
 
@@ -213,12 +208,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
         }
 
         if (mCameraSource != null) {
-            try {
-                mPreview.start(mCameraSource);
-            } catch (IOException e) {
-                mCameraSource.release();
-                mCameraSource = null;
-            }
+            mPreview.start(mCameraSource);
         }
     }
 }
