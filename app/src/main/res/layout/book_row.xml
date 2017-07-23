@@ -34,7 +34,7 @@
         android:paddingEnd="16dp"
         android:paddingStart="72dp"
         android:paddingTop="20dp"
-        android:text="Book name"
+        android:text="@string/book_name"
         android:textColor="@color/Black"
         android:textSize="16sp" />
 
@@ -49,7 +49,7 @@
         android:maxLines="1"
         android:paddingEnd="16dp"
         android:paddingStart="72dp"
-        android:text="Author"
+        android:text="@string/author"
         android:textColor="@color/Gray"
         android:textSize="14sp" />
 

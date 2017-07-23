@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky;
+package com.fonsecakarsten.audiobooky.Book;
 
 import java.io.Serializable;
 
@@ -7,7 +7,7 @@ import java.io.Serializable;
  * Audiobook template
  */
 
-class AudioBook implements Serializable {
+public class AudioBook implements Serializable {
     private String title;
     private String author;
     private String coverImagePath;

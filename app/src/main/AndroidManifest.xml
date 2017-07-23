@@ -34,14 +34,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BookActivity"
+            android:name=".Book.BookActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".Barcode.BarcodeCaptureActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".ReadChapterActivity"
-            android:parentActivityName=".BookActivity" />
+            android:name=".Book.ReadChapterActivity"
+            android:parentActivityName=".Book.BookActivity" />
         <activity android:name=".AddBookActivity" />
     </application>
 

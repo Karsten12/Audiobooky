@@ -14,7 +14,7 @@
             android:id="@+id/chapter_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Chapter Title"
+            android:hint="@string/chapter_name"
             android:inputType="textCapSentences" />
     </android.support.design.widget.TextInputLayout>
 

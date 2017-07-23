@@ -3,13 +3,12 @@ package com.fonsecakarsten.audiobooky.Camera;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
-import android.view.SurfaceHolder;
+import android.util.Size;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.ViewGroup;
 
 import com.fonsecakarsten.audiobooky.CameraView;
-import com.google.android.gms.common.images.Size;
 
 /**
  * Created by Karsten on 6/16/2017.
@@ -33,22 +32,7 @@ public class CameraSourcePreview extends ViewGroup {
     private int screenWidth;
     private int screenHeight;
     private int screenRotation;
-    private final SurfaceHolder.Callback mSurfaceViewListener = new SurfaceHolder.Callback() {
-        @Override
-        public void surfaceCreated(SurfaceHolder surface) {
-            mSurfaceAvailable = true;
-            startIfReady();
-        }
 
-        @Override
-        public void surfaceDestroyed(SurfaceHolder surface) {
-            mSurfaceAvailable = false;
-        }
-
-        @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        }
-    };
     private final TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture texture, int width, int height) {
@@ -78,8 +62,6 @@ public class CameraSourcePreview extends ViewGroup {
         screenRotation = Utils.getScreenRotation(context);
         mStartRequested = false;
         mSurfaceAvailable = false;
-        mSurfaceView = new SurfaceView(context);
-        mSurfaceView.getHolder().addCallback(mSurfaceViewListener);
         mAutoFitTextureView = new CameraView(context);
         mAutoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
     }
@@ -91,8 +73,6 @@ public class CameraSourcePreview extends ViewGroup {
         screenRotation = Utils.getScreenRotation(context);
         mStartRequested = false;
         mSurfaceAvailable = false;
-        mSurfaceView = new SurfaceView(context);
-        mSurfaceView.getHolder().addCallback(mSurfaceViewListener);
         mAutoFitTextureView = new CameraView(context);
         mAutoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
     }

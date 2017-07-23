@@ -8,9 +8,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.google.android.gms.common.images.Size;
-
-public class Utils {
+class Utils {
 
     public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
@@ -50,13 +48,5 @@ public class Utils {
         if (p1 == null || p2 == null)
             return null;
         return new PointF((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-    }
-
-    public static Size[] sizeToSize(android.util.Size[] sizes) {
-        Size[] size = new Size[sizes.length];
-        for (int i = 0; i < sizes.length; i++) {
-            size[i] = new Size(sizes[i].getWidth(), sizes[i].getHeight());
-        }
-        return size;
     }
 }

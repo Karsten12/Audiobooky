@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
 
+import com.fonsecakarsten.audiobooky.Book.BookActivity;
 import com.fonsecakarsten.audiobooky.Database.BookContract;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -37,7 +38,7 @@ import java.util.List;
  * An async class that sends and processes all book pictures into text via OCR software
  */
 
-class CloudVisionAsync extends AsyncTask<Void, Void, Void> {
+public class CloudVisionAsync extends AsyncTask<Void, Void, Void> {
 
     private String accessToken;
     private String chapterTitle;
@@ -47,8 +48,8 @@ class CloudVisionAsync extends AsyncTask<Void, Void, Void> {
     private ArrayList<Boolean> idk;
     private int position;
 
-    CloudVisionAsync(String token, String chptrTitle, ArrayList<String> imageURIS, SQLiteDatabase database,
-                     BookActivity.recycleAdapter adapter, ArrayList<Boolean> something, int pos) {
+    public CloudVisionAsync(String token, String chptrTitle, ArrayList<String> imageURIS, SQLiteDatabase database,
+                            BookActivity.recycleAdapter adapter, ArrayList<Boolean> something, int pos) {
         this.accessToken = token;
         this.chapterTitle = chptrTitle;
         this.URI = imageURIS;
@@ -101,7 +102,7 @@ class CloudVisionAsync extends AsyncTask<Void, Void, Void> {
         ContentValues values = new ContentValues();
 
         // Add chapter title
-        values.put(BookContract.bookChapterEntry.COLUMN_NAME_TITLE, chapterTitle);
+        values.put(BookContract.bookChapterEntry.COLUMN_NAME_CHAPTER_TITLE, chapterTitle);
 
         // Add arrayList containing the chapterText
         JSONObject json = new JSONObject();

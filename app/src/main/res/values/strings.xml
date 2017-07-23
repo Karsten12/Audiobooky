@@ -17,5 +17,11 @@
     <string name="description_info">Info</string>
     <string name="request_permission">This sample needs camera permission.</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+    <string name="book_name">Book name</string>
+    <string name="author">Author</string>
+    <string name="chapter_name">Chapter name</string>
+    <string name="title">Title</string>
+    <string name="select_account">You need to select an account</string>
+    <string name="auth_failed">Authorization Failed</string>
 
 </resources>

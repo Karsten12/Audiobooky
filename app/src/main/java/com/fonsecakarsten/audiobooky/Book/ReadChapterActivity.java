@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky;
+package com.fonsecakarsten.audiobooky.Book;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,13 +9,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toolbar;
+import android.support.v7.widget.Toolbar;
 
 import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
+import com.fonsecakarsten.audiobooky.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,34 +21,40 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import static com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry.TABLE_NAME;
+
 /**
  * Created by Karsten on 7/16/2017.
  */
 
 public class ReadChapterActivity extends AppCompatActivity {
 
-    FragmentAdapter adapter;
-    ViewPager mViewPager;
-    String bookTitle;
-    ArrayList<String> chapterText;
+    private myPagerAdapter adapter;
+    private ViewPager mViewPager;
+    private String bookTitle;
+    private String chapterTitle;
+    private ArrayList<String> chapterText = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.read_chapter_activity);
 
         // Get the chapter data
         Bundle extras = getIntent().getExtras();
 
         // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
-        bookTitle = extras.getString("CHAPTER_TITLE");
-        toolbar.setTitle(bookTitle);
-        setActionBar(toolbar);
+        chapterTitle = extras.getString("CHAPTER_NAME");
+        toolbar.setTitle(chapterTitle);
+        bookTitle = extras.getString("BOOK_TITLE");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        adapter = new FragmentAdapter(getSupportFragmentManager());
+        adapter = new myPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(adapter);
+        getChapter();
 
     }
 
@@ -58,20 +62,20 @@ public class ReadChapterActivity extends AppCompatActivity {
         BookChapterDbHelper mDbHelper = new BookChapterDbHelper(this, bookTitle);
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        String selection = bookChapterEntry.COLUMN_NAME_TITLE + "=?";
-        String[] selectionArgs = {bookTitle};
+        String selection = bookChapterEntry.COLUMN_NAME_CHAPTER_TITLE + "=?";
+        String[] selectionArgs = {chapterTitle};
         String[] columnsToReturn = {bookChapterEntry.COLUMN_NAME_CHAPTER_DATA};
 
         // SELECT all_columns FROM table_name WHERE bookChapterEntry._ID == chapter
         Cursor c = db.query(
-                bookChapterEntry.TABLE_NAME,    // The table to query
+                TABLE_NAME,    // The table to query
                 columnsToReturn,                // The columns to return
                 selection,                      // The columns for the WHERE clause
                 selectionArgs,                  // The values for the WHERE clause
                 null,                           // don't group the rows
                 null,                           // don't filter by row groups
                 null);                          // The sort order
-
+        c.moveToNext();
         int chapterDataColumn = c.getColumnIndex(bookChapterEntry.COLUMN_NAME_CHAPTER_DATA);
         final String idk = c.getString(chapterDataColumn);
         c.close();
@@ -98,37 +102,24 @@ public class ReadChapterActivity extends AppCompatActivity {
                 super.onPostExecute(arrayList);
                 if (arrayList.size() > 0) {
                     chapterText = arrayList;
+                    adapter.notifyDataSetChanged();
                 }
             }
         }.execute(idk);
-
     }
 
-    // Instances of this class are fragments representing a single object in our collection.
-    public static class DemoObjectFragment extends Fragment {
-        public static final String ARG_OBJECT = "object";
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-            // last two arguments ensure LayoutParams are inflated properly.
-            View rootView = inflater.inflate(R.layout.read_chapter_activity, container, false);
-            return rootView;
-        }
-    }
-
-    private class FragmentAdapter extends FragmentStatePagerAdapter {
-        FragmentAdapter(FragmentManager fm) {
+    private class myPagerAdapter extends FragmentStatePagerAdapter {
+        myPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public Fragment getItem(int i) {
-            Fragment fragment = new DemoObjectFragment();
-            Bundle args = new Bundle();
-            // Our object is just an integer :-P
-            args.putInt(DemoObjectFragment.ARG_OBJECT, i + 1);
-            fragment.setArguments(args);
+
+            Fragment fragment = new PageFragment();
+            Bundle bundleArgs = new Bundle();
+            bundleArgs.putString("PageText", chapterText.get(i));
+            fragment.setArguments(bundleArgs);
             return fragment;
         }
 

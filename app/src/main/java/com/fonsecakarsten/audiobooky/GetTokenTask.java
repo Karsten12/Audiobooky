@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.app.Activity;
 import android.os.AsyncTask;
 
+import com.fonsecakarsten.audiobooky.Book.BookActivity;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -15,12 +16,12 @@ import java.io.IOException;
  * Created by Karsten on 6/15/2017.
  */
 
-class GetTokenTask extends AsyncTask<Void, Void, Void> {
+public class GetTokenTask extends AsyncTask<Void, Void, Void> {
     private Activity mActivity;
     private Account mAccount;
     private int mRequestCode;
 
-    GetTokenTask(Activity activity, Account account) {
+    public GetTokenTask(Activity activity, Account account) {
         this.mActivity = activity;
         this.mAccount = account;
         this.mRequestCode = BookActivity.REQUEST_ACCOUNT_AUTHORIZATION;

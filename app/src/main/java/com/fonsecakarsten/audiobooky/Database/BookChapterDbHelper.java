@@ -17,7 +17,7 @@ public class BookChapterDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + bookChapterEntry.TABLE_NAME + " (" +
                     bookChapterEntry._ID + " INTEGER PRIMARY KEY," +
-                    bookChapterEntry.COLUMN_NAME_TITLE + " TEXT," +
+                    bookChapterEntry.COLUMN_NAME_CHAPTER_TITLE + " TEXT," +
                     bookChapterEntry.COLUMN_NAME_CHAPTER_DATA + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =

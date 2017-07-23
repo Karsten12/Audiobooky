@@ -35,12 +35,12 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.MotionEvent;
 import android.view.Surface;
 
 import com.fonsecakarsten.audiobooky.CameraView;
-import com.google.android.gms.common.images.Size;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
 
@@ -155,10 +155,6 @@ public class CameraSource {
      * The {@link Size} of camera preview.
      */
     private Size mPreviewSize;
-    /**
-     * ID of the current {@link CameraDevice}.
-     */
-    private String mCameraId;
     /**
      * An {@link CameraView} for camera preview.
      */
@@ -467,26 +463,6 @@ public class CameraSource {
         }
     }
 
-    public boolean isCamera2Native() {
-        try {
-            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-            manager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
-            mCameraId = manager.getCameraIdList()[mFacing];
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraId);
-            //CHECK CAMERA HARDWARE LEVEL. IF CAMERA2 IS NOT NATIVELY SUPPORTED, GO BACK TO CAMERA1
-            Integer deviceLevel = characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
-            return deviceLevel != null && (deviceLevel != CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY);
-        } catch (CameraAccessException ex) {
-            return false;
-        } catch (NullPointerException e) {
-            return false;
-        } catch (ArrayIndexOutOfBoundsException ez) {
-            return false;
-        }
-    }
-
     /**
      * Opens the camera and starts sending preview frames to the underlying detector.  The supplied
      * texture view is used for the preview so frames can be displayed to the user.
@@ -665,9 +641,13 @@ public class CameraSource {
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
-            if (manager == null)
+            if (manager == null) {
                 manager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
-            mCameraId = manager.getCameraIdList()[mFacing];
+            }
+            /*
+      ID of the current {@link CameraDevice}.
+     */
+            String mCameraId = manager.getCameraIdList()[mFacing];
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             if (map == null) {
@@ -732,8 +712,8 @@ public class CameraSource {
             // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
             // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
             // garbage capture data.
-            Size[] outputSizes = Utils.sizeToSize(map.getOutputSizes(SurfaceTexture.class));
-            mPreviewSize = chooseOptimalSize(outputSizes, rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth, maxPreviewHeight, largest);
+            mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth, maxPreviewHeight, largest);
+
 
             // We fit the aspect ratio of TextureView to the size of preview we picked.
             int orientation = mDisplayOrientation;
@@ -1043,27 +1023,14 @@ public class CameraSource {
 
             mDetector = detector;
             mCameraSource.mContext = context;
-        }
-
-        public Builder setFocusMode() {
+            // Default to the back camera
+            mCameraSource.mFacing = CameraSource.CAMERA_FACING_BACK;
+            // Default the camera to auto focus
             mCameraSource.mFocusMode = CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_PICTURE;
-            return this;
         }
 
         public Builder setFlashMode(int mode) {
             mCameraSource.mFlashMode = mode;
-            return this;
-        }
-
-        /**
-         * Sets the camera to use (either {@link #CAMERA_FACING_BACK} or
-         * {@link #CAMERA_FACING_FRONT}). Default: back facing.
-         */
-        public Builder setFacing() {
-            if ((CameraSource.CAMERA_FACING_BACK != CAMERA_FACING_BACK) && (CameraSource.CAMERA_FACING_BACK != CAMERA_FACING_FRONT)) {
-                throw new IllegalArgumentException("Invalid camera: " + CameraSource.CAMERA_FACING_BACK);
-            }
-            mCameraSource.mFacing = CameraSource.CAMERA_FACING_BACK;
             return this;
         }
 

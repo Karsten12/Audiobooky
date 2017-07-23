@@ -13,7 +13,7 @@ public class BookContract {
 
     public static class bookChapterEntry implements BaseColumns {
         public static final String TABLE_NAME = "bookChapterEntry";
-        public static final String COLUMN_NAME_TITLE = "chapterName";
+        public static final String COLUMN_NAME_CHAPTER_TITLE = "chapterName";
         public static final String COLUMN_NAME_CHAPTER_DATA = "chapterData";
     }
 

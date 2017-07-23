@@ -15,11 +15,11 @@
         android:id="@+id/picture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/picture"
         android:layout_above="@+id/recycler_view"
+        android:layout_gravity="center"
+        android:layout_marginEnd="72dp"
         android:layout_toStartOf="@+id/FAB2"
-        android:layout_marginEnd="72dp" />
+        android:text="@string/picture" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky;
+package com.fonsecakarsten.audiobooky.Book;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+
+import com.fonsecakarsten.audiobooky.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,14 +31,14 @@ import java.net.URL;
  * barcode scanner
  */
 
-class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
+public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
     private String ISBN;
     private Context context;
     private Activity activity;
     private ProgressDialog progressDialog;
     private Intent intent;
 
-    BookInfoAsync(String isbn, Context con, Activity acc) {
+    public BookInfoAsync(String isbn, Context con, Activity acc) {
         this.ISBN = isbn;
         this.context = con;
         this.activity = acc;

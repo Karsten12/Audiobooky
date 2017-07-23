@@ -24,6 +24,8 @@ import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.fonsecakarsten.audiobooky.Barcode.BarcodeCaptureActivity;
+import com.fonsecakarsten.audiobooky.Book.BookActivity;
+import com.fonsecakarsten.audiobooky.Book.BookInfoAsync;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
 import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
 
@@ -35,7 +37,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity {
 
     String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.GET_ACCOUNTS};
-    private ArrayList<AudioBook> mBooks = new ArrayList<>();
     private ArrayList<String> mBooksTitle = new ArrayList<>();
     private ArrayList<String> mBooksAuthor = new ArrayList<>();
     private ArrayList<String> mBooksGraphic = new ArrayList<>();
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 mBooksAuthor.add(c.getString(bookAuthorColumn));
                 mBooksGraphic.add(c.getString(bookGraphic));
                 mBooksAbsolutePath.add(c.getString(bookGraphicAbsolutePath));
+                System.out.println(c.getColumnCount());
             }
             mAdapter.notifyDataSetChanged();
         }
@@ -135,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-//
 //                      // TODO
 //                      // Check if either textboxes are empty
 //                      // ISBN mobile vision activity
@@ -143,9 +144,6 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
                         intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
                         startActivityForResult(intent, 1);
-//                        Intent intent = new Intent(getApplicationContext(), AddBookActivity.class);
-//                        startActivity(intent);
-
                     }
                 })
                 .create();

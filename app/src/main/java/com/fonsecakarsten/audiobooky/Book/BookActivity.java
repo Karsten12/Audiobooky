@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky;
+package com.fonsecakarsten.audiobooky.Book;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -34,10 +34,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.fonsecakarsten.audiobooky.AddBookActivity;
+import com.fonsecakarsten.audiobooky.CloudVisionAsync;
 import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
 import com.fonsecakarsten.audiobooky.Database.BookContract;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
 import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
+import com.fonsecakarsten.audiobooky.GetTokenTask;
+import com.fonsecakarsten.audiobooky.R;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
@@ -48,10 +52,10 @@ import java.util.ArrayList;
 
 
 public class BookActivity extends AppCompatActivity {
-    static final int REQUEST_CODE_PICK_ACCOUNT = 11;
-    static final int REQUEST_ACCOUNT_AUTHORIZATION = 12;
+    public static final int REQUEST_ACCOUNT_AUTHORIZATION = 12;
+    private static final int REQUEST_CODE_PICK_ACCOUNT = 11;
     private static String accessToken;
-    Account mAccount;
+    private Account mAccount;
     private recycleAdapter mAdapter;
     private ArrayList<String> mChapters = new ArrayList<>();
     private ArrayList<Boolean> mChaptersReady = new ArrayList<>();
@@ -166,7 +170,6 @@ public class BookActivity extends AppCompatActivity {
         title.requestFocus();
         newChapterDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         newChapterDialog.show();
-
     }
 
     @Override
@@ -191,7 +194,7 @@ public class BookActivity extends AppCompatActivity {
                 }
                 getAuthToken();
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "You need to select an account", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.select_account, Toast.LENGTH_SHORT).show();
                 pickUserAccount();
             }
         } else if (requestCode == REQUEST_ACCOUNT_AUTHORIZATION) {
@@ -199,7 +202,7 @@ public class BookActivity extends AppCompatActivity {
                 Bundle extra = data.getExtras();
                 onTokenReceived(extra.getString("authtoken"));
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Authorization Failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.auth_failed, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -241,7 +244,7 @@ public class BookActivity extends AppCompatActivity {
 
         // Get all the chapter names and add it to the arraylist
         while (c.moveToNext()) {
-            int chapterNameColumn = c.getColumnIndex(bookChapterEntry.COLUMN_NAME_TITLE);
+            int chapterNameColumn = c.getColumnIndex(bookChapterEntry.COLUMN_NAME_CHAPTER_TITLE);
             mChapters.add(c.getString(chapterNameColumn));
             mChaptersReady.add(true);
         }
@@ -259,7 +262,7 @@ public class BookActivity extends AppCompatActivity {
         // chapterText is being processed, show indeterminate progressCircle
         CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position);
         task.execute();
-        tempChapTitle = null;
+//        tempChapTitle = null;
     }
 
     // Add the newBook to the bookDatabase
@@ -292,6 +295,7 @@ public class BookActivity extends AppCompatActivity {
     // Go to ReadActivity
     private void readChapter(int chapter) {
         Intent intent = new Intent(this, ReadChapterActivity.class);
+        intent.putExtra("BOOK_TITLE", bookTitle);
         intent.putExtra("CHAPTER_NAME", mChapters.get(chapter));
         startActivity(intent);
     }
@@ -328,7 +332,7 @@ public class BookActivity extends AppCompatActivity {
         accessToken = token;
     }
 
-    class recycleAdapter extends RecyclerView.Adapter<BookActivity.recycleAdapter.viewholder> {
+    public class recycleAdapter extends RecyclerView.Adapter<BookActivity.recycleAdapter.viewholder> {
 
         @Override
         public BookActivity.recycleAdapter.viewholder onCreateViewHolder(ViewGroup parent, int viewType) {
