@@ -262,7 +262,6 @@ public class BookActivity extends AppCompatActivity {
         // chapterText is being processed, show indeterminate progressCircle
         CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position);
         task.execute();
-//        tempChapTitle = null;
     }
 
     // Add the newBook to the bookDatabase
