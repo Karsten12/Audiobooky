@@ -28,6 +28,8 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -176,15 +178,20 @@ public class CloudVisionAsync extends AsyncTask<Void, Void, Void> {
 //            resizedHeight = maxDimension;
 //            resizedWidth = maxDimension;
 //        }
-        Bitmap bitmap;
+        Bitmap bitmap = null;
 //        bitmap =  Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
         options.inSampleSize = 2;
-        bitmap = BitmapFactory.decodeFile(f.getName(), options);
+        try {
+            bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         Image image = new Image();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] imageBytes = byteArrayOutputStream.toByteArray();
         image.encodeContent(imageBytes);
+        boolean deleted = f.delete();
         return image;
     }
 }
