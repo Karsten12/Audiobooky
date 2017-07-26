@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
                 mBooksAuthor.add(c.getString(bookAuthorColumn));
                 mBooksGraphic.add(c.getString(bookGraphic));
                 mBooksAbsolutePath.add(c.getString(bookGraphicAbsolutePath));
-                System.out.println(c.getColumnCount());
             }
             mAdapter.notifyDataSetChanged();
         }

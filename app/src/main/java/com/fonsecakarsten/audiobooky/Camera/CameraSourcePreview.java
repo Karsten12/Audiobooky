@@ -8,8 +8,6 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.ViewGroup;
 
-import com.fonsecakarsten.audiobooky.CameraView;
-
 /**
  * Created by Karsten on 6/16/2017.
  * CameraSourcePreview from Android Open Source Project
@@ -21,7 +19,7 @@ public class CameraSourcePreview extends ViewGroup {
 
     //PREVIEW VISUALIZERS FOR BOTH CAMERA1 AND CAMERA2 API.
     private SurfaceView mSurfaceView;
-    private CameraView mAutoFitTextureView;
+    private AutoFitTextureView mAutoFitTextureView;
 
     private boolean mStartRequested;
     private boolean mSurfaceAvailable;
@@ -62,7 +60,7 @@ public class CameraSourcePreview extends ViewGroup {
         screenRotation = Utils.getScreenRotation(context);
         mStartRequested = false;
         mSurfaceAvailable = false;
-        mAutoFitTextureView = new CameraView(context);
+        mAutoFitTextureView = new AutoFitTextureView(context);
         mAutoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
     }
 
@@ -73,7 +71,7 @@ public class CameraSourcePreview extends ViewGroup {
         screenRotation = Utils.getScreenRotation(context);
         mStartRequested = false;
         mSurfaceAvailable = false;
-        mAutoFitTextureView = new CameraView(context);
+        mAutoFitTextureView = new AutoFitTextureView(context);
         mAutoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
     }
 

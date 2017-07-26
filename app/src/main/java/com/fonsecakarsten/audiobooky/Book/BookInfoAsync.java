@@ -90,7 +90,9 @@ public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
                         .getJSONObject("volumeInfo");
 
                 title = bookInfo.getString("title");
-                subtitle = bookInfo.getString("subtitle");
+                if (bookInfo.has("subtitle")) {
+                    subtitle = bookInfo.getString("subtitle");
+                }
                 author = bookInfo.getJSONArray("authors").getString(0);
                 publisher = bookInfo.getString("publisher");
                 publishDate = bookInfo.getString("publishedDate");
@@ -125,9 +127,9 @@ public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         }
         if (subtitle != null) {
             book.setSubtitle(subtitle);
+            intent.putExtra("BOOK_SUBTITLE", subtitle);
         }
 
-        book.setSubtitle(subtitle);
         book.setPublisher(publisher);
         book.setPublishDate(publishDate);
         book.setDescription(description);

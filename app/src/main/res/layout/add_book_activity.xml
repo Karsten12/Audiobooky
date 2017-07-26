@@ -4,12 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.fonsecakarsten.audiobooky.CameraView
-        android:id="@+id/texture"
-        android:layout_width="wrap_content"
+    <com.flurgle.camerakit.CameraView xmlns:camerakit="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/camera"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        camerakit:ckJpegQuality="100" />
 
     <Button
         android:id="@+id/picture"

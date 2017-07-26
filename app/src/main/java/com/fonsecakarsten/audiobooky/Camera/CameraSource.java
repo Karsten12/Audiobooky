@@ -40,11 +40,9 @@ import android.util.SparseIntArray;
 import android.view.MotionEvent;
 import android.view.Surface;
 
-import com.fonsecakarsten.audiobooky.CameraView;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
 
-import java.io.IOException;
 import java.lang.Thread.State;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -66,13 +64,13 @@ import java.util.concurrent.TimeUnit;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class CameraSource {
-    public static final int CAMERA_FACING_BACK = 0;
-    public static final int CAMERA_AF_AUTO = CaptureRequest.CONTROL_AF_MODE_AUTO;
     public static final int CAMERA_AF_EDOF = CaptureRequest.CONTROL_AF_MODE_EDOF;
     public static final int CAMERA_AF_MACRO = CaptureRequest.CONTROL_AF_MODE_MACRO;
     public static final int CAMERA_AF_OFF = CaptureRequest.CONTROL_AF_MODE_OFF;
     public static final int CAMERA_AF_CONTINUOUS_PICTURE = CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE;
     public static final int CAMERA_AF_CONTINUOUS_VIDEO = CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO;
+    private static final int CAMERA_FACING_BACK = 0;
+    private static final int CAMERA_AF_AUTO = CaptureRequest.CONTROL_AF_MODE_AUTO;
     private static final int CAMERA_FACING_FRONT = 1;
     private static final int CAMERA_FLASH_AUTO = CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH;
     private static final String TAG = "CameraSource";
@@ -156,9 +154,9 @@ public class CameraSource {
      */
     private Size mPreviewSize;
     /**
-     * An {@link CameraView} for camera preview.
+     * An {@link AutoFitTextureView} for camera preview.
      */
-    private CameraView mTextureView;
+    private AutoFitTextureView mTextureView;
     private ShutterCallback mShutterCallback;
     private AutoFocusCallback mAutoFocusCallback;
     private Rect sensorArraySize;
@@ -418,7 +416,7 @@ public class CameraSource {
     /**
      * Closes the camera and stops sending frames to the underlying frame detector.
      * <p/>
-     * This camera source may be restarted again by calling {@link #start(CameraView, int)}.
+     * This camera source may be restarted again by calling .
      * <p/>
      * Call {@link #release()} instead to completely shut down this camera source and release the
      * resources of the underlying detector.
@@ -469,10 +467,9 @@ public class CameraSource {
      *
      * @param textureView        the surface holder to use for the preview frames
      * @param displayOrientation the display orientation for a non stretched preview
-     * @throws IOException if the supplied texture view could not be used as the preview display
      */
     @RequiresPermission(Manifest.permission.CAMERA)
-    public void start(CameraView textureView, int displayOrientation) {
+    public void start(AutoFitTextureView textureView, int displayOrientation) {
         mDisplayOrientation = displayOrientation;
         if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             if (cameraStarted) {
