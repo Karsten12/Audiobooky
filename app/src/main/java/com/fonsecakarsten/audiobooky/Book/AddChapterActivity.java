@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky;
+package com.fonsecakarsten.audiobooky.Book;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.flurgle.camerakit.CameraListener;
 import com.flurgle.camerakit.CameraView;
+import com.fonsecakarsten.audiobooky.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,7 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class AddBookActivity extends Activity {
+public class AddChapterActivity extends Activity {
     private imageAdapter mAdapter;
     private CameraView mCameraView;
     private ArrayList<String> mImageArray = new ArrayList<>();
@@ -35,7 +36,7 @@ public class AddBookActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_book_activity);
+        setContentView(R.layout.add_chapter_activity);
 
 
         mCameraView = (CameraView) findViewById(R.id.camera);
@@ -146,7 +147,7 @@ public class AddBookActivity extends Activity {
         public void onBindViewHolder(final imageAdapter.Myviewholder holder, int position) {
             // Display image
             final String imagePath = mImageArray.get(position);
-            Glide.with(AddBookActivity.this).load(imagePath).into(holder.imageView);
+            Glide.with(AddChapterActivity.this).load(imagePath).into(holder.imageView);
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -155,9 +156,9 @@ public class AddBookActivity extends Activity {
 
                     // Display the image
                     ImageView image = (ImageView) layout.findViewById(R.id.image_popup_image);
-                    Glide.with(AddBookActivity.this).load(imagePath).into(image);
+                    Glide.with(AddChapterActivity.this).load(imagePath).into(image);
 
-                    AlertDialog imageDialog = new AlertDialog.Builder(AddBookActivity.this)
+                    AlertDialog imageDialog = new AlertDialog.Builder(AddChapterActivity.this)
                             .setView(layout)
                             .setPositiveButton("RETAKE", new DialogInterface.OnClickListener() {
                                 @Override

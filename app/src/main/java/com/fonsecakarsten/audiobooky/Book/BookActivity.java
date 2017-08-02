@@ -30,7 +30,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.fonsecakarsten.audiobooky.AddBookActivity;
 import com.fonsecakarsten.audiobooky.CloudVisionAsync;
 import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
@@ -153,7 +152,7 @@ public class BookActivity extends AppCompatActivity {
 
                         if (!title.getText().toString().isEmpty()) {
                             tempChapTitle = title.getText().toString();
-                            Intent intent = new Intent(getApplicationContext(), AddBookActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), AddChapterActivity.class);
                             startActivityForResult(intent, 1);
                         } else {
                             // TODO

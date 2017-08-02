@@ -43,7 +43,7 @@
         <activity
             android:name=".Book.ReadChapterActivity"
             android:parentActivityName=".Book.BookActivity" />
-        <activity android:name=".AddBookActivity" />
+        <activity android:name=".Book.AddChapterActivity" />
     </application>
 
 </manifest>
