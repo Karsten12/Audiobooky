@@ -31,7 +31,6 @@ public class AddBookActivity extends Activity {
     private imageAdapter mAdapter;
     private CameraView mCameraView;
     private ArrayList<String> mImageArray = new ArrayList<>();
-    private Integer retakePosition = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,8 +88,6 @@ public class AddBookActivity extends Activity {
                         mAdapter.notifyItemInserted(mImageArray.size());
                     }
                 }.execute(picture);
-
-                //Bitmap result = BitmapFactory.decodeByteArray(picture, 0, picture.length);
             }
         });
     }
@@ -111,7 +108,7 @@ public class AddBookActivity extends Activity {
         }
 
         // Save a file: path for use with ACTION_VIEW intents
-        mImageArray.add(image.getAbsolutePath());
+        mImageArray.add(image != null ? image.getAbsolutePath() : null);
         return image;
     }
 

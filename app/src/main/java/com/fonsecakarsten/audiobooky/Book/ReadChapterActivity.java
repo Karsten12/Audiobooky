@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -20,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import static com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry.TABLE_NAME;
 
@@ -29,6 +31,7 @@ import static com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEnt
 
 public class ReadChapterActivity extends AppCompatActivity {
 
+    private TextToSpeech speech;
     private myPagerAdapter adapter;
     private ViewPager mViewPager;
     private String bookTitle;
@@ -108,6 +111,20 @@ public class ReadChapterActivity extends AppCompatActivity {
         }.execute(idk);
     }
 
+    private void speak() {
+        speech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status != TextToSpeech.ERROR) {
+                    speech.setLanguage(Locale.getDefault());
+                }
+            }
+        });
+        String utteranceId = this.hashCode() + "";
+        speech.speak(chapterText.get(mViewPager.getCurrentItem()), TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+    }
+
+
     private class myPagerAdapter extends FragmentStatePagerAdapter {
         myPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -126,11 +143,6 @@ public class ReadChapterActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             return chapterText.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return "OBJECT " + (position + 1);
         }
     }
 

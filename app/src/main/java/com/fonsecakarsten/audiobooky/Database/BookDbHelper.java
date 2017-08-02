@@ -12,7 +12,7 @@ import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
  */
 
 public class BookDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "AudioBookList.db";
 
     private static final String SQL_CREATE_ENTRIES =
@@ -27,7 +27,9 @@ public class BookDbHelper extends SQLiteOpenHelper {
                     bookEntry.COLUMN_NAME_ISBN + " TEXT," +
                     bookEntry.COLUMN_NAME_RATING + " INTEGER," +
                     bookEntry.COLUMN_NAME_COVER_IMAGE_PATH + " TEXT," +
-                    bookEntry.COLUMN_NAME_ABSOLUTE_PATH + " TEXT)";
+                    bookEntry.COLUMN_NAME_ABSOLUTE_PATH + " TEXT," +
+                    bookEntry.COLUMN_NAME_CONTENT_COLOR + " INTEGER," +
+                    bookEntry.COLUMN_NAME_STATUS_COLOR + " INTEGER)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + bookEntry.TABLE_NAME;

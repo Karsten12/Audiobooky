@@ -13,11 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toolbar;
@@ -41,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> mBooksAuthor = new ArrayList<>();
     private ArrayList<String> mBooksGraphic = new ArrayList<>();
     private ArrayList<String> mBooksAbsolutePath = new ArrayList<>();
+    private ArrayList<Integer> mBooksContentColor = new ArrayList<>();
+    private ArrayList<Integer> mBooksStatusColor = new ArrayList<>();
+
     private recycleAdapter mAdapter;
 
     @Override
@@ -78,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Create and/or open a database to read from it, this allows for read access as well
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        String[] columnsToGet = {bookEntry.COLUMN_NAME_TITLE, bookEntry.COLUMN_NAME_AUTHOR, bookEntry.COLUMN_NAME_COVER_IMAGE_PATH, bookEntry.COLUMN_NAME_ABSOLUTE_PATH};
+        String[] columnsToGet = {bookEntry.COLUMN_NAME_TITLE, bookEntry.COLUMN_NAME_AUTHOR, bookEntry.COLUMN_NAME_COVER_IMAGE_PATH,
+                bookEntry.COLUMN_NAME_ABSOLUTE_PATH, bookEntry.COLUMN_NAME_CONTENT_COLOR, bookEntry.COLUMN_NAME_STATUS_COLOR};
 
         // SELECT columnsToGet FROM table_name
         Cursor c = db.query(
@@ -96,15 +97,21 @@ public class MainActivity extends AppCompatActivity {
             mBooksAuthor.clear();
             mBooksGraphic.clear();
             mBooksAbsolutePath.clear();
+            mBooksContentColor.clear();
+            mBooksStatusColor.clear();
             while (c.moveToNext()) {
                 int bookNameColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_TITLE);
                 int bookAuthorColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_AUTHOR);
                 int bookGraphic = c.getColumnIndex(bookEntry.COLUMN_NAME_COVER_IMAGE_PATH);
                 int bookGraphicAbsolutePath = c.getColumnIndex(bookEntry.COLUMN_NAME_ABSOLUTE_PATH);
+                int bookContentColor = c.getColumnIndex(bookEntry.COLUMN_NAME_CONTENT_COLOR);
+                int bookStatusColor = c.getColumnIndex(bookEntry.COLUMN_NAME_STATUS_COLOR);
                 mBooksTitle.add(c.getString(bookNameColumn));
                 mBooksAuthor.add(c.getString(bookAuthorColumn));
                 mBooksGraphic.add(c.getString(bookGraphic));
                 mBooksAbsolutePath.add(c.getString(bookGraphicAbsolutePath));
+                mBooksContentColor.add(c.getInt(bookContentColor));
+                mBooksStatusColor.add(c.getInt(bookStatusColor));
             }
             mAdapter.notifyDataSetChanged();
         }
@@ -118,45 +125,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addNewBook() {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View layout = inflater.inflate(R.layout.newbook_dialog, (ViewGroup) findViewById(R.id.newbook_dialog_root), false);
-        final EditText title = (EditText) layout.findViewById(R.id.dialog_title);
-        final EditText author = (EditText) layout.findViewById(R.id.dialog_author);
-
-        AlertDialog newBookDialog = new AlertDialog.Builder(this)
-                .setView(layout)
+        String[] list = {"Barcode", "Manual"};
+        AlertDialog newDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.newBookString)
                 .setCancelable(false)
+                .setItems(list, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                Intent intent = new Intent(getApplicationContext(), BarcodeCaptureActivity.class);
+                                startActivityForResult(intent, 1);
+                                break;
+                            case 1:
+                                // TODO
+                                // Add manual information entry
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                })
                 .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 })
-                .setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-//                      // TODO
-//                      // Check if either textboxes are empty
-//                      // ISBN mobile vision activity
-                        Intent intent = new Intent(getApplicationContext(), BarcodeCaptureActivity.class);
-                        intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
-                        intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
-                        startActivityForResult(intent, 1);
-                    }
-                })
                 .create();
-        title.requestFocus();
-        newBookDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-        newBookDialog.show();
+        newDialog.show();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK && data != null) {
-                BookInfoAsync task = new BookInfoAsync(data.getStringExtra("BarCodeString"),
-                        getApplicationContext(), MainActivity.this);
+                BookInfoAsync task = new BookInfoAsync(data.getStringExtra("BarCodeString"), getApplicationContext(), MainActivity.this);
                 task.execute();
             }
         } else {
@@ -221,10 +225,14 @@ public class MainActivity extends AppCompatActivity {
                     // Go to bookActivity
                     Intent intent = new Intent(getApplicationContext(), BookActivity.class);
 
-                    intent.putExtra("BOOK_TITLE", mBooksTitle.get(holder.getAdapterPosition()));
-                    intent.putExtra("BOOK_AUTHOR", mBooksAuthor.get(holder.getAdapterPosition()));
-                    intent.putExtra("BOOK_GRAPHIC", mBooksGraphic.get(holder.getAdapterPosition()));
-                    intent.putExtra("BOOK_GRAPHIC_ABSOLUTEPATH", mBooksAbsolutePath.get(holder.getAdapterPosition()));
+                    int pos = holder.getAdapterPosition();
+
+                    intent.putExtra("BOOK_TITLE", mBooksTitle.get(pos));
+                    intent.putExtra("BOOK_AUTHOR", mBooksAuthor.get(pos));
+                    intent.putExtra("BOOK_GRAPHIC", mBooksGraphic.get(pos));
+                    intent.putExtra("BOOK_GRAPHIC_ABSOLUTEPATH", mBooksAbsolutePath.get(pos));
+                    intent.putExtra("CONTENT_COLOR", mBooksContentColor.get(pos));
+                    intent.putExtra("STATUS_COLOR", mBooksStatusColor.get(pos));
 
                     startActivity(intent);
                 }

@@ -14,7 +14,7 @@ class Utils {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
-    public static int getScreenHeight(Context c) {
+    static int getScreenHeight(Context c) {
         WindowManager wm = (WindowManager) c.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
@@ -22,7 +22,7 @@ class Utils {
         return size.y;
     }
 
-    public static int getScreenWidth(Context c) {
+    static int getScreenWidth(Context c) {
         WindowManager wm = (WindowManager) c.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
@@ -30,12 +30,12 @@ class Utils {
         return size.x;
     }
 
-    public static float getScreenRatio(Context c) {
+    static float getScreenRatio(Context c) {
         DisplayMetrics metrics = c.getResources().getDisplayMetrics();
         return ((float) metrics.heightPixels / (float) metrics.widthPixels);
     }
 
-    public static int getScreenRotation(Context c) {
+    static int getScreenRotation(Context c) {
         WindowManager wm = (WindowManager) c.getSystemService(Context.WINDOW_SERVICE);
         return wm.getDefaultDisplay().getRotation();
     }

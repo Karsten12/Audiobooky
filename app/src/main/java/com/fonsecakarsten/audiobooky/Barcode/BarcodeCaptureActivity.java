@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.fonsecakarsten.audiobooky.Camera.CameraSource;
 import com.fonsecakarsten.audiobooky.Camera.CameraSourcePreview;
@@ -29,9 +30,6 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
  * size, and ID of each barcode.
  */
 public final class BarcodeCaptureActivity extends AppCompatActivity {
-    // constants used to pass extra data in the intent
-    public static final String AutoFocus = "AutoFocus";
-    public static final String UseFlash = "UseFlash";
     // intent request code to handle updating play services if needed.
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -46,6 +44,10 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.barcode_capture);
+
+        // Set up toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setActionBar(toolbar);
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
 

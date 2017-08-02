@@ -9,15 +9,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,8 +33,8 @@ import com.bumptech.glide.Glide;
 import com.fonsecakarsten.audiobooky.AddBookActivity;
 import com.fonsecakarsten.audiobooky.CloudVisionAsync;
 import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
-import com.fonsecakarsten.audiobooky.Database.BookContract;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
+import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
 import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
 import com.fonsecakarsten.audiobooky.GetTokenTask;
 import com.fonsecakarsten.audiobooky.R;
@@ -46,8 +42,6 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 
@@ -85,6 +79,8 @@ public class BookActivity extends AppCompatActivity {
         String bookAuthor = extras.getString(getString(R.string.book_author));
         String bookGraphic = extras.getString(getString(R.string.book_graphic));
         bookGraphicAbsolutePath = extras.getString(getString(R.string.book_graphic_absolutePath));
+        int content_color = extras.getInt("CONTENT_COLOR");
+        int status_color = extras.getInt("STATUS_COLOR");
 
         // Set imageView to book cover
         ImageView imageView = (ImageView) findViewById(R.id.book_image);
@@ -96,7 +92,7 @@ public class BookActivity extends AppCompatActivity {
             readDatabase();
         } else {
             // Database doesn't exist. Need to add it to bookDatabase and create a new database for this book
-            addBookToDatabase(bookAuthor, bookGraphic);
+            addBookToDatabase(bookAuthor, bookGraphic, content_color, status_color);
         }
 
         // Set up recyclerView
@@ -110,12 +106,12 @@ public class BookActivity extends AppCompatActivity {
         // Set up collapsing toolbar complex view
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(bookTitle);
-        Palette palette = createPaletteSync();
         //collapsingToolbarLayout.setCollapsedTitleTextColor(palette.getMutedSwatch().getTitleTextColor());
         //collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
-        collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
+
+        collapsingToolbarLayout.setContentScrimColor(content_color);
         //collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark)));
-        getWindow().setStatusBarColor(palette.getMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
+        getWindow().setStatusBarColor(status_color);
 
         FloatingActionButton playFab = (FloatingActionButton) findViewById(R.id.play_fab);
         FloatingActionButton addFab = (FloatingActionButton) findViewById(R.id.add_chapter_fab);
@@ -209,11 +205,11 @@ public class BookActivity extends AppCompatActivity {
 
 
     public void getBookDetails() {
-        String Selection = BookContract.bookEntry.COLUMN_NAME_TITLE + "=?";
+        String Selection = bookEntry.COLUMN_NAME_TITLE + "=?";
         String[] rowQuery = {bookTitle};
         BookDbHelper bookDatabase = new BookDbHelper(this);
         Cursor c1 = bookDatabase.getReadableDatabase().query(
-                BookContract.bookEntry.TABLE_NAME,      // queries the list of books
+                bookEntry.TABLE_NAME,      // queries the list of books
                 null,                                   // queries all columns
                 Selection,                              // return the row (basically the book) where the id
                 rowQuery,                               //  == tablePosition
@@ -265,26 +261,28 @@ public class BookActivity extends AppCompatActivity {
     }
 
     // Add the newBook to the bookDatabase
-    private void addBookToDatabase(String Author, String bookGraphic) {
+    private void addBookToDatabase(String Author, String bookGraphic, int con_color, int stat_color) {
 
         AudioBook book = (AudioBook) getIntent().getSerializableExtra("newBook");
         ContentValues values = new ContentValues();
 
-        values.put(BookContract.bookEntry.COLUMN_NAME_TITLE, bookTitle);
-        values.put(BookContract.bookEntry.COLUMN_NAME_AUTHOR, Author);
-        values.put(BookContract.bookEntry.COLUMN_NAME_COVER_IMAGE_PATH, bookGraphic);
-        values.put(BookContract.bookEntry.COLUMN_NAME_ABSOLUTE_PATH, bookGraphicAbsolutePath);
+        values.put(bookEntry.COLUMN_NAME_TITLE, bookTitle);
+        values.put(bookEntry.COLUMN_NAME_AUTHOR, Author);
+        values.put(bookEntry.COLUMN_NAME_COVER_IMAGE_PATH, bookGraphic);
+        values.put(bookEntry.COLUMN_NAME_ABSOLUTE_PATH, bookGraphicAbsolutePath);
 
-        values.put(BookContract.bookEntry.COLUMN_NAME_SUBTITLE, book.getSubtitle());
-        values.put(BookContract.bookEntry.COLUMN_NAME_DESCRIPTION, book.getDescription());
-        values.put(BookContract.bookEntry.COLUMN_NAME_PUBLISHER, book.getPublisher());
-        values.put(BookContract.bookEntry.COLUMN_NAME_PUBLISH_DATE, book.getPublishDate());
-        values.put(BookContract.bookEntry.COLUMN_NAME_ISBN, book.getISBN());
-        values.put(BookContract.bookEntry.COLUMN_NAME_RATING, book.getRating());
-        values.put(BookContract.bookEntry.COLUMN_NAME_COVER_IMAGE_PATH, bookGraphic);
+        values.put(bookEntry.COLUMN_NAME_SUBTITLE, book.getSubtitle());
+        values.put(bookEntry.COLUMN_NAME_DESCRIPTION, book.getDescription());
+        values.put(bookEntry.COLUMN_NAME_PUBLISHER, book.getPublisher());
+        values.put(bookEntry.COLUMN_NAME_PUBLISH_DATE, book.getPublishDate());
+        values.put(bookEntry.COLUMN_NAME_ISBN, book.getISBN());
+        values.put(bookEntry.COLUMN_NAME_RATING, book.getRating());
+        values.put(bookEntry.COLUMN_NAME_COVER_IMAGE_PATH, bookGraphic);
+        values.put(bookEntry.COLUMN_NAME_CONTENT_COLOR, con_color);
+        values.put(bookEntry.COLUMN_NAME_STATUS_COLOR, stat_color);
 
         SQLiteDatabase bookDatabase = new BookDbHelper(this).getWritableDatabase();
-        bookDatabase.insert(BookContract.bookEntry.TABLE_NAME, null, values);
+        bookDatabase.insert(bookEntry.TABLE_NAME, null, values);
 
         // Create the database for this book
         BookChapterDbHelper mDbHelper = new BookChapterDbHelper(this, bookTitle);
@@ -297,20 +295,6 @@ public class BookActivity extends AppCompatActivity {
         intent.putExtra("BOOK_TITLE", bookTitle);
         intent.putExtra("CHAPTER_NAME", mChapters.get(chapter));
         startActivity(intent);
-    }
-
-    // Generate palette synchronously and return it
-    private Palette createPaletteSync() {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 8;
-        Bitmap bmp = null;
-
-        try {
-            bmp = BitmapFactory.decodeStream(new FileInputStream(new File(bookGraphicAbsolutePath)), null, options);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return Palette.from(bmp).generate();
     }
 
     private void pickUserAccount() {

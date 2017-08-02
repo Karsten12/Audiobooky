@@ -29,6 +29,8 @@ public class BookContract {
         public static final String COLUMN_NAME_RATING = "rating";
         public static final String COLUMN_NAME_COVER_IMAGE_PATH = "cover_image_path";
         public static final String COLUMN_NAME_ABSOLUTE_PATH = "absolute_image_path";
+        public static final String COLUMN_NAME_CONTENT_COLOR = "content_color";
+        public static final String COLUMN_NAME_STATUS_COLOR = "status_color";
     }
 
 

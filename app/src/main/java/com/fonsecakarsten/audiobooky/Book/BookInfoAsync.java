@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.graphics.Palette;
 
 import com.fonsecakarsten.audiobooky.R;
 
@@ -17,7 +19,6 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,6 +67,8 @@ public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         String publishDate = null;
         String description = null;
         int rating = 0;
+        int content_color = 0;
+        int status_color = 0;
 
 
         // Retrieve book cover image from openLibrary.org
@@ -73,7 +76,7 @@ public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         String[] sizes = {"L", "M", "S"};
         for (String size : sizes) {
             imageURL = String.format("http://covers.openlibrary.org/b/isbn/%s-%s.jpg", ISBN, size);
-            bitmap = getimageBitmap(imageURL);
+            bitmap = getImageBitmap(imageURL);
 
             if (bitmap != null) {
                 break;
@@ -99,7 +102,7 @@ public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
                 description = bookInfo.getString("description");
                 rating = bookInfo.getInt("averageRating");
                 if (bitmap == null) {
-                    bitmap = getimageBitmap(bookInfo.getJSONArray("imageLinks").getString(1));
+                    bitmap = getImageBitmap(bookInfo.getJSONArray("imageLinks").getString(1));
                 }
 
             } catch (final JSONException e) {
@@ -110,21 +113,25 @@ public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
 
         File f = null;
         if (bitmap != null && title != null) {
+
+            // Get palette colors
+            Palette palette = Palette.from(bitmap).generate();
+            content_color = palette.getMutedColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            status_color = palette.getMutedColor(ContextCompat.getColor(context, R.color.colorPrimary));
+
             // Create a file inside of CoverImages folder to store the book image
             f = new File(context.getDir("CoverImages", Context.MODE_PRIVATE), title);
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(f);
-            } catch (FileNotFoundException e) {
-                // Error occurred
-            }
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            try {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
                 fos.close();
             } catch (IOException e) {
-                // Error occurred
+                e.printStackTrace();
             }
         }
+
+
         if (subtitle != null) {
             book.setSubtitle(subtitle);
             intent.putExtra("BOOK_SUBTITLE", subtitle);
@@ -141,12 +148,14 @@ public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         intent.putExtra("BOOK_AUTHOR", author);
         intent.putExtra("BOOK_GRAPHIC", Uri.fromFile(f).toString());
         intent.putExtra("BOOK_GRAPHIC_ABSOLUTEPATH", f.getAbsolutePath());
+        intent.putExtra("CONTENT_COLOR", content_color);
+        intent.putExtra("STATUS_COLOR", status_color);
 
         return book;
     }
 
 
-    private Bitmap getimageBitmap(String imageURL) {
+    private Bitmap getImageBitmap(String imageURL) {
         Bitmap bitmap = null;
         try {
             URL url = new URL(imageURL);

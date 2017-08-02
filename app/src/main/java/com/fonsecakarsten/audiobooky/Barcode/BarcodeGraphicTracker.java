@@ -22,7 +22,7 @@ class BarcodeGraphicTracker extends Tracker<Barcode> {
         mCallback.onFound(item.displayValue);
     }
 
-    public interface Callback {
+    interface Callback {
         void onFound(String barcodeValue);
     }
 }

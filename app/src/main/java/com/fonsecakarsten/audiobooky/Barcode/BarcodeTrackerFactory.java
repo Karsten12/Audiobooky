@@ -11,7 +11,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 class BarcodeTrackerFactory implements MultiProcessor.Factory<Barcode> {
     private BarcodeGraphicTracker.Callback mCallback;
 
-    public BarcodeTrackerFactory(BarcodeGraphicTracker.Callback callback) {
+    BarcodeTrackerFactory(BarcodeGraphicTracker.Callback callback) {
         mCallback = callback;
     }
 

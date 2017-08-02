@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.util.Size;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.ViewGroup;
 
@@ -18,7 +17,6 @@ public class CameraSourcePreview extends ViewGroup {
     private static final String TAG = "CameraSourcePreview";
 
     //PREVIEW VISUALIZERS FOR BOTH CAMERA1 AND CAMERA2 API.
-    private SurfaceView mSurfaceView;
     private AutoFitTextureView mAutoFitTextureView;
 
     private boolean mStartRequested;
