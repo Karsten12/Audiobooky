@@ -60,8 +60,6 @@ class MobileVisionAsync extends AsyncTask<String, Void, String> {
                 }
             }
         }
-
-
         return null;
     }
 }

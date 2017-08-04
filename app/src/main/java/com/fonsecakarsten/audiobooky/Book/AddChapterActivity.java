@@ -158,6 +158,8 @@ public class AddChapterActivity extends Activity {
                     ImageView image = (ImageView) layout.findViewById(R.id.image_popup_image);
                     Glide.with(AddChapterActivity.this).load(imagePath).into(image);
 
+                    final int pos = holder.getAdapterPosition();
+
                     AlertDialog imageDialog = new AlertDialog.Builder(AddChapterActivity.this)
                             .setView(layout)
                             .setPositiveButton("RETAKE", new DialogInterface.OnClickListener() {
@@ -170,9 +172,8 @@ public class AddChapterActivity extends Activity {
                                     dialog.dismiss();
                                     File f = new File(imagePath);
                                     f.delete();
-                                    mImageArray.remove(holder.getAdapterPosition());
-                                    notifyItemRemoved(holder.getAdapterPosition());
-                                    notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray.size());
+                                    mImageArray.remove(pos);
+                                    mAdapter.notifyItemRemoved(pos);
                                 }
                             })
                             .setNeutralButton(R.string.Ok, new DialogInterface.OnClickListener() {
@@ -184,9 +185,8 @@ public class AddChapterActivity extends Activity {
                             .setNegativeButton("REMOVE", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    mImageArray.remove(holder.getAdapterPosition());
-                                    notifyItemRemoved(holder.getAdapterPosition());
-                                    notifyItemRangeChanged(holder.getAdapterPosition(), mImageArray.size());
+                                    mImageArray.remove(pos);
+                                    mAdapter.notifyItemRemoved(pos);
                                     File f = new File(imagePath);
                                     f.delete();
                                 }
