@@ -23,5 +23,7 @@
     <string name="title">Title</string>
     <string name="select_account">You need to select an account</string>
     <string name="auth_failed">Authorization Failed</string>
+    <string name="cont_color">CONTENT_COLOR</string>
+    <string name="stat_color">STATUS_COLOR</string>
 
 </resources>

@@ -19,6 +19,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -78,8 +81,8 @@ public class BookActivity extends AppCompatActivity {
         String bookAuthor = extras.getString(getString(R.string.book_author));
         String bookGraphic = extras.getString(getString(R.string.book_graphic));
         bookGraphicAbsolutePath = extras.getString(getString(R.string.book_graphic_absolutePath));
-        int content_color = extras.getInt("CONTENT_COLOR");
-        int status_color = extras.getInt("STATUS_COLOR");
+        int content_color = extras.getInt(getString(R.string.cont_color));
+        int status_color = extras.getInt(getString(R.string.stat_color));
 
         // Set imageView to book cover
         ImageView imageView = (ImageView) findViewById(R.id.book_image);
@@ -219,6 +222,24 @@ public class BookActivity extends AppCompatActivity {
         c1.close();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.book_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.button_info:
+                getBookDetails();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     // Create and/or open the database and get the chapter list
     private void readDatabase() {
         // instantiate subclass of SQLiteOpenHelper
@@ -237,7 +258,7 @@ public class BookActivity extends AppCompatActivity {
                 null,                           // don't filter by row groups
                 null);                          // The sort order
 
-        // Get all the chapter names and add it to the arraylist
+        // Get all the chapter names and add it to the arrayList
         while (c.moveToNext()) {
             int chapterNameColumn = c.getColumnIndex(bookChapterEntry.COLUMN_NAME_CHAPTER_TITLE);
             mChapters.add(c.getString(chapterNameColumn));
@@ -314,16 +335,16 @@ public class BookActivity extends AppCompatActivity {
         accessToken = token;
     }
 
-    public class recycleAdapter extends RecyclerView.Adapter<BookActivity.recycleAdapter.viewholder> {
+    public class recycleAdapter extends RecyclerView.Adapter<recycleAdapter.viewHolder> {
 
         @Override
-        public BookActivity.recycleAdapter.viewholder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public viewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = getLayoutInflater().inflate(R.layout.chapter_row, parent, false);
-            return new BookActivity.recycleAdapter.viewholder(v);
+            return new viewHolder(v);
         }
 
         @Override
-        public void onBindViewHolder(final BookActivity.recycleAdapter.viewholder holder, int position) {
+        public void onBindViewHolder(final viewHolder holder, int position) {
             holder.chapterName.setText(mChapters.get(position));
             if (mChaptersReady.get(position)) {
                 holder.progressBar.setVisibility(View.GONE);
@@ -343,12 +364,12 @@ public class BookActivity extends AppCompatActivity {
             return mChapters.size();
         }
 
-        class viewholder extends RecyclerView.ViewHolder {
+        class viewHolder extends RecyclerView.ViewHolder {
             TextView chapterName;
             RelativeLayout root;
             ProgressBar progressBar;
 
-            viewholder(View itemView) {
+            viewHolder(View itemView) {
                 super(itemView);
                 root = (RelativeLayout) itemView.findViewById(R.id.chapter_row_root);
                 chapterName = (TextView) itemView.findViewById(R.id.chapter_name);

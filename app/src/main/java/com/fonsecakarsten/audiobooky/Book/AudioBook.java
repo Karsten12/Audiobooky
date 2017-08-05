@@ -7,7 +7,7 @@ import java.io.Serializable;
  * Audiobook template
  */
 
-public class AudioBook implements Serializable {
+class AudioBook implements Serializable {
     private String title;
     private String author;
     private String coverImagePath;
@@ -21,9 +21,6 @@ public class AudioBook implements Serializable {
     private String ISBN;
 
     String getTitle() {
-        if (subtitle != null) {
-            return title + ": " + subtitle;
-        }
         return title;
     }
 
