@@ -20,7 +20,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +58,7 @@ public class BookActivity extends AppCompatActivity {
     private String bookGraphicAbsolutePath;
     private String tempChapTitle = null;
     private SQLiteDatabase db;
+    private String[] bookInfo;
     private int lastChapterRead;
 
     private boolean checkDatabaseExist(Context context, String dbName) {
@@ -207,25 +207,28 @@ public class BookActivity extends AppCompatActivity {
 
 
     public void getBookDetails() {
-        String Selection = bookEntry.COLUMN_NAME_TITLE + "=?";
-        String[] rowQuery = {bookTitle};
-        BookDbHelper bookDatabase = new BookDbHelper(this);
-        Cursor c1 = bookDatabase.getReadableDatabase().query(
-                bookEntry.TABLE_NAME,      // queries the list of books
-                null,                                   // queries all columns
-                Selection,                              // return the row (basically the book) where the id
-                rowQuery,                               //  == tablePosition
-                null,                                   // don't group the rows
-                null,                                   // don't filter by row groups
-                null);                                  // The sort order
+        if (bookInfo != null) {
+            // TODO
+        } else {
+            String Selection = bookEntry.COLUMN_NAME_TITLE + "=?";
+            String[] rowQuery = {bookTitle};
+            BookDbHelper bookDatabase = new BookDbHelper(this);
+            Cursor c1 = bookDatabase.getReadableDatabase().query(
+                    bookEntry.TABLE_NAME,      // queries the list of books
+                    null,                                   // queries all columns
+                    Selection,                              // return the row (basically the book) where the id
+                    rowQuery,                               //  == tablePosition
+                    null,                                   // don't group the rows
+                    null,                                   // don't filter by row groups
+                    null);                                  // The sort order
 
-        c1.close();
+            c1.close();
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.book_menu, menu);
+        getMenuInflater().inflate(R.menu.book_menu, menu);
         return true;
     }
 
