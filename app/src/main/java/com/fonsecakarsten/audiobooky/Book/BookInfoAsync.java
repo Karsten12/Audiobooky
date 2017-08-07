@@ -32,7 +32,7 @@ import java.net.URL;
  * barcode scanner
  */
 
-public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
+public class BookInfoAsync extends AsyncTask<String, Void, Void> {
     private String ISBN;
     private Context context;
     private Activity activity;
@@ -56,7 +56,7 @@ public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
 
     // Send a request to GoogleBooks and OpenLib via Http request, and retrieve book information
     @Override
-    protected AudioBook doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         AudioBook book = new AudioBook();
 
         String title = null;
@@ -151,7 +151,8 @@ public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
         intent.putExtra("CONTENT_COLOR", content_color);
         intent.putExtra("STATUS_COLOR", status_color);
 
-        return book;
+        intent.putExtra("newBook", book);
+        return null;
     }
 
 
@@ -202,9 +203,8 @@ public class BookInfoAsync extends AsyncTask<String, Void, AudioBook> {
     }
 
     @Override
-    protected void onPostExecute(AudioBook book) {
-        super.onPostExecute(book);
-        intent.putExtra("newBook", book);
+    protected void onPostExecute(Void aVoid) {
+        //super.onPostExecute(aVoid);
         activity.startActivity(intent);
         progressDialog.dismiss();
     }
