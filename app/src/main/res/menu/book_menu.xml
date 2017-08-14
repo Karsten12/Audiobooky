@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/button_info"
+        android:icon="@mipmap/ic_info"
         android:title="Info"
         app:showAsAction="always" />
 </menu>
