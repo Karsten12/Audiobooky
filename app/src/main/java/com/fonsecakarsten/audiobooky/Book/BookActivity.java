@@ -27,6 +27,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -207,9 +208,8 @@ public class BookActivity extends AppCompatActivity {
 
 
     public void getBookDetails() {
-        if (bookInfo != null) {
-            // TODO
-        } else {
+
+        if (bookInfo == null) {
             String Selection = bookEntry.COLUMN_NAME_TITLE + "=?";
             String[] rowQuery = {bookTitle};
             BookDbHelper bookDatabase = new BookDbHelper(this);
@@ -222,8 +222,54 @@ public class BookActivity extends AppCompatActivity {
                     null,                                   // don't filter by row groups
                     null);                                  // The sort order
 
+            c1.moveToFirst();
+            bookInfo = new String[6];
+            int subTitleColumn = c1.getColumnIndex(bookEntry.COLUMN_NAME_SUBTITLE);
+            int bookAuthorColumn = c1.getColumnIndex(bookEntry.COLUMN_NAME_AUTHOR);
+            int ratingColumn = c1.getColumnIndex(bookEntry.COLUMN_NAME_RATING);
+            int descriptionColumn = c1.getColumnIndex(bookEntry.COLUMN_NAME_DESCRIPTION);
+            int publishDateColumn = c1.getColumnIndex(bookEntry.COLUMN_NAME_PUBLISH_DATE);
+            int ISBN = c1.getColumnIndex(bookEntry.COLUMN_NAME_ISBN);
+            bookInfo[0] = c1.getString(subTitleColumn);
+            bookInfo[1] = c1.getString(bookAuthorColumn);
+            bookInfo[2] = String.valueOf(c1.getInt(ratingColumn));
+            bookInfo[3] = c1.getString(descriptionColumn);
+            bookInfo[4] = c1.getString(publishDateColumn);
+            bookInfo[5] = c1.getString(ISBN);
+
             c1.close();
         }
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View layout = inflater.inflate(R.layout.book_info, (ViewGroup) findViewById(R.id.book_info_root), false);
+
+        TextView title = (TextView) layout.findViewById(R.id.title);
+        TextView subTitle = (TextView) layout.findViewById(R.id.sub_title);
+        TextView bookAuthor = (TextView) layout.findViewById(R.id.book_author);
+        RatingBar ratingBar = (RatingBar) layout.findViewById(R.id.ratingBar);
+        TextView description = (TextView) layout.findViewById(R.id.description);
+        TextView publishDate = (TextView) layout.findViewById(R.id.publish_date);
+        TextView ISBN = (TextView) layout.findViewById(R.id.ISBN);
+
+        title.setText(bookTitle);
+        subTitle.setText(bookInfo[0]);
+        bookAuthor.setText(bookInfo[1]);
+        ratingBar.setRating(Float.valueOf(bookInfo[2]));
+        description.setText(bookInfo[3]);
+        publishDate.setText(bookInfo[4]);
+        ISBN.setText(bookInfo[5]);
+
+
+        AlertDialog newChapterDialog = new AlertDialog.Builder(this)
+                .setView(layout)
+                .setTitle(bookTitle)
+                .setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+        newChapterDialog.show();
     }
 
     @Override
