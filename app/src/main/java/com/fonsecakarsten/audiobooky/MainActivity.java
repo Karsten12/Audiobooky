@@ -100,18 +100,12 @@ public class MainActivity extends AppCompatActivity {
             mBooksContentColor.clear();
             mBooksStatusColor.clear();
             while (c.moveToNext()) {
-                int bookNameColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_TITLE);
-                int bookAuthorColumn = c.getColumnIndex(bookEntry.COLUMN_NAME_AUTHOR);
-                int bookGraphic = c.getColumnIndex(bookEntry.COLUMN_NAME_COVER_IMAGE_PATH);
-                int bookGraphicAbsolutePath = c.getColumnIndex(bookEntry.COLUMN_NAME_ABSOLUTE_PATH);
-                int bookContentColor = c.getColumnIndex(bookEntry.COLUMN_NAME_CONTENT_COLOR);
-                int bookStatusColor = c.getColumnIndex(bookEntry.COLUMN_NAME_STATUS_COLOR);
-                mBooksTitle.add(c.getString(bookNameColumn));
-                mBooksAuthor.add(c.getString(bookAuthorColumn));
-                mBooksGraphic.add(c.getString(bookGraphic));
-                mBooksAbsolutePath.add(c.getString(bookGraphicAbsolutePath));
-                mBooksContentColor.add(c.getInt(bookContentColor));
-                mBooksStatusColor.add(c.getInt(bookStatusColor));
+                mBooksTitle.add(c.getString(c.getColumnIndex(bookEntry.COLUMN_NAME_TITLE)));
+                mBooksAuthor.add(c.getString(c.getColumnIndex(bookEntry.COLUMN_NAME_AUTHOR)));
+                mBooksGraphic.add(c.getString(c.getColumnIndex(bookEntry.COLUMN_NAME_COVER_IMAGE_PATH)));
+                mBooksAbsolutePath.add(c.getString(c.getColumnIndex(bookEntry.COLUMN_NAME_ABSOLUTE_PATH)));
+                mBooksContentColor.add(c.getInt(c.getColumnIndex(bookEntry.COLUMN_NAME_CONTENT_COLOR)));
+                mBooksStatusColor.add(c.getInt(c.getColumnIndex(bookEntry.COLUMN_NAME_STATUS_COLOR)));
             }
             mAdapter.notifyDataSetChanged();
         }
