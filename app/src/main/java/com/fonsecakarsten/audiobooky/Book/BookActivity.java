@@ -224,19 +224,12 @@ public class BookActivity extends AppCompatActivity {
 
             c1.moveToFirst();
             bookInfo = new String[6];
-            int subTitleColumn = c1.getColumnIndex(bookEntry.COLUMN_NAME_SUBTITLE);
-            int bookAuthorColumn = c1.getColumnIndex(bookEntry.COLUMN_NAME_AUTHOR);
-            int ratingColumn = c1.getColumnIndex(bookEntry.COLUMN_NAME_RATING);
-            int descriptionColumn = c1.getColumnIndex(bookEntry.COLUMN_NAME_DESCRIPTION);
-            int publishDateColumn = c1.getColumnIndex(bookEntry.COLUMN_NAME_PUBLISH_DATE);
-            int ISBN = c1.getColumnIndex(bookEntry.COLUMN_NAME_ISBN);
-            bookInfo[0] = c1.getString(subTitleColumn);
-            bookInfo[1] = c1.getString(bookAuthorColumn);
-            bookInfo[2] = String.valueOf(c1.getInt(ratingColumn));
-            bookInfo[3] = c1.getString(descriptionColumn);
-            bookInfo[4] = c1.getString(publishDateColumn);
-            bookInfo[5] = c1.getString(ISBN);
-
+            bookInfo[0] = c1.getString(c1.getColumnIndex(bookEntry.COLUMN_NAME_SUBTITLE));
+            bookInfo[1] = c1.getString(c1.getColumnIndex(bookEntry.COLUMN_NAME_AUTHOR));
+            bookInfo[2] = String.valueOf(c1.getInt(c1.getColumnIndex(bookEntry.COLUMN_NAME_RATING)));
+            bookInfo[3] = c1.getString(c1.getColumnIndex(bookEntry.COLUMN_NAME_DESCRIPTION));
+            bookInfo[4] = c1.getString(c1.getColumnIndex(bookEntry.COLUMN_NAME_PUBLISH_DATE));
+            bookInfo[5] = c1.getString(c1.getColumnIndex(bookEntry.COLUMN_NAME_ISBN));
             c1.close();
         }
         LayoutInflater inflater = LayoutInflater.from(this);
