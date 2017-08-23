@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "142791750256",
+    "firebase_url": "https://audiobooky-ad7de.firebaseio.com",
+    "project_id": "audiobooky-ad7de",
+    "storage_bucket": "audiobooky-ad7de.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142791750256:android:455baee19d7031e3",
+        "android_client_info": {
+          "package_name": "com.fonsecakarsten.audiobooky"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142791750256-vbun5leegdn9k2cq79blnokdqjse43br.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fonsecakarsten.audiobooky",
+            "certificate_hash": "cfea149f1fba460759d41cc549e5b0ab5f4aac9c"
+          }
+        },
+        {
+          "client_id": "142791750256-unkedoegf288uu45ic0kpdpuu6o396ql.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQt61tSph6IuJ4HvAdDsQ2Gcrfn4r-TBo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "142791750256-unkedoegf288uu45ic0kpdpuu6o396ql.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
