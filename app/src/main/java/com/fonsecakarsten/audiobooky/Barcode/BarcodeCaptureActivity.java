@@ -104,6 +104,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
                 data.putExtra("BarCodeString", barcodeValue);
                 setResult(RESULT_OK, data);
                 finish();
+
             }
         });
         barcodeDetector.setProcessor(new MultiProcessor.Builder<>(barcodeFactory).build());

@@ -235,7 +235,6 @@ public class BookActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         View layout = inflater.inflate(R.layout.book_info, (ViewGroup) findViewById(R.id.book_info_root), false);
 
-        TextView title = (TextView) layout.findViewById(R.id.title);
         TextView subTitle = (TextView) layout.findViewById(R.id.sub_title);
         TextView bookAuthor = (TextView) layout.findViewById(R.id.book_author);
         RatingBar ratingBar = (RatingBar) layout.findViewById(R.id.ratingBar);
@@ -243,7 +242,6 @@ public class BookActivity extends AppCompatActivity {
         TextView publishDate = (TextView) layout.findViewById(R.id.publish_date);
         TextView ISBN = (TextView) layout.findViewById(R.id.ISBN);
 
-        title.setText(bookTitle);
         subTitle.setText(bookInfo[0]);
         bookAuthor.setText(bookInfo[1]);
         ratingBar.setRating(Float.valueOf(bookInfo[2]));
@@ -320,6 +318,8 @@ public class BookActivity extends AppCompatActivity {
         // chapterText is being processed, show indeterminate progressCircle
         CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position);
         task.execute();
+//        MobileVisionAsync task = new MobileVisionAsync(imageArray.get(0), this);
+//        task.execute();
     }
 
     // Add the newBook to the bookDatabase
