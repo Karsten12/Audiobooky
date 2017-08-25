@@ -121,7 +121,7 @@ public class BookInfoAsync extends AsyncTask<String, Void, Void> {
 
             // Create a file inside of CoverImages folder to store the book image
             f = new File(context.getDir("CoverImages", Context.MODE_PRIVATE), title);
-            FileOutputStream fos = null;
+            FileOutputStream fos;
             try {
                 fos = new FileOutputStream(f);
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);

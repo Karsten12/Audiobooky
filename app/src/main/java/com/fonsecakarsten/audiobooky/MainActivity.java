@@ -324,6 +324,7 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra("STATUS_COLOR", mBooksStatusColor.get(pos));
 
                     startActivity(intent);
+                    overridePendingTransition(R.anim.enter, R.anim.exit);
                 }
             });
         }

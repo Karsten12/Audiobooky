@@ -25,8 +25,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile('com.google.api-client:google-api-client-android:1.22.0')
-    compile('com.google.http-client:google-http-client-gson:1.20.0')
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
@@ -45,16 +43,19 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
 
     // CloudVision and MobileVision dependencies
+    compile('com.google.api-client:google-api-client-android:1.22.0')
+    compile('com.google.http-client:google-http-client-gson:1.22.0')
     compile 'com.google.android.gms:play-services-vision:11.0.4'
     compile 'com.google.android.gms:play-services-base:11.0.4'
     compile 'com.google.android.gms:play-services-auth:11.0.4'
-    compile 'com.google.apis:google-api-services-vision:v1-rev16-1.22.0'
+    compile 'com.google.apis:google-api-services-vision:v1-rev360-1.22.0'
 
     // Firebase
     compile 'com.google.firebase:firebase-auth:11.0.4'
     compile 'com.google.firebase:firebase-storage:11.0.4'
+
+    // Appintro
+    compile 'com.github.apl-devs:appintro:v4.2.2'
 }
-
-
 
 apply plugin: 'com.google.gms.google-services'

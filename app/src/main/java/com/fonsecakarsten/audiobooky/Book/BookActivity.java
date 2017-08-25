@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.fonsecakarsten.audiobooky.CloudVisionAsync;
 import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
@@ -206,7 +207,7 @@ public class BookActivity extends AppCompatActivity {
     }
 
 
-    public void getBookDetails() {
+    private void getBookDetails() {
 
         if (bookInfo == null) {
             String Selection = bookEntry.COLUMN_NAME_TITLE + "=?";
@@ -272,11 +273,22 @@ public class BookActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
+            case android.R.id.home:
+                //NavUtils.navigateUpFromSameTask(this);
+                finish();
+                overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
+                return true;
             case R.id.button_info:
                 getBookDetails();
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
     }
 
     // Create and/or open the database and get the chapter list
@@ -316,10 +328,10 @@ public class BookActivity extends AppCompatActivity {
         int position = mChapters.indexOf(tempChapTitle);
         // chapterText is being processed, show indeterminate progressCircle
 //        CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position);
-//        CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position, this);
-//        task.execute();
-        MobileVisionAsync task = new MobileVisionAsync(imageArray.get(0), this);
+        CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position, this);
         task.execute();
+//        MobileVisionAsync task = new MobileVisionAsync(imageArray.get(0), this);
+//        task.execute();
     }
 
     // Add the newBook to the bookDatabase

@@ -9,9 +9,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
@@ -39,6 +41,7 @@ public class ReadChapterActivity extends AppCompatActivity {
     private String bookTitle;
     private String chapterTitle;
     private ArrayList<String> chapterText = new ArrayList<>();
+    private FloatingActionButton speakBTN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +64,9 @@ public class ReadChapterActivity extends AppCompatActivity {
         mViewPager.setAdapter(adapter);
         getChapter();
 
-        FloatingActionButton captureBtn = (FloatingActionButton) findViewById(R.id.FAB3);
-        captureBtn.bringToFront();
-        captureBtn.setOnClickListener(new View.OnClickListener() {
+        speakBTN = (FloatingActionButton) findViewById(R.id.FAB3);
+        speakBTN.bringToFront();
+        speakBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 speak();
@@ -123,16 +126,34 @@ public class ReadChapterActivity extends AppCompatActivity {
     }
 
     private void speak() {
-        speech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status != TextToSpeech.ERROR) {
-                    speech.setLanguage(Locale.getDefault());
-                    String utteranceId = this.hashCode() + "";
-                    speech.speak(chapterText.get(mViewPager.getCurrentItem()), TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+        if (speech == null) {
+            speech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if (status != TextToSpeech.ERROR) {
+                        speech.setLanguage(Locale.getDefault());
+                        String utteranceId = this.hashCode() + "";
+                        speech.speak(chapterText.get(mViewPager.getCurrentItem()), TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+                        speakBTN.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
+
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            speech.stop();
+            speakBTN.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+
+        return (super.onOptionsItemSelected(item));
     }
 
     public void onPause() {
