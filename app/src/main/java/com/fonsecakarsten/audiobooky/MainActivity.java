@@ -106,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
         captureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                addNewBook();
-                signIn();
+                addNewBook();
+//                signIn();
             }
         });
     }

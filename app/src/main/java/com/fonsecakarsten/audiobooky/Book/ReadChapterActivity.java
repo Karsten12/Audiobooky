@@ -5,12 +5,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
@@ -58,6 +60,15 @@ public class ReadChapterActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(adapter);
         getChapter();
+
+        FloatingActionButton captureBtn = (FloatingActionButton) findViewById(R.id.FAB3);
+        captureBtn.bringToFront();
+        captureBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                speak();
+            }
+        });
 
     }
 
@@ -117,11 +128,19 @@ public class ReadChapterActivity extends AppCompatActivity {
             public void onInit(int status) {
                 if (status != TextToSpeech.ERROR) {
                     speech.setLanguage(Locale.getDefault());
+                    String utteranceId = this.hashCode() + "";
+                    speech.speak(chapterText.get(mViewPager.getCurrentItem()), TextToSpeech.QUEUE_FLUSH, null, utteranceId);
                 }
             }
         });
-        String utteranceId = this.hashCode() + "";
-        speech.speak(chapterText.get(mViewPager.getCurrentItem()), TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+    }
+
+    public void onPause() {
+        if (speech != null) {
+            speech.stop();
+            speech.shutdown();
+        }
+        super.onPause();
     }
 
 

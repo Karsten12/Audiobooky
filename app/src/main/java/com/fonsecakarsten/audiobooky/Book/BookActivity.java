@@ -316,7 +316,8 @@ public class BookActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
         int position = mChapters.indexOf(tempChapTitle);
         // chapterText is being processed, show indeterminate progressCircle
-        CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position);
+//        CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position);
+        CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position, this);
         task.execute();
 //        MobileVisionAsync task = new MobileVisionAsync(imageArray.get(0), this);
 //        task.execute();
