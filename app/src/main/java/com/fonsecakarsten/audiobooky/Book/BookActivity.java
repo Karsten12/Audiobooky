@@ -33,7 +33,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.fonsecakarsten.audiobooky.CloudVisionAsync;
 import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
 import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
@@ -317,10 +316,10 @@ public class BookActivity extends AppCompatActivity {
         int position = mChapters.indexOf(tempChapTitle);
         // chapterText is being processed, show indeterminate progressCircle
 //        CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position);
-        CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position, this);
-        task.execute();
-//        MobileVisionAsync task = new MobileVisionAsync(imageArray.get(0), this);
+//        CloudVisionAsync task = new CloudVisionAsync(accessToken, tempChapTitle, imageArray, db, mAdapter, mChaptersReady, position, this);
 //        task.execute();
+        MobileVisionAsync task = new MobileVisionAsync(imageArray.get(0), this);
+        task.execute();
     }
 
     // Add the newBook to the bookDatabase
