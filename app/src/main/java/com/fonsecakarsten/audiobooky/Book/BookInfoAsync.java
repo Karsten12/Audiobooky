@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 
+import com.fonsecakarsten.audiobooky.MainActivity;
 import com.fonsecakarsten.audiobooky.R;
 
 import org.json.JSONException;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -38,6 +40,8 @@ public class BookInfoAsync extends AsyncTask<String, Void, Void> {
     private Activity activity;
     private ProgressDialog progressDialog;
     private Intent intent;
+    private boolean failed = false;
+    private Intent goBack;
 
     public BookInfoAsync(String isbn, Context con, Activity acc) {
         this.ISBN = isbn;
@@ -85,73 +89,78 @@ public class BookInfoAsync extends AsyncTask<String, Void, Void> {
 
         // Get book info from Google books
         String jsonStr = getJsonString(String.format("https://www.googleapis.com/books/v1/volumes?q=isbn:%s", ISBN));
-        if (jsonStr != null) {
-            try {
-                JSONObject bookInfo = new JSONObject(jsonStr)
-                        .getJSONArray("items")
-                        .getJSONObject(0)
-                        .getJSONObject("volumeInfo");
+        if (failed) {
+            goBack = new Intent(context, MainActivity.class);
+        } else {
 
-                title = bookInfo.getString("title");
-                if (bookInfo.has("subtitle")) {
-                    subtitle = bookInfo.getString("subtitle");
+            if (jsonStr != null) {
+                try {
+                    JSONObject bookInfo = new JSONObject(jsonStr)
+                            .getJSONArray("items")
+                            .getJSONObject(0)
+                            .getJSONObject("volumeInfo");
+
+                    title = bookInfo.getString("title");
+                    if (bookInfo.has("subtitle")) {
+                        subtitle = bookInfo.getString("subtitle");
+                    }
+                    author = bookInfo.getJSONArray("authors").getString(0);
+                    publisher = bookInfo.getString("publisher");
+                    publishDate = bookInfo.getString("publishedDate");
+                    description = bookInfo.getString("description");
+                    rating = bookInfo.getInt("averageRating");
+                    if (bitmap == null) {
+                        bitmap = getImageBitmap(bookInfo.getJSONArray("imageLinks").getString(1));
+                    }
+
+                } catch (final JSONException e) {
+                    System.out.println("Error");
                 }
-                author = bookInfo.getJSONArray("authors").getString(0);
-                publisher = bookInfo.getString("publisher");
-                publishDate = bookInfo.getString("publishedDate");
-                description = bookInfo.getString("description");
-                rating = bookInfo.getInt("averageRating");
-                if (bitmap == null) {
-                    bitmap = getImageBitmap(bookInfo.getJSONArray("imageLinks").getString(1));
+            }
+
+
+            File f = null;
+            if (bitmap != null && title != null) {
+
+                // Get palette colors
+                Palette palette = Palette.from(bitmap).generate();
+                content_color = palette.getMutedColor(ContextCompat.getColor(context, R.color.colorPrimary));
+                status_color = palette.getMutedColor(ContextCompat.getColor(context, R.color.colorPrimary));
+
+                // Create a file inside of CoverImages folder to store the book image
+                f = new File(context.getDir("CoverImages", Context.MODE_PRIVATE), title);
+                FileOutputStream fos;
+                try {
+                    fos = new FileOutputStream(f);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
-            } catch (final JSONException e) {
-                System.out.println("Error");
             }
-        }
 
 
-        File f = null;
-        if (bitmap != null && title != null) {
-
-            // Get palette colors
-            Palette palette = Palette.from(bitmap).generate();
-            content_color = palette.getMutedColor(ContextCompat.getColor(context, R.color.colorPrimary));
-            status_color = palette.getMutedColor(ContextCompat.getColor(context, R.color.colorPrimary));
-
-            // Create a file inside of CoverImages folder to store the book image
-            f = new File(context.getDir("CoverImages", Context.MODE_PRIVATE), title);
-            FileOutputStream fos;
-            try {
-                fos = new FileOutputStream(f);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (subtitle != null) {
+                book.setSubtitle(subtitle);
+                intent.putExtra("BOOK_SUBTITLE", subtitle);
             }
-        }
 
+            book.setPublisher(publisher);
+            book.setPublishDate(publishDate);
+            book.setDescription(description);
+            book.setRating(rating);
+            book.setISBN(ISBN);
 
-        if (subtitle != null) {
-            book.setSubtitle(subtitle);
+            intent.putExtra("BOOK_TITLE", title);
             intent.putExtra("BOOK_SUBTITLE", subtitle);
+            intent.putExtra("BOOK_AUTHOR", author);
+            intent.putExtra("BOOK_GRAPHIC", Uri.fromFile(f).toString());
+            intent.putExtra("BOOK_GRAPHIC_ABSOLUTEPATH", f.getAbsolutePath());
+            intent.putExtra("CONTENT_COLOR", content_color);
+            intent.putExtra("STATUS_COLOR", status_color);
+
+            intent.putExtra("newBook", book);
         }
-
-        book.setPublisher(publisher);
-        book.setPublishDate(publishDate);
-        book.setDescription(description);
-        book.setRating(rating);
-        book.setISBN(ISBN);
-
-        intent.putExtra("BOOK_TITLE", title);
-        intent.putExtra("BOOK_SUBTITLE", subtitle);
-        intent.putExtra("BOOK_AUTHOR", author);
-        intent.putExtra("BOOK_GRAPHIC", Uri.fromFile(f).toString());
-        intent.putExtra("BOOK_GRAPHIC_ABSOLUTEPATH", f.getAbsolutePath());
-        intent.putExtra("CONTENT_COLOR", content_color);
-        intent.putExtra("STATUS_COLOR", status_color);
-
-        intent.putExtra("newBook", book);
         return null;
     }
 
@@ -175,6 +184,7 @@ public class BookInfoAsync extends AsyncTask<String, Void, Void> {
         try {
             URL url = new URL(reqUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.connect();
             conn.setRequestMethod(context.getString(R.string.get));
             // read the response
             InputStream in = new BufferedInputStream(conn.getInputStream());
@@ -196,8 +206,10 @@ public class BookInfoAsync extends AsyncTask<String, Void, Void> {
                 }
             }
             response = sb.toString();
-        } catch (Exception e) {
-            // Error occurred
+        } catch (MalformedURLException e) {
+            failed = true;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return response;
     }
@@ -205,7 +217,11 @@ public class BookInfoAsync extends AsyncTask<String, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         //super.onPostExecute(aVoid);
-        activity.startActivity(intent);
+        if (failed) {
+            activity.startActivity(goBack);
+        } else {
+            activity.startActivity(intent);
+        }
         progressDialog.dismiss();
     }
 }

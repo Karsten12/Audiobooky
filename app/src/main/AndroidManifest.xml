@@ -46,7 +46,9 @@
         <activity
             android:name=".Book.ReadChapterActivity"
             android:parentActivityName=".Book.BookActivity" />
-        <activity android:name=".Book.AddChapterActivity" />
+        <activity
+            android:name=".Book.AddChapterActivity"
+            android:theme="@style/AppTheme.Fullscreen" />
     </application>
 
 </manifest>
