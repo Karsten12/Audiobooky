@@ -13,6 +13,8 @@ Simple android audiobook creation application designed for accuracy and speed
 
 
 **To fix**:
+- Barcode scanning preview is skewed left
+- Page scanning preview should be fullscreen
 - Poor book info formatting 
 - Book title needs to stand out from image
 - Fix error on GS7 where OCR fails
