@@ -13,6 +13,7 @@ Simple android audiobook creation application designed for accuracy and speed
 
 
 **To fix**:
+- Issue where ISBN is not found
 - Barcode scanning preview is skewed left
 - ~~Page scanning preview should be fullscreen~~
 - Poor book info formatting 
