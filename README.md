@@ -3,7 +3,7 @@
 # Audiobooky
 Simple android audiobook creation application designed for accuracy and speed
 
-To implement:
+**To implement**:
 - Add app intro screen w/ permission requests
 - Implement image cropping
 - Implement delete book, book chapter etc feature
@@ -12,7 +12,7 @@ To implement:
 - Use firebase auth for google cloud
 
 
-To fix:
+**To fix**:
 - Poor book info formatting 
 - Book title needs to stand out from image
 - Fix error on GS7 where OCR fails
