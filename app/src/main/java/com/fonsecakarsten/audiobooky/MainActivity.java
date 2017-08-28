@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private recycleAdapter mAdapter;
     private FirebaseAuth mAuth;
     private GoogleApiClient mGoogleApiClient;
+    private ArrayList<Integer> toDelete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                 null,                    // don't filter by row groups
                 null);                   // The sort order
 
-        if (c.getCount() > mBooksTitle.size()) {
+        if (c.getCount() != mBooksTitle.size()) {
             // Get all the chapter names and add it to the arraylist
             mBooksTitle.clear();
             mBooksAuthor.clear();
@@ -257,6 +258,38 @@ public class MainActivity extends AppCompatActivity {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
     }
 
+//    @Override
+//    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+//        MenuInflater menuInflater = getMenuInflater();
+//        menuInflater.inflate(R.menu.delete_books, menu);
+//        toDelete = new ArrayList<>();
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+//        switch (menuItem.getItemId()) {
+//            case R.id.action_delete:
+//                for (Integer item : toDelete) {
+//                    mBooksTitle.remove(item);
+//                    mBooksAuthor.remove(item);
+//                    mBooksGraphic.remove(item);
+//                    mBooksAbsolutePath.remove(item);
+//                    mBooksContentColor.remove(item);
+//                    mBooksStatusColor.remove(item);
+//                }
+//                actionMode.finish();
+//                return true;
+//            default:
+//                return false;
+//        }
+//    }
+//
+//    @Override
+//    public void onDestroyActionMode(ActionMode actionMode) {
+//        toDelete.clear();
+//    }
+
 
     //    // Check if permissions granted
 //    public static boolean hasPermissions(Context context, String... permissions)  {
@@ -308,13 +341,13 @@ public class MainActivity extends AppCompatActivity {
             holder.bookName.setText(mBooksTitle.get(position));
             holder.bookAuthor.setText(mBooksAuthor.get(position));
 
+            final int pos = holder.getAdapterPosition();
+
             holder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Go to bookActivity
                     Intent intent = new Intent(getApplicationContext(), BookActivity.class);
-
-                    int pos = holder.getAdapterPosition();
 
                     intent.putExtra("BOOK_TITLE", mBooksTitle.get(pos));
                     intent.putExtra("BOOK_AUTHOR", mBooksAuthor.get(pos));
@@ -325,6 +358,16 @@ public class MainActivity extends AppCompatActivity {
 
                     startActivity(intent);
                     overridePendingTransition(R.anim.enter, R.anim.exit);
+                }
+            });
+
+            holder.root.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    // TODO
+                    // Add curr book to toDelete so that the book can be deleted
+
+                    return false;
                 }
             });
         }

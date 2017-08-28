@@ -232,6 +232,7 @@ public class BookActivity extends AppCompatActivity {
             bookInfo[5] = c1.getString(c1.getColumnIndex(bookEntry.COLUMN_NAME_ISBN));
             c1.close();
         }
+
         LayoutInflater inflater = LayoutInflater.from(this);
         View layout = inflater.inflate(R.layout.book_info, (ViewGroup) findViewById(R.id.book_info_root), false);
 
@@ -244,7 +245,7 @@ public class BookActivity extends AppCompatActivity {
 
         subTitle.setText(bookInfo[0]);
         bookAuthor.setText(bookInfo[1]);
-        ratingBar.setRating(Float.valueOf(bookInfo[2]));
+        ratingBar.setRating(Float.parseFloat(bookInfo[2]));
         description.setText(bookInfo[3]);
         publishDate.setText(bookInfo[4]);
         ISBN.setText(bookInfo[5]);
