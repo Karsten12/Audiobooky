@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addNewBook() {
-        String[] list = {"Barcode", "Manual"};
+        String[] list = {"Barcode", "Title", "Author", "ISBN"};
         AlertDialog newDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.newBookString)
                 .setCancelable(false)
@@ -176,12 +176,30 @@ public class MainActivity extends AppCompatActivity {
                             case 1:
                                 // TODO
                                 // Add manual information entry
+                                // Open new dialog w/ spinner selecting choice from title, author, or ISBN,
+                                // make new BookInfoAsync task
                                 break;
+                            case 2:
+                                
                             default:
                                 break;
                         }
                     }
                 })
+                .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+        newDialog.show();
+    }
+
+    private void searchBookBy(String value) {
+        AlertDialog newDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.newBookString)
+                .setCancelable(false)
                 .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
