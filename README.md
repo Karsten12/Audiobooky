@@ -21,3 +21,5 @@ Simple android audiobook creation application designed for accuracy and speed
 - Fix error on GS7 where OCR fails
 - Error where no book cover image is present
 - move auth from each book to mainActivity
+
+##### Logo designed by Karsten12 #####
