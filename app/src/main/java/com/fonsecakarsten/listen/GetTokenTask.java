@@ -1,10 +1,10 @@
-package com.fonsecakarsten.audiobooky;
+package com.fonsecakarsten.listen;
 
 import android.accounts.Account;
 import android.app.Activity;
 import android.os.AsyncTask;
 
-import com.fonsecakarsten.audiobooky.Book.BookActivity;
+import com.fonsecakarsten.listen.Book.BookActivity;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;

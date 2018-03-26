@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky;
+package com.fonsecakarsten.listen;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -13,8 +13,8 @@ import android.os.AsyncTask;
 import android.util.SparseArray;
 import android.widget.Toast;
 
-import com.fonsecakarsten.audiobooky.Book.BookActivity;
-import com.fonsecakarsten.audiobooky.Database.BookContract;
+import com.fonsecakarsten.listen.Book.BookActivity;
+import com.fonsecakarsten.listen.Database.BookContract;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.fonsecakarsten.audiobooky">
+    package="com.fonsecakarsten.listen">
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -29,7 +29,7 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name="com.fonsecakarsten.listen.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,17 +37,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Book.BookActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name="com.fonsecakarsten.listen.Book.BookActivity"
+            android:parentActivityName="com.fonsecakarsten.listen.MainActivity" />
         <activity
-            android:name=".Barcode.BarcodeCaptureActivity"
+            android:name="com.fonsecakarsten.listen.Barcode.BarcodeCaptureActivity"
             android:label="Barcode"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName="com.fonsecakarsten.listen.MainActivity" />
         <activity
-            android:name=".Book.ReadChapterActivity"
-            android:parentActivityName=".Book.BookActivity" />
+            android:name="com.fonsecakarsten.listen.Book.ReadChapterActivity"
+            android:parentActivityName="com.fonsecakarsten.listen.Book.BookActivity" />
         <activity
-            android:name=".Book.AddChapterActivity"
+            android:name="com.fonsecakarsten.listen.Book.AddChapterActivity"
             android:theme="@style/AppTheme.Fullscreen" />
     </application>
 

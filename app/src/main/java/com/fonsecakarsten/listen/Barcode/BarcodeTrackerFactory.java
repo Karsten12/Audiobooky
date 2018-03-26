@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky.Barcode;
+package com.fonsecakarsten.listen.Barcode;
 
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;

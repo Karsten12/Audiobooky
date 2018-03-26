@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky.Barcode;
+package com.fonsecakarsten.listen.Barcode;
 
 import android.Manifest;
 import android.app.Activity;
@@ -16,9 +16,9 @@ import android.view.View;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
-import com.fonsecakarsten.audiobooky.Camera.CameraSource;
-import com.fonsecakarsten.audiobooky.Camera.CameraSourcePreview;
-import com.fonsecakarsten.audiobooky.R;
+import com.fonsecakarsten.listen.Camera.CameraSource;
+import com.fonsecakarsten.listen.Camera.CameraSourcePreview;
+import com.fonsecakarsten.listen.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.MultiProcessor;
@@ -46,10 +46,10 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
         setContentView(R.layout.barcode_capture);
 
         // Set up toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar toolbar = findViewById(R.id.app_bar);
         setActionBar(toolbar);
 
-        mPreview = (CameraSourcePreview) findViewById(R.id.preview);
+        mPreview = findViewById(R.id.preview);
 
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.

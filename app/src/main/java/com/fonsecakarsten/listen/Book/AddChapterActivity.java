@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky.Book;
+package com.fonsecakarsten.listen.Book;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,7 +19,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.flurgle.camerakit.CameraListener;
 import com.flurgle.camerakit.CameraView;
-import com.fonsecakarsten.audiobooky.R;
+import com.fonsecakarsten.listen.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,10 +39,10 @@ public class AddChapterActivity extends Activity {
         setContentView(R.layout.add_chapter_activity);
 
 
-        mCameraView = (CameraView) findViewById(R.id.camera);
-        Button button = (Button) findViewById(R.id.picture);
+        mCameraView = findViewById(R.id.camera);
+        Button button = findViewById(R.id.picture);
 
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        RecyclerView mRecyclerView = findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mAdapter = new imageAdapter();
@@ -55,7 +55,7 @@ public class AddChapterActivity extends Activity {
                 mCameraView.captureImage();
             }
         });
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.FAB2);
+        FloatingActionButton fab = findViewById(R.id.FAB2);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,7 +155,7 @@ public class AddChapterActivity extends Activity {
                     View layout = inflater.inflate(R.layout.image_popup, (ViewGroup) findViewById(R.id.image_popup_root), false);
 
                     // Display the image
-                    ImageView image = (ImageView) layout.findViewById(R.id.image_popup_image);
+                    ImageView image = layout.findViewById(R.id.image_popup_image);
                     Glide.with(AddChapterActivity.this).load(imagePath).into(image);
 
                     final int pos = holder.getAdapterPosition();
@@ -206,7 +206,7 @@ public class AddChapterActivity extends Activity {
 
             Myviewholder(View itemView) {
                 super(itemView);
-                imageView = (ImageView) itemView.findViewById(R.id.image_view);
+                imageView = itemView.findViewById(R.id.image_view);
             }
         }
     }

@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">AudioBooky</string>
+    <string name="app_name">Listen</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="newBookString">Add a new audiobook!</string>
     <string name="Cancel">Cancel</string>
-    <string name="Ok">Ok</string>
+    <string name="Ok">OK</string>
     <string name="newChapterString">Add a new chapter!</string>
     <string name="TitleEmptyWarning">Title cannot be empty</string>
     <string name="book_title">BOOK_TITLE</string>

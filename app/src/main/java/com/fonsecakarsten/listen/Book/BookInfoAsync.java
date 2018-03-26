@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky.Book;
+package com.fonsecakarsten.listen.Book;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -11,8 +11,8 @@ import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 
-import com.fonsecakarsten.audiobooky.MainActivity;
-import com.fonsecakarsten.audiobooky.R;
+import com.fonsecakarsten.listen.MainActivity;
+import com.fonsecakarsten.listen.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

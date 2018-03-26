@@ -1,10 +1,10 @@
-package com.fonsecakarsten.audiobooky.Database;
+package com.fonsecakarsten.listen.Database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
+import com.fonsecakarsten.listen.Database.BookContract.bookEntry;
 
 
 /**

@@ -18,7 +18,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <com.fonsecakarsten.audiobooky.Camera.CameraSourcePreview
+    <com.fonsecakarsten.listen.Camera.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

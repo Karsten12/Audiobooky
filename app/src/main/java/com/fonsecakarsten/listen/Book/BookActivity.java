@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky.Book;
+package com.fonsecakarsten.listen.Book;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -33,13 +33,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.fonsecakarsten.audiobooky.CloudVisionAsync;
-import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
-import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
-import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
-import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
-import com.fonsecakarsten.audiobooky.GetTokenTask;
-import com.fonsecakarsten.audiobooky.R;
+import com.fonsecakarsten.listen.CloudVisionAsync;
+import com.fonsecakarsten.listen.Database.BookChapterDbHelper;
+import com.fonsecakarsten.listen.Database.BookContract.bookChapterEntry;
+import com.fonsecakarsten.listen.Database.BookContract.bookEntry;
+import com.fonsecakarsten.listen.Database.BookDbHelper;
+import com.fonsecakarsten.listen.GetTokenTask;
+import com.fonsecakarsten.listen.R;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
@@ -73,7 +73,7 @@ public class BookActivity extends AppCompatActivity {
         setContentView(R.layout.book_activity);
 
         // Set up toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar toolbar = findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -86,7 +86,7 @@ public class BookActivity extends AppCompatActivity {
         int status_color = extras.getInt(getString(R.string.stat_color));
 
         // Set imageView to book cover
-        ImageView imageView = (ImageView) findViewById(R.id.book_image);
+        ImageView imageView = findViewById(R.id.book_image);
         Glide.with(this).load(Uri.parse(bookGraphic)).into(imageView);
 
 
@@ -99,7 +99,7 @@ public class BookActivity extends AppCompatActivity {
         }
 
         // Set up recyclerView
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.book_recview);
+        RecyclerView recyclerView = findViewById(R.id.book_recview);
         mAdapter = new recycleAdapter();
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -107,7 +107,7 @@ public class BookActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), mLayoutManager.getOrientation()));
 
         // Set up collapsing toolbar complex view
-        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(bookTitle);
         //collapsingToolbarLayout.setCollapsedTitleTextColor(palette.getMutedSwatch().getTitleTextColor());
         //collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
@@ -116,8 +116,8 @@ public class BookActivity extends AppCompatActivity {
         //collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark)));
         getWindow().setStatusBarColor(status_color);
 
-        FloatingActionButton playFab = (FloatingActionButton) findViewById(R.id.play_fab);
-        FloatingActionButton addFab = (FloatingActionButton) findViewById(R.id.add_chapter_fab);
+        FloatingActionButton playFab = findViewById(R.id.play_fab);
+        FloatingActionButton addFab = findViewById(R.id.add_chapter_fab);
         playFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,7 +138,7 @@ public class BookActivity extends AppCompatActivity {
         getAuthToken();
         LayoutInflater inflater = LayoutInflater.from(this);
         View layout = inflater.inflate(R.layout.newchapter_dialog, (ViewGroup) findViewById(R.id.newchapter_dialog_root), false);
-        final EditText title = (EditText) layout.findViewById(R.id.chapter_title);
+        final EditText title = layout.findViewById(R.id.chapter_title);
 
         AlertDialog newChapterDialog = new AlertDialog.Builder(this)
                 .setView(layout)
@@ -236,12 +236,12 @@ public class BookActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         View layout = inflater.inflate(R.layout.book_info, (ViewGroup) findViewById(R.id.book_info_root), false);
 
-        TextView subTitle = (TextView) layout.findViewById(R.id.sub_title);
-        TextView bookAuthor = (TextView) layout.findViewById(R.id.book_author);
-        RatingBar ratingBar = (RatingBar) layout.findViewById(R.id.ratingBar);
-        TextView description = (TextView) layout.findViewById(R.id.description);
-        TextView publishDate = (TextView) layout.findViewById(R.id.publish_date);
-        TextView ISBN = (TextView) layout.findViewById(R.id.ISBN);
+        TextView subTitle = layout.findViewById(R.id.sub_title);
+        TextView bookAuthor = layout.findViewById(R.id.book_author);
+        RatingBar ratingBar = layout.findViewById(R.id.ratingBar);
+        TextView description = layout.findViewById(R.id.description);
+        TextView publishDate = layout.findViewById(R.id.publish_date);
+        TextView ISBN = layout.findViewById(R.id.ISBN);
 
         subTitle.setText(bookInfo[0]);
         bookAuthor.setText(bookInfo[1]);
@@ -426,9 +426,9 @@ public class BookActivity extends AppCompatActivity {
 
             viewHolder(View itemView) {
                 super(itemView);
-                root = (RelativeLayout) itemView.findViewById(R.id.chapter_row_root);
-                chapterName = (TextView) itemView.findViewById(R.id.chapter_name);
-                progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar2);
+                root = itemView.findViewById(R.id.chapter_row_root);
+                chapterName = itemView.findViewById(R.id.chapter_name);
+                progressBar = itemView.findViewById(R.id.progressBar2);
             }
         }
     }

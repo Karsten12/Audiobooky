@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky.Book;
+package com.fonsecakarsten.listen.Book;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -16,9 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.fonsecakarsten.audiobooky.Database.BookChapterDbHelper;
-import com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry;
-import com.fonsecakarsten.audiobooky.R;
+import com.fonsecakarsten.listen.Database.BookChapterDbHelper;
+import com.fonsecakarsten.listen.Database.BookContract.bookChapterEntry;
+import com.fonsecakarsten.listen.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,7 +27,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static com.fonsecakarsten.audiobooky.Database.BookContract.bookChapterEntry.TABLE_NAME;
+import static com.fonsecakarsten.listen.Database.BookContract.bookChapterEntry.TABLE_NAME;
 
 /**
  * Created by Karsten on 7/16/2017.
@@ -52,7 +52,7 @@ public class ReadChapterActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
 
         // Set up toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar toolbar = findViewById(R.id.app_bar);
         chapterTitle = extras.getString("CHAPTER_NAME");
         toolbar.setTitle(chapterTitle);
         bookTitle = extras.getString("BOOK_TITLE");
@@ -60,11 +60,11 @@ public class ReadChapterActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         adapter = new myPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = findViewById(R.id.pager);
         mViewPager.setAdapter(adapter);
         getChapter();
 
-        speakBTN = (FloatingActionButton) findViewById(R.id.FAB3);
+        speakBTN = findViewById(R.id.FAB3);
         speakBTN.bringToFront();
         speakBTN.setOnClickListener(new View.OnClickListener() {
             @Override

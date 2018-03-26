@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky.Book;
+package com.fonsecakarsten.listen.Book;
 
 /**
  * Created by kfonseca on 8/28/17.
@@ -8,7 +8,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.fonsecakarsten.audiobooky.R;
+import com.fonsecakarsten.listen.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

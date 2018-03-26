@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky;
+package com.fonsecakarsten.listen;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -22,11 +22,11 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.fonsecakarsten.audiobooky.Barcode.BarcodeCaptureActivity;
-import com.fonsecakarsten.audiobooky.Book.BookActivity;
-import com.fonsecakarsten.audiobooky.Book.BookInfoAsync;
-import com.fonsecakarsten.audiobooky.Database.BookContract.bookEntry;
-import com.fonsecakarsten.audiobooky.Database.BookDbHelper;
+import com.fonsecakarsten.listen.Barcode.BarcodeCaptureActivity;
+import com.fonsecakarsten.listen.Book.BookActivity;
+import com.fonsecakarsten.listen.Book.BookInfoAsync;
+import com.fonsecakarsten.listen.Database.BookContract.bookEntry;
+import com.fonsecakarsten.listen.Database.BookDbHelper;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -69,11 +69,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Set up toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar toolbar = findViewById(R.id.app_bar);
         setActionBar(toolbar);
 
         // Set up recyclerView
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.mainRecView);
+        RecyclerView recyclerView = findViewById(R.id.mainRecView);
         mAdapter = new recycleAdapter();
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // Set up Floating action button
-        FloatingActionButton captureBtn = (FloatingActionButton) findViewById(R.id.FAB1);
+        FloatingActionButton captureBtn = findViewById(R.id.FAB1);
         captureBtn.bringToFront();
         captureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -403,10 +403,10 @@ public class MainActivity extends AppCompatActivity {
 
             viewholder(View itemView) {
                 super(itemView);
-                root = (RelativeLayout) itemView.findViewById(R.id.book_row_root);
-                imageView = (CircleImageView) itemView.findViewById(R.id.profile_image);
-                bookName = (TextView) itemView.findViewById(R.id.book_name);
-                bookAuthor = (TextView) itemView.findViewById(R.id.book_author);
+                root = itemView.findViewById(R.id.book_row_root);
+                imageView = itemView.findViewById(R.id.profile_image);
+                bookName = itemView.findViewById(R.id.book_name);
+                bookAuthor = itemView.findViewById(R.id.book_author);
 
             }
         }

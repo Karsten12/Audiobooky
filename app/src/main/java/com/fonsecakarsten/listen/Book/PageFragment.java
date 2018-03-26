@@ -1,4 +1,4 @@
-package com.fonsecakarsten.audiobooky.Book;
+package com.fonsecakarsten.listen.Book;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fonsecakarsten.audiobooky.R;
+import com.fonsecakarsten.listen.R;
 
 /**
  * Created by Karsten on 7/23/2017.
@@ -20,7 +20,7 @@ public class PageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.card_view, container, false);
         Bundle args = getArguments();
-        TextView pageText = (TextView) rootView.findViewById(R.id.pageTextView);
+        TextView pageText = rootView.findViewById(R.id.pageTextView);
         pageText.setText(args.getString("PageText"));
         pageText.setMovementMethod(new ScrollingMovementMethod());
         return rootView;
